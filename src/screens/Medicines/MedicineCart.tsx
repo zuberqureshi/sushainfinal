@@ -26,7 +26,7 @@ import CSafeAreaView from '../../components/common/CSafeAreaView'
 import CText from '../../components/common/CText';
 import { CouponPercent, GreenCouponPercent, ReportDeleteIcon, RightArrowBlack, ShippingTrack } from '../../assets/svgs';
 import { medicineCartDate, sushainProductData } from '../../api/constant';
-
+import { FlashList } from '@shopify/flash-list';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import SimilarProduct from '../../components/Medicines/SimilarProduct';
 import { StackNav } from '../../navigation/NavigationKeys';

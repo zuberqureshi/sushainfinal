@@ -1,21 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
- 
-import React,{useEffect} from 'react';
+import React from 'react'
 import { Home, HomeSelected } from './assets/svgs'
 import { GluestackUIProvider} from "@gluestack-ui/themed"
 import { config } from '../gluestack-ui.config'
-import AppNavigator from './navigation'
-import { notificationListener, requestUserPermission } from './utils/notificationService'
 
+import AppNavigator from './navigation'
 
 const App = () => {
-
-  useEffect(() => {
-    requestUserPermission()
-    notificationListener()
-    
-  }, [])
-
   return (
     <GluestackUIProvider config={config}>
       <AppNavigator/>
