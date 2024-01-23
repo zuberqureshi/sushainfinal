@@ -1,24 +1,25 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 import React from 'react';
-import { colors, styles } from '../themes';
-import CHeader from '../components/common/CHeader';
+import { colors, styles } from '../../themes';
+import CHeader from '../../components/common/CHeader';
 
-import images from '../assets/images';
-import typography from '../themes/typography';
+import images from '../../assets/images';
+import typography from '../../themes/typography';
 import { responsiveFontSize, responsiveHeight, responsiveWidth, } from 'react-native-responsive-dimensions';
-import { moderateScale } from '../common/constants';
-import { DigitalPrecereption, FreeFollowUp, MedicineBottle, CovidVirusResearch, UserIcon, DoctorIcon, BrandIcon, ReviewsIcon, GreaterThanIcon, } from '../assets/svgs';
-import CText from '../components/common/CText';
+import { moderateScale } from '../../common/constants';
+import { DigitalPrecereption, FreeFollowUp, MedicineBottle, CovidVirusResearch, UserIcon, DoctorIcon, BrandIcon, ReviewsIcon, GreaterThanIcon, } from '../../assets/svgs';
+import CText from '../../components/common/CText';
 //   import DoctorCategoryComponent from '../../components/DoctorComponent/DoctorCategoryComponent';
-import MedicinesConcerns from '../components/Medicines/MedicinesConcerns';
-import SellingProduct from '../components/Medicines/SellingProduct';
-import SubHeader from '../components/common/CommonComponent/SubHeader';
+import MedicinesConcerns from '../../components/Medicines/MedicinesConcerns';
+import SellingProduct from '../../components/Medicines/SellingProduct';
+import SubHeader from '../../components/common/CommonComponent/SubHeader';
 // import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { medicineBestSellingData, saveBigData, sushainProductData } from '../api/constant';
-import strings from '../themes/strings';
-import SearchWithLikeComponent from './FindDoctor/SearchWithLikeComponent';
-import SimilarProduct from '../components/Medicines/SimilarProduct';
+import { medicineBestSellingData, saveBigData, sushainProductData } from '../../api/constant';
+import strings from '../../i18n/strings';
+import SimilarProduct from '../../components/Medicines/SimilarProduct';
+import SearchWithLikeComponent from '../FindDoctor/SearchWithLikeComponent';
+
 
 
 const BottomContainer = ({ icon, title }: any) => {
@@ -37,7 +38,7 @@ const BottomContainer = ({ icon, title }: any) => {
   );
 };
 
-const MedicinesMain = () => {
+const Medicines = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <CHeader
@@ -82,7 +83,7 @@ const MedicinesMain = () => {
 
         <MedicinesConcerns title={strings.medicinesbyHealthConcerns} />
 
-        {/* <SellingProduct title={strings.bestSelling} data={medicineBestSellingData} bestSeller={false} /> */}
+        <SellingProduct title={strings.bestSelling} data={medicineBestSellingData} bestSeller={false} />
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -199,7 +200,7 @@ const MedicinesMain = () => {
         </View>
 
 
-        {/* <SellingProduct title={'Recommended For You'} data={saveBigData} bestSeller={true} /> */}
+        <SellingProduct title={'Recommended For You'} data={saveBigData} bestSeller={true} />
 
         <TouchableOpacity style={[localStyles.bannerContaienr, { marginVertical: responsiveHeight(1) }]}>
           <Image
@@ -209,9 +210,9 @@ const MedicinesMain = () => {
           />
         </TouchableOpacity>
         
-          {/* <SellingProduct title={'Top Ayurveda Product'} data={saveBigData} bestSeller={true} />
+          <SellingProduct title={'Top Ayurveda Product'} data={saveBigData} bestSeller={true} />
   
-          <SellingProduct title={'Sushain Products '} data={sushainProductData} bestSeller={false}  /> */}
+          <SellingProduct title={'Sushain Products '} data={sushainProductData} bestSeller={false}  />
 
         <View style={localStyles.bottomContainer}>
           <View style={localStyles.rowStyle}>
@@ -239,7 +240,7 @@ const MedicinesMain = () => {
   );
 };
 
-export default MedicinesMain;
+export default Medicines;
 
 const localStyles = StyleSheet.create({
   bannerContaienr: {

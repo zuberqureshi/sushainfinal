@@ -7,7 +7,7 @@ import {CurvedBottomBar} from 'react-native-curved-bottom-bar';
 // Local import
 // import {StackRoute, TabRoute} from '../NavigationRoutes';
 // import {StackNav, TabNav} from '../NavigationKeys';
-import {isAndroid, moderateScale} from '../common/constants';
+import {isAndroid, moderateScale} from '../../common/constants';
 import {
   ContactUs,
   ContactUsSelected,
@@ -17,14 +17,16 @@ import {
   HomeSelected,
   Medicines,
   MedicineSelected,
-} from '../assets/svgs';
-import {colors, styles} from '../themes';
-import CText from '../components/common/CText';
-import CSafeAreaView from '../components/common/CSafeAreaView';
-import images from '../assets/images';
+} from '../../assets/svgs';
+import {colors, styles} from '../../themes';
+import CText from '../../components/common/CText';
+import CSafeAreaView from '../../components/common/CSafeAreaView';
+import images from '../../assets/images';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import MedicinesMain from '../screens/MedicinesMain';
-import HomeMain from '../screens/Home/HomeMain';
+import MedicinesMain from '../../screens/Medicines/Medicines';
+import HomeMain from '../../screens/Home/HomeMain';
+import { StackRoute, TabRoute } from '../NavigationRoutes';
+import { StackNav, TabNav } from '../NavigationKeys';
 
 const Stack = createNativeStackNavigator();
 
@@ -53,27 +55,27 @@ const svgHW = moderateScale(23);
 //   );
 // };
 
-// const tabRouteMedicines = () => {
-//   return (
-//     <Stack.Navigator
-//       screenOptions={{headerShown: false}}
-//       initialRouteName={TabNav.Medicines}>
-//       <Stack.Screen
-//         name={TabNav.FindADoctor}
-//         component={TabRoute.Medicines}
-//       />
-//       <Stack.Screen
-//         name={StackNav.ProductByCategories}
-//         component={StackRoute.ProductByCategories}
-//       />
-//       <Stack.Screen
-//         name={StackNav.ProductDetail}
-//         component={StackRoute.ProductDetail}
-//       />
+const tabRouteMedicines = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName={StackNav.MedicineHome}>
+      <Stack.Screen
+        name={StackNav.MedicineHome}
+        component={TabRoute.Medicines}
+      />
+      <Stack.Screen
+        name={StackNav.ProductByCategories}
+        component={StackRoute.ProductByCategories}
+      />
+      <Stack.Screen
+        name={StackNav.ProductDetail}
+        component={StackRoute.ProductDetail}
+      />
      
-//     </Stack.Navigator>
-//   );
-// };
+    </Stack.Navigator>
+  );
+};
 
 
 
@@ -181,7 +183,7 @@ export default function TabBarNavigation({}) {
         type="DOWN"
         shadowStyle={localStyles.shadow}
         renderCircle={({selectedTab, navigate}) => (
-          <TouchableOpacity onPress={() => navigate('AskVirtualVaidya')}>
+          <TouchableOpacity onPress={() => navigate(TabNav.AskVirtualVaidya)}>
             <View style={localStyles.btnCircleUp}>
               <Image
                 source={images.askVirtualVaidya}
@@ -206,18 +208,18 @@ export default function TabBarNavigation({}) {
         />
         <Tab.Screen
           position="CIRCLE"
-          name={'AskVirtualVaidya'}
-          component={()=>{return(<Text>AskVirtualVaidya</Text>)}}
+          name={TabNav.AskVirtualVaidya}
+          component={TabRoute.AskVirtualVaidya}
         />
         <Tab.Screen
           position="RIGHT"
-          name={'Medicines'}
-          component={()=>{return(<MedicinesMain/>)}}
+          name={TabNav.Medicines}
+          component={tabRouteMedicines}
         />
         <Tab.Screen
           position="RIGHT"
-          name={'ContactUs'}
-          component={()=>{return(<Text>CONTACTUSh</Text>)}}
+          name={TabNav.ContactUs}
+          component={TabRoute.ContactUs}
         />
       </CurvedBottomBar.Navigator>
    

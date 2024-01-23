@@ -87,6 +87,7 @@ import typography from '../../themes/typography'
           contentContainerStyle={{...styles.ph1,}}
           scrollEnabled={false}
           style={{alignSelf:'center'}}
+       
         />
         
       </View>

@@ -1,14 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Home, HomeSelected } from './assets/svgs'
-import TabBarNaviagtion from './navigation/TabBarNaviagtion'
-import { NavigationContainer } from '@react-navigation/native'
+import { GluestackUIProvider} from "@gluestack-ui/themed"
+import { config } from '../gluestack-ui.config'
+
+import AppNavigator from './navigation'
 
 const App = () => {
   return (
-    <NavigationContainer>
-          <TabBarNaviagtion/>
-    </NavigationContainer>
+    <GluestackUIProvider config={config}>
+      <AppNavigator/>
+    </GluestackUIProvider>
 
   )
 }
