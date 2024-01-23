@@ -1,4 +1,4 @@
-package com.sushain.marketplace
+package com.sushain
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

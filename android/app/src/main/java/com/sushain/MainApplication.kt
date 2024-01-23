@@ -1,4 +1,4 @@
-package com.sushain.marketplace
+package com.sushain
 
 import android.app.Application
 import com.facebook.react.PackageList
