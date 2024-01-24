@@ -2,7 +2,7 @@
 // import Home from '../containers/Home/Home';
 
 import Medicines from "../screens/Medicines/Medicines";
-// import FindADoctor from '../containers/FindADoctor/FindADoctor';
+import FindADoctor from "../screens/FindDoctor/FindADoctor";
 import ContactUs from "../screens/ContactUs/ContactUs";
 import AskVirtualVaidya from "../screens/AskVirtualVaidya";
 
@@ -26,8 +26,9 @@ import DrawerNavigation from "./Type/DrawerNavigation";
 
 
 
-// import CategoryDoctorList from '../containers/FindADoctor/CategoryDoctorList';
-// import DortorProfile from '../containers/FindADoctor/DortorProfile';
+import CategoryDoctorList from "../screens/FindDoctor/CategoryDoctorList";
+
+import DoctorProfile from "../screens/FindDoctor/DortorProfile";
 // import PatientsReview from '../containers/FindADoctor/PatientsReview';
 // import PaymentScreen from '../containers/FindADoctor/PaymentScreen';
 // import SelectTimeSlot from '../containers/FindADoctor/SelectTimeSlot';
@@ -37,12 +38,18 @@ import ProductByCategories from "../screens/Medicines/ProductByCategories";
 import ProductDetail from "../screens/Medicines/ProductDetail";
 import ProductsReview from "../screens/Medicines/ProductsReview";
 import MedicineCart from "../screens/Medicines/MedicineCart";
-import MedicineSummery from "../screens/Medicines/MedicineSummery";
 import MedicineAddress from "../screens/Medicines/MedicineAddress";
+import OrderSummery from "../screens/OrderSummery/OrderSummery";
+import SelectTimeSlot from "../screens/FindDoctor/SelectTimeSlot";
+import AppointmentBooked from "../screens/CommonScreens/AppointmentBooked";
+import AppointmentCancellation from "../screens/CommonScreens/AppointmentCancellation";
+import RescheduleAppointment from "../screens/CommonScreens/RescheduleAppointment";
 
-// import AppointmentBooked from '../containers/FindADoctor/AppointmentBooked';
-// import RescheduleAppointment from '../containers/FindADoctor/RescheduleAppointment';
-// import AppointmentCancellation from '../containers/FindADoctor/AppointmentCancellation';
+
+
+
+
+
 
 
 
@@ -52,7 +59,7 @@ import MedicineAddress from "../screens/Medicines/MedicineAddress";
 
 export const TabRoute = {
   // Home,
-  // FindADoctor,
+  FindADoctor,
   Medicines,
   ContactUs,
   AskVirtualVaidya,
@@ -70,22 +77,22 @@ export const StackRoute = {
   // TermsOfService,
   // PrivacyPolicy,
   DrawerNavigation,
-  // CategoryDoctorList,
-  // DortorProfile,
+  CategoryDoctorList,
+  DoctorProfile,
   // PatientsReview,
   // PaymentScreen,
-  // SelectTimeSlot,
+  SelectTimeSlot,
   // ConsultDoctor,
   // ClinicDoctorDetailCard,
   ProductByCategories,
-  // AppointmentBooked,
-  // RescheduleAppointment,
-  // AppointmentCancellation,
+  AppointmentBooked,
+  RescheduleAppointment,
+  AppointmentCancellation,
   ProductDetail,
   ProductsReview,
   MedicineCart,
   MedicineAddress,
-  MedicineSummery,
+  OrderSummery,
 
 
 };

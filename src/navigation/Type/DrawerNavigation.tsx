@@ -47,12 +47,14 @@ const DrawerContentComponent = (props: any) => {
 
  
 
+ 
 
-  const {icon, title, isNew = false} = props;
+
+  const {icon, title, isNew = false,onPress} = props;
 
   
   return (
-    <TouchableOpacity style={localStyles.drawerContentStyle}>
+    <TouchableOpacity onPress={onPress} style={localStyles.drawerContentStyle}>
       <View style={localStyles.drawerIconStyle}>{icon}</View>
       <CText
         type="r12"
@@ -72,26 +74,41 @@ const DrawerContentComponent = (props: any) => {
   );
 };
 
+const changeLng = (lng:string) => {
+  if(lng ==='English' || lng === 'إنجليزي'){
+    // strings.setLanguage('en')
+    setLng('en')
+    RNRestart.Restart()
+    return
+  }else if(lng ==='Arabic' || lng === 'عربي'){
+    // strings.setLanguage('ar')
+    setLng('ar')
+    RNRestart.Restart()
+    
+    return
+  }
+}
+
 const InnerSubDrawerComponent = (props: any) => {
   const {icon, title,onPress} = props;
 
-  const changeLng = (lng:string) => {
-    if(lng ==='English' || lng === 'إنجليزي'){
-      // strings.setLanguage('en')
-      setLng('en')
-      RNRestart.Restart()
-      return
-    }else if(lng ==='Arabic' || lng === 'عربي'){
-      // strings.setLanguage('ar')
-      setLng('ar')
-      RNRestart.Restart()
+  // const changeLng = (lng:string) => {
+  //   if(lng ==='English' || lng === 'إنجليزي'){
+  //     // strings.setLanguage('en')
+  //     setLng('en')
+  //     RNRestart.Restart()
+  //     return
+  //   }else if(lng ==='Arabic' || lng === 'عربي'){
+  //     // strings.setLanguage('ar')
+  //     setLng('ar')
+  //     RNRestart.Restart()
       
-      return
-    }
-  }
+  //     return
+  //   }
+  // }
 
   return (
-    <TouchableOpacity onPress={()=>{changeLng(title)}} style={localStyles.subDrawerStyle}>
+    <TouchableOpacity onPress={()=>{onPress(title)}} style={localStyles.subDrawerStyle}>
       <View style={localStyles.innerDrwerIconStyle}>{icon}</View>
       <CText
         type="r12"
@@ -104,10 +121,13 @@ const InnerSubDrawerComponent = (props: any) => {
   );
 };
 
+
 const InnerDrawerComponent = (props: any) => {
   const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress} = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const onPressOpen = () => setIsOpen(!isOpen);
+  
+  
   return (
     <View
       style={[
@@ -131,8 +151,8 @@ const InnerDrawerComponent = (props: any) => {
       </TouchableOpacity>
       {isOpen && (
         <View style={localStyles.subContainerStyle}>
-          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={onPress} />
-          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={onPress} />
+          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={changeLng} />
+          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={changeLng} />
           {title3 && <InnerSubDrawerComponent icon={icon3} title={title3} />}
         </View>
       )}
@@ -141,6 +161,7 @@ const InnerDrawerComponent = (props: any) => {
 };
 
 const DrawerView = () => {
+   
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const onPressLogOut = () => {
@@ -244,10 +265,12 @@ const DrawerView = () => {
             // icon2={<UpcommingYogaDrawerIcon />}
             title2={strings.arabic}
             
+            
           />
           <DrawerContentComponent
             icon={<MyOrderDrawerIcon />}
             title={strings.myOrders}
+            onPress={()=>{navigation.navigate(StackNav.OrderSummery)}}
           />
           <DrawerContentComponent
             icon={<PrescriptionDrawerIcon />}

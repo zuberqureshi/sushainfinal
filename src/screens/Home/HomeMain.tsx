@@ -48,6 +48,8 @@ import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import strings from '../../i18n/strings';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { Container } from '../../components/Container';
+import Body from '../../components/Body/Body';
 
 // import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
 // import ShopCategory from '../../components/HomeComponent/ShopCategory';
@@ -185,8 +187,8 @@ const HomeMain = () => {
   const RenderSeparator = () => <View style={localStyles.dividerStyle} />;
 
   return (
-    <CSafeAreaView>
-      <KeyBoardAvoidWrapper>
+    <Container statusBarStyle='dark-content' >
+      <Body>
         <View style={localStyles.headerStyle}>
           <TouchableOpacity style={localStyles.locationContainer}>
             <Location />
@@ -257,8 +259,8 @@ const HomeMain = () => {
           </View>
         )} */}
 
-      </KeyBoardAvoidWrapper>
-    </CSafeAreaView>
+      </Body>
+    </Container>
   );
 };
 

@@ -260,7 +260,7 @@ const renderMedicineCartItem = ({item,index}) => {
 
 <Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {'\u20B9'}526</Text>
 
-<TouchableOpacity  activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.MedicineSummery)}}  >
+<TouchableOpacity  activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.OrderSummery)}}  >
   <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(5),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
 
     <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Continue</Text>

@@ -1,6 +1,6 @@
 export const TabNav = {
   Home: 'Home',
-  FindADoctor: 'Find a Doctor',
+  FindADoctorHome: 'FindADoctorHome',
   Medicines: 'Medicines',
   ContactUs: 'ContactUs',
   AskVirtualVaidya: 'Ask Virtual Vaidya',
@@ -16,11 +16,12 @@ export const StackNav = {
   Signup: 'Signup',
   TabBar: 'TabBar',
   TabBarNew :'TabBarNew',
+  FindADoctor:'Find A Doctor',
   DrawerNavigation: 'DrawerNavigation',
   TermsOfService: 'TermsOfService',
   PrivacyPolicy: 'PrivacyPolicy',
   CategoryDoctorList: 'CategoryDoctorList',
-  DortorProfile: 'DortorProfile',
+  DoctorProfile: 'DoctorProfile',
   PatientsReview: 'PatientsReview',
   PaymentScreen: 'PaymentScreen',
   SelectTimeSlot: 'SelectTimeSlot',
@@ -35,6 +36,6 @@ export const StackNav = {
   MedicineHome:'MedicineHome',
   MedicineCart:'MedicineCart',
   MedicineAddress:'MedicineAddress',
-  MedicineSummery:'MedicineSummery'
+  OrderSummery:'OrderSummery'
   
 };

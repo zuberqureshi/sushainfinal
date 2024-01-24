@@ -33,27 +33,27 @@ const Stack = createNativeStackNavigator();
 const selectedSvgWH = moderateScale(30);
 const svgHW = moderateScale(23);
 
-// const tabRoute = () => {
-//   return (
-//     <Stack.Navigator
-//       screenOptions={{headerShown: false}}
-//       initialRouteName={TabNav.FindADoctor}>
-//       <Stack.Screen
-//         name={TabNav.FindADoctor}
-//         component={TabRoute.FindADoctor}
-//       />
-//       <Stack.Screen
-//         name={StackNav.CategoryDoctorList}
-//         component={StackRoute.CategoryDoctorList}
-//       />
-//       <Stack.Screen
-//         name={StackNav.ClinicDoctorDetailCard}
-//         component={StackRoute.ClinicDoctorDetailCard}
+const tabRouteDoctor = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName={StackNav.FindADoctor}>
+      <Stack.Screen
+        name={StackNav.FindADoctor}
+        component={TabRoute.FindADoctor}
+      />
+      <Stack.Screen
+        name={StackNav.CategoryDoctorList}
+        component={StackRoute.CategoryDoctorList}
+      />
+      {/* <Stack.Screen
+        name={StackNav.ClinicDoctorDetailCard}
+        component={StackRoute.ClinicDoctorDetailCard}
         
-//       />
-//     </Stack.Navigator>
-//   );
-// };
+      /> */}
+    </Stack.Navigator>
+  );
+};
 
 const tabRouteMedicines = () => {
   return (
@@ -110,7 +110,7 @@ export default function TabBarNavigation({}) {
             <Home width={svgHW} height={svgHW} />
           );
         break;
-      case 'Doctor':
+      case TabNav.FindADoctorHome:
         icon =
           routeName == selectedTab ? (
             <FindADoctorSelected width={selectedSvgWH} height={selectedSvgWH} />
@@ -118,7 +118,7 @@ export default function TabBarNavigation({}) {
             <FindADoctor width={svgHW} height={svgHW} />
           );
         break;
-      case 'Medicines':
+      case TabNav.Medicines:
         icon =
           routeName == selectedTab ? (
             <MedicineSelected width={selectedSvgWH} height={selectedSvgWH} />
@@ -202,8 +202,8 @@ export default function TabBarNavigation({}) {
         />
         <Tab.Screen
           position="LEFT"
-          name={'Doctor'}
-          component={()=>{return(<Text>DOCTORS</Text>)}}
+          name={TabNav.FindADoctorHome}
+          component={tabRouteDoctor}
           
         />
         <Tab.Screen

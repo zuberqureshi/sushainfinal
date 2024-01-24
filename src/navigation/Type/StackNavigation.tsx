@@ -53,29 +53,29 @@ export default function StackNavigation() {
       <Stack.Screen
         name={StackNav.PrivacyPolicy}
         component={StackRoute.PrivacyPolicy}
-      />
+      /> */}
       <Stack.Screen
-        name={StackNav.DortorProfile}
-        component={StackRoute.DortorProfile}
+        name={StackNav.DoctorProfile}
+        component={StackRoute.DoctorProfile}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.PatientsReview}
         component={StackRoute.PatientsReview}
       />
       <Stack.Screen
         name={StackNav.PaymentScreen}
         component={StackRoute.PaymentScreen}
-      />
+      /> */}
       <Stack.Screen
         name={StackNav.SelectTimeSlot}
         component={StackRoute.SelectTimeSlot}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.ProductByCategories}
         component={StackRoute.ProductByCategories}
       /> */}
 
-      {/* <Stack.Screen
+      <Stack.Screen
         name={StackNav.AppointmentBooked}
         component={StackRoute.AppointmentBooked}
       />
@@ -88,7 +88,7 @@ export default function StackNavigation() {
       <Stack.Screen
         name={StackNav.AppointmentCancellation}
         component={StackRoute.AppointmentCancellation}
-      /> */}
+      />
 
       <Stack.Screen
         name={StackNav.ProductsReview}
@@ -106,8 +106,8 @@ export default function StackNavigation() {
       /> 
 
       <Stack.Screen
-        name={StackNav.MedicineSummery}
-        component={StackRoute.MedicineSummery}
+        name={StackNav.OrderSummery}
+        component={StackRoute.OrderSummery}
       /> 
 
     </Stack.Navigator>

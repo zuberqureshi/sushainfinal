@@ -33,7 +33,7 @@ import CheckBox from 'react-native-check-box'
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 
 
-const MedicineSummery = () => {
+const OrderSummery = () => {
 
     const [stepCurrentPosition,setStepCurrentPosition] = useState(3)
 
@@ -108,9 +108,9 @@ const MedicineSummery = () => {
         
        <View>
         {
-            medicineCartDate.map((item)=>{
+            medicineCartDate.map((item,index)=>{
                 return(
-                  <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(1.6),gap:responsiveWidth(5)}} >
+                  <View key={index} style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(1.6),gap:responsiveWidth(5)}} >
                     <View style={{height:responsiveHeight(8),width:responsiveWidth(15),borderRadius:responsiveWidth(3),borderWidth:1,borderColor:'#CDC9C9'}} >
                     <Image source={item.img} style={{resizeMode:'contain',height:'100%',width:'90%'}} />
                     </View>
@@ -162,6 +162,6 @@ const MedicineSummery = () => {
   )
 }
 
-export default MedicineSummery
+export default OrderSummery
 
 const localStyles = StyleSheet.create({})
