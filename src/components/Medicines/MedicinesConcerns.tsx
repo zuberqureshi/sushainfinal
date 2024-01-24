@@ -12,6 +12,7 @@ import {moderateScale} from '../../common/constants';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
 import { useNavigation } from '@react-navigation/native';
 import {OptimizedFlatList} from 'react-native-optimized-flatlist'
+import { StackNav } from '../../navigation/NavigationKeys';
 // import { StackNav } from '../../navigation/NavigationKeys';
 
 
@@ -25,7 +26,7 @@ const MedicinesConcerns = ({title}: {title: string}) => {
 
     
   return (
-    <TouchableOpacity onPress={()=>{}} style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.title})}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
         <Image source={item?.image} style={localStyles.imgStyle} />
       </View>

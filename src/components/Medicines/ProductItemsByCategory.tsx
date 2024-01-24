@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FlashList } from '@shopify/flash-list';
 import CSafeAreaView from '../common/CSafeAreaView';
 import { HeartLightBlue } from '../../assets/svgs';
-import { moderateScale } from '../../common/constants';
+import { deviceHeight, moderateScale } from '../../common/constants';
 import images from '../../assets/images';
 import { color } from 'react-native-reanimated';
 import { Pressable } from 'react-native';
@@ -24,7 +24,7 @@ const ProductItemsByCategory = ({title,data,bestSeller,multipleAddButton,setMult
    
 
     const renderCardItem = ({item, index}: any) => {
-           console.log(item);
+          //  console.log(item);
            
         return(
           <Pressable onPress={()=>{navigation.navigate(StackNav.ProductDetail)}} >
@@ -88,16 +88,17 @@ const ProductItemsByCategory = ({title,data,bestSeller,multipleAddButton,setMult
 
   return (
  
-      <View style={{flex:1,paddingHorizontal:responsiveWidth(3),marginBottom:responsiveHeight(0),marginLeft:responsiveWidth(1)}} >
+      <View style={{flex:1,paddingHorizontal:responsiveWidth(3),marginBottom:responsiveHeight(0),marginLeft:responsiveWidth(1),height:deviceHeight}} >
 
-<FlashList
-        style={{flex:1,}}
+    <FlashList
+        // style={{flex:1,}}
           data={data}
           renderItem={renderCardItem}
           keyExtractor={(item, index) => index.toString()}
           numColumns={2}
           // justifyContent="space-between"
          contentContainerStyle={{}}
+         estimatedItemSize={200}
         />
 
       </View>

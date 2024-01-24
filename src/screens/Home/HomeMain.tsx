@@ -1,5 +1,5 @@
 // library imports
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View,Text} from 'react-native';
 import React, {useState, useEffect, useMemo} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -41,11 +41,16 @@ import {
 import CText from '../../components/common/CText';
 // import strings from '../../i18n/strings';
 import {getHeight, moderateScale} from '../../common/constants';
-import strings from '../../themes/strings';
 import CInput from '../../components/common/CInput';
 // import BannerList from '../../components/HomeComponent/BannerList';
 // import CategoryList from '../../components/HomeComponent/CategoryList';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
+import strings from '../../i18n/strings';
+import { responsiveWidth } from 'react-native-responsive-dimensions';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { Container } from '../../components/Container';
+import Body from '../../components/Body/Body';
+
 // import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
 // import ShopCategory from '../../components/HomeComponent/ShopCategory';
 // import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
@@ -64,12 +69,12 @@ type Props = {
 };
 
 const HomeMain = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
   const [search, setSearch] = useState('');
   const [resultData, setResultData] = useState<any>({});
   const [searchResult, setSearchResult] = useState([]);
 //   const debounceSearch = CDebounce(search, 300);
-
+   
 //   const selectedLng = async () => {
 //     const lngData = await getLng()
 //     if(!!lngData){
@@ -182,8 +187,8 @@ const HomeMain = () => {
   const RenderSeparator = () => <View style={localStyles.dividerStyle} />;
 
   return (
-    <CSafeAreaView>
-      <KeyBoardAvoidWrapper>
+    <Container statusBarStyle='dark-content' >
+      <Body>
         <View style={localStyles.headerStyle}>
           <TouchableOpacity style={localStyles.locationContainer}>
             <Location />
@@ -207,7 +212,7 @@ const HomeMain = () => {
           </View>
         </View>
         <View style={localStyles.searchContainer}>
-          <TouchableOpacity onPress={()=>{}}>
+          <TouchableOpacity onPress={()=>{navigationDrawer.openDrawer()}}>
             <Menu />
           </TouchableOpacity>
           <CInput
@@ -253,8 +258,9 @@ const HomeMain = () => {
             <View style={{height: 120}} />
           </View>
         )} */}
-      </KeyBoardAvoidWrapper>
-    </CSafeAreaView>
+
+      </Body>
+    </Container>
   );
 };
 

@@ -4,7 +4,8 @@ import React from 'react';
 // local imports
 import {colors, styles} from '../../../themes';
 import CText from '../CText';
-import strings from '../../../themes/strings';
+import strings from '../../../i18n/strings';
+
 
 
 type SubHeaderProps = {
