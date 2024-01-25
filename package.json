@@ -21,6 +21,8 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "@shopify/flash-list": "^1.6.3",
+    "@tanstack/react-query": "^5.17.19",
+    "axios": "^1.6.6",
     "curved-bottom-navigation-bar": "^2.0.5",
     "formik": "^2.4.5",
     "moment": "^2.30.1",

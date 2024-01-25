@@ -22,12 +22,15 @@ import GoogleLogin from '../../components/GoogleLogin'
 import FaceBookLogin from '../../components/FaceBookLogin'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
+import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
 
+  const { data, isPending, isLoading } = useDoctorListSpec();
 
+  console.log( 'useDoctorListSpec', data?.data?.data)
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();
