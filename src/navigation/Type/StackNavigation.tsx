@@ -39,10 +39,10 @@ export default function StackNavigation() {
       />
       <Stack.Screen name={StackNav.TabBar} component={StackRoute.TabBarNavigation} />
 
-      {/* <Stack.Screen
-        name={StackNav.ConsultDoctor}
-        component={StackRoute.ConsultDoctor}
-      /> */}
+      <Stack.Screen
+        name={StackNav.InstantConsultation}
+        component={StackRoute.InstantConsultation}
+      />
 
 
 
@@ -108,6 +108,10 @@ export default function StackNavigation() {
       <Stack.Screen
         name={StackNav.OrderSummery}
         component={StackRoute.OrderSummery}
+      /> 
+      <Stack.Screen
+        name={StackNav.clinicConsultation}
+        component={StackRoute.clinicConsultation}
       /> 
 
     </Stack.Navigator>

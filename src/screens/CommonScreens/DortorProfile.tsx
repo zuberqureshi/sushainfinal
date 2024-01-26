@@ -4,8 +4,7 @@ import { FlashList } from '@shopify/flash-list';
 
 // local imports
 // const CHeader = React.lazy(() => import('../../components/common/CHeader'))
-const CSafeAreaView = React.lazy(() => import('../../components/common/CSafeAreaView'))
-const CText = React.lazy(() => import('../../components/common/CText'))
+// const CText = React.lazy(() => import('../../components/common/CText'))
 // const RatingComponent = React.lazy(() => import('../../components/HomeComponent/RatingComponent'))
 // const CButton = React.lazy(() => import('../../components/common/CButton'))
 // const SubHeader = React.lazy(() => import('../../components/common/CommonComponent/SubHeader'))
@@ -16,7 +15,7 @@ import strings from '../../i18n/strings';
 // import CSafeAreaView from '../../components/common/CSafeAreaView';
 import { BlackShareIcon, BottomIcon, ChatIcon, LikeIcon, RegistrationIcon, ServiceOfferdIcon, VideoCallDrawerIcon, } from '../../assets/svgs';
 import { colors, styles } from '../../themes';
-// import CText from '../../components/common/CText';
+import CText from '../../components/common/CText';
 import RatingComponent from '../../components/HomeComponent/RatingComponent';
 import { TIME_FORMATE, TIME_YMD, deviceWidth, getHeight, moderateScale, } from '../../common/constants';
 import CButton from '../../components/common/CButton';
