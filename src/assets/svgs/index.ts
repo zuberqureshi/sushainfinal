@@ -109,6 +109,19 @@ import PhoneIcon from './phoneIcon.svg'
 import BillBigIconGreen from './billBigIconGreen.svg'
 import GreenDot from './greenDot.svg'
 import GreaterThanIcon from './GreaterThanIcon.svg'
+import ShakeHand from './shakeHand.svg'
+import ClockSmallColorIcon from './clockSmallColorIcon.svg'
+import AppointmentMedicinesIcon from './appointmentMedicinesIcon.svg'
+import AppointmentBeautyIcon from './appointmentBeautyIcon.svg'
+import AppointmentOrderIcon from './appointmentOrdersIcon.svg'
+import GreaterThanBlack from './greaterThanBlack.svg'
+import DownloadWhiteIcon from './downloadWhiteIcon.svg'
+import ViewBlackEyeIcon from './viewBlackEyeIcon.svg'
+import StarUnFilledPrimaryColor from './starUnFilledPrimaryColor.svg'
+import StarFilledPrimaryColor from './starFilledPrimaryColor.svg'
+import DiscountGreenIcon from './discountGreenIcon.svg'
+
+
 
 export {
   Home,
@@ -219,6 +232,16 @@ export {
   BillBigIconGreen,
   GreenDot,
   GreaterThanIcon,
-
+  ShakeHand,
+  ClockSmallColorIcon,
+  AppointmentOrderIcon,
+  AppointmentBeautyIcon,
+  AppointmentMedicinesIcon,
+  GreaterThanBlack,
+  DownloadWhiteIcon,
+  ViewBlackEyeIcon,
+  StarFilledPrimaryColor,
+  StarUnFilledPrimaryColor,
+  DiscountGreenIcon,
 
 };

@@ -21,7 +21,8 @@ import strings from '../../i18n/strings';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
-import DoctorDetailCard from './DoctorDetailCard';
+import DoctorDetailCard from '../../components/DoctorComponent/DoctorDetailCard';
+
 
 interface Props {
   route: any;

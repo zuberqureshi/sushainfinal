@@ -26,24 +26,28 @@ import DrawerNavigation from "./Type/DrawerNavigation";
 
 
 
-import CategoryDoctorList from "../screens/FindDoctor/CategoryDoctorList";
 
-import DoctorProfile from "../screens/FindDoctor/DortorProfile";
+
 // import PatientsReview from '../containers/FindADoctor/PatientsReview';
 // import PaymentScreen from '../containers/FindADoctor/PaymentScreen';
 // import SelectTimeSlot from '../containers/FindADoctor/SelectTimeSlot';
-// import ConsultDoctor from '../containers/InstantConsultation/ConsultDoctor'
-// import ClinicDoctorDetailCard from '../containers/clinicConsultation/DoctorDetailCard'
+
+
 import ProductByCategories from "../screens/Medicines/ProductByCategories";
 import ProductDetail from "../screens/Medicines/ProductDetail";
 import ProductsReview from "../screens/Medicines/ProductsReview";
 import MedicineCart from "../screens/Medicines/MedicineCart";
 import MedicineAddress from "../screens/Medicines/MedicineAddress";
 import OrderSummery from "../screens/OrderSummery/OrderSummery";
-import SelectTimeSlot from "../screens/FindDoctor/SelectTimeSlot";
 import AppointmentBooked from "../screens/CommonScreens/AppointmentBooked";
 import AppointmentCancellation from "../screens/CommonScreens/AppointmentCancellation";
 import RescheduleAppointment from "../screens/CommonScreens/RescheduleAppointment";
+import SelectTimeSlot from "../screens/CommonScreens/SelectTimeSlot";
+import CategoryDoctorList from "../screens/CommonScreens/CategoryDoctorList";
+import DoctorProfile from "../screens/CommonScreens/DortorProfile";
+import InstantConsultation from "../screens/InstantConsultation/ConsultDoctor";
+import ClinicConsultation from "../screens/ClinicConsultation/DoctorDetailCard";
+import Appointments from "../screens/Appointments/Appointments";
 
 
 
@@ -82,8 +86,8 @@ export const StackRoute = {
   // PatientsReview,
   // PaymentScreen,
   SelectTimeSlot,
-  // ConsultDoctor,
-  // ClinicDoctorDetailCard,
+  InstantConsultation,
+  ClinicConsultation,
   ProductByCategories,
   AppointmentBooked,
   RescheduleAppointment,
@@ -93,6 +97,7 @@ export const StackRoute = {
   MedicineCart,
   MedicineAddress,
   OrderSummery,
+  Appointments,
 
 
 };

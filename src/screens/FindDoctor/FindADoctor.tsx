@@ -3,32 +3,23 @@ import React, { useEffect, useState } from 'react';
 
 // local imports
 
-// const ADoctorHealthIssue = React.lazy(() => import('../../components/DoctorComponent/ADoctorHealthIssue'))
-// const TopDoctor = React.lazy(() => import('../../components/DoctorComponent/TopDoctor'))
-// const DoctorCategoryComponent = React.lazy(() => import('../../components/DoctorComponent/DoctorCategoryComponent'))
-const CText = React.lazy(() => import('../../components/common/CText'))
-// const TopBannerFindDoctor = React.lazy(() => import('../../components/DoctorComponent/TopBannerFindDoctor'))
-// const CHeader = React.lazy(() => import('../../components/common/CHeader'))
-const SearchWithLikeComponent = React.lazy(() => import('./SearchWithLikeComponent'))
-
-
-// import CSafeAreaView from '../../components/common/CSafeAreaView';
 import ADoctorHealthIssue from '../../components/DoctorComponent/ADoctorHealthIssue';
 import { colors, styles } from '../../themes';
 import TopDoctor from '../../components/DoctorComponent/TopDoctor';
 import DoctorCategoryComponent from '../../components/DoctorComponent/DoctorCategoryComponent';
 import strings from '../../i18n/strings';
-// import CText from '../../components/common/CText';
+import CText from '../../components/common/CText';
 import { moderateScale } from '../../common/constants';
 import { BrandIcon, DoctorIcon, ReviewsIcon, UserIcon } from '../../assets/svgs';
 import TopBannerFindDoctor from '../../components/DoctorComponent/TopBannerFindDoctor';
 // import {findDoctorHomeAPI} from '../../api/FindDoctor';
 import CHeader from '../../components/common/CHeader';
-// import SearchWithLikeComponent from './SearchWithLikeComponent';
 import { Container } from '../../components/Container';
 import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 import { Box, Spinner, Text } from '@gluestack-ui/themed';
 import Loader from '../../components/Loader/Loader';
+import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
+import ScreenBottomAchievement from '../../components/common/ScreenBottomAchievement/ScreenBottomAchievement';
 
 const BottomContainer = ({ icon, title }: any) => {
   return (
@@ -58,7 +49,7 @@ const FindADoctor = () => {
     const fetchData = async () => {
       // const data = await findDoctorHomeAPI();
       // console.log('FindADoctor', data);
-      const apiUrl = `${API_BASE_URL}/booking/videomainpage`; // Replace with your API endpoint
+      const apiUrl = `${API_BASE_URL}booking/videomainpage`; // Replace with your API endpoint
 
       // Make a GET request using the fetch method
       fetch(apiUrl, {
@@ -134,7 +125,7 @@ const FindADoctor = () => {
           ) 
         })}
 
-        <View style={localStyles.bottomContainer}>
+        {/* <View style={localStyles.bottomContainer}>
           <View style={localStyles.rowStyle}>
             <BottomContainer title="7000+ users" icon={<UserIcon />} />
             <BottomContainer
@@ -149,7 +140,8 @@ const FindADoctor = () => {
               icon={<ReviewsIcon />}
             />
           </View>
-        </View>
+        </View> */}
+        <ScreenBottomAchievement/>
         <View style={{ height: 120 }} />
       </ScrollView>
     </Container>

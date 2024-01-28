@@ -18,7 +18,7 @@ import SubHeader from '../../components/common/CommonComponent/SubHeader';
 import { medicineBestSellingData, saveBigData, sushainProductData } from '../../api/constant';
 import strings from '../../i18n/strings';
 import SimilarProduct from '../../components/Medicines/SimilarProduct';
-import SearchWithLikeComponent from '../FindDoctor/SearchWithLikeComponent';
+import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
 
 
 

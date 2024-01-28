@@ -18,7 +18,7 @@ import { productItemCategoryData } from '../../api/constant'
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper'
 import RBSheet from "react-native-raw-bottom-sheet";
 import { StackNav } from '../../navigation/NavigationKeys'
-import SearchWithLikeComponent from '../FindDoctor/SearchWithLikeComponent'
+import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent'
 import MedicinesByCategory from '../../components/Medicines/MedicinesByCategory'
 import { Container } from '../../components/Container'
 import { FlatList } from 'react-native-gesture-handler'

@@ -189,7 +189,7 @@ const LoginScreen = () => {
                 </Text>
               </TouchableOpacity>
 
-              <PrimaryButton buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
+              <PrimaryButton onPress={handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
             </View>
 
 

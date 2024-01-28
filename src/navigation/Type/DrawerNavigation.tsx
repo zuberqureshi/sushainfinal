@@ -45,7 +45,8 @@ import { setLng } from '../../i18n/changeLng';
 
 const DrawerContentComponent = (props: any) => {
 
- 
+   
+
 
  
 
@@ -73,6 +74,10 @@ const DrawerContentComponent = (props: any) => {
     </TouchableOpacity>
   );
 };
+
+const onPressBookVideoConsultation = () => {
+ 
+}
 
 const changeLng = (lng:string) => {
   if(lng ==='English' || lng === 'إنجليزي'){
@@ -123,7 +128,7 @@ const InnerSubDrawerComponent = (props: any) => {
 
 
 const InnerDrawerComponent = (props: any) => {
-  const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress} = props;
+  const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress,onPress1,onPress2} = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const onPressOpen = () => setIsOpen(!isOpen);
   
@@ -151,8 +156,8 @@ const InnerDrawerComponent = (props: any) => {
       </TouchableOpacity>
       {isOpen && (
         <View style={localStyles.subContainerStyle}>
-          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={changeLng} />
-          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={changeLng} />
+          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={onPress} />
+          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={onPress1} />
           {title3 && <InnerSubDrawerComponent icon={icon3} title={title3} />}
         </View>
       )}
@@ -224,6 +229,7 @@ const DrawerView = () => {
           <DrawerContentComponent
             icon={<VideoCallDrawerIcon />}
             title={strings.bookVideoConsultation}
+            onPress={()=>{navigation.navigate(StackNav.InstantConsultation)}}
           />
           <DrawerContentComponent
             icon={<BuyDrawerIcon />}
@@ -236,6 +242,7 @@ const DrawerView = () => {
           <InnerDrawerComponent
             icon={<AppointmentsDrawerIcon />}
             title={strings.myAppointments}
+            onPress={()=>{navigation.navigate(StackNav.Appointments)}}
             icon1={<UpcomingVideoAppointmentsDrawerIcon />}
             title1={strings.upcomingVideoAppointments}
             icon2={<AppointmentsDrawerIcon />}
@@ -260,8 +267,10 @@ const DrawerView = () => {
           <InnerDrawerComponent
             icon={ <MIcon name="google-translate" size={responsiveWidth(6)} color={colors.success} />}
             title={strings.language}
+            onPress={changeLng}
             // icon1={<PastYogaDrawerIcon />}
             title1={strings.english}
+            onPress1={changeLng}
             // icon2={<UpcommingYogaDrawerIcon />}
             title2={strings.arabic}
             
@@ -286,7 +295,7 @@ const DrawerView = () => {
             {strings.support}
           </CText>
           <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.ClinicDoctorDetailCard)
+            // navigation.navigate(StackNav.ClinicDoctorDetailCard)
             }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}

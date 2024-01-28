@@ -25,8 +25,8 @@ export const StackNav = {
   PatientsReview: 'PatientsReview',
   PaymentScreen: 'PaymentScreen',
   SelectTimeSlot: 'SelectTimeSlot',
-  ConsultDoctor:'ConsultDoctor',
-  ClinicDoctorDetailCard:'ClinicDoctorDetailCard',
+  InstantConsultation:'InstantConsultation',
+  ClinicConsultation:'ClinicConsultation',
   ProductByCategories:'ProductByCategories',
   ProductDetail:'ProductDetail',
   AppointmentBooked:'AppointmentBooked',
@@ -36,6 +36,7 @@ export const StackNav = {
   MedicineHome:'MedicineHome',
   MedicineCart:'MedicineCart',
   MedicineAddress:'MedicineAddress',
-  OrderSummery:'OrderSummery'
+  OrderSummery:'OrderSummery',
+  Appointments:'Appointments',
   
 };

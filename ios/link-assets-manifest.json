@@ -2,6 +2,14 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "src/assets/fonts/Inika-Bold.ttf",
+      "sha1": "6f6ddd9101be0f0c8fe7bdeeda675584acafdb74"
+    },
+    {
+      "path": "src/assets/fonts/Inika-Regular.ttf",
+      "sha1": "007b7a7b281cb74d1aea72859e87bdd1aae39a37"
+    },
+    {
       "path": "src/assets/fonts/Inter-Bold.ttf",
       "sha1": "47ff07c75746682133b81e7ac0537ce50a4c9916"
     },

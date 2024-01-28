@@ -5,14 +5,14 @@ import {useNavigation} from '@react-navigation/native';
 // import Voice from '@react-native-voice/voice';
 
 // local imports
-import {Cart, CloseIcon, LikeIcon, Menu, Mic, Search} from '../../assets/svgs';
-import CInput from '../../components/common/CInput';
-import {colors, styles} from '../../themes';
-import CText from '../../components/common/CText';
-import {getHeight, moderateScale} from '../../common/constants';
-import typography from '../../themes/typography';
-import CDebounce from '../../components/common/CDebounce';
-import strings from '../../i18n/strings';
+import {Cart, CloseIcon, LikeIcon, Menu, Mic, Search} from '../../../assets/svgs';
+import CInput from '../CInput';
+import {colors, styles} from '../../../themes';
+import CText from '../CText';
+import {getHeight, moderateScale} from '../../../common/constants';
+import typography from '../../../themes/typography';
+import CDebounce from '../CDebounce';
+import strings from '../../../i18n/strings';
 // import {SearchAPI} from '../../api/homeApis';
 
 export default function SearchWithLikeComponent() {

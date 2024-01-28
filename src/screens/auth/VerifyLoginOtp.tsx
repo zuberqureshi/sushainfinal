@@ -1,12 +1,11 @@
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
-import CountDown from 'react-native-countdown-component';
+// import CountDown from 'react-native-countdown-component';
 import {ParamListBase} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { Text } from '@gluestack-ui/themed';
 import OTPTextView from 'react-native-otp-textinput';
 import Clipboard from '@react-native-clipboard/clipboard';
-
 // local imports
 import {colors, styles} from '../../themes';
 import typography from '../../themes/typography';
@@ -31,6 +30,7 @@ import {
 } from '../../utils/asyncstorage';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
+import CountDown from 'react-native-countdown-component';
 
 type Props = {
   route: any;

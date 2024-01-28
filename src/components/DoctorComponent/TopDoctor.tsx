@@ -65,7 +65,7 @@ export default function TopDoctor({data}:{data:any}) {
 
       <FlashList
         data={data}
-        renderItem={({item,index}) => <RenderItem key={item?.photo+index} item={item} index={index} />}
+        renderItem={({item,index}) => <RenderItem key={`${item?.photo}${index}`} item={item} index={index} />}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}
         horizontal
