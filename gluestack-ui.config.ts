@@ -233,6 +233,8 @@ const config = createConfig({
       InterMedium:'Inter-Medium',
       InterRegular:'Inter-Regular',
       InterSemiBold:'Inter-SemiBold',
+      InikaBold:'Inika-Bold',
+      InikaRegular:'Inika-Regular',
     
     }
   },

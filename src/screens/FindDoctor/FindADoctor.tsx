@@ -19,6 +19,7 @@ import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 import { Box, Spinner, Text } from '@gluestack-ui/themed';
 import Loader from '../../components/Loader/Loader';
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
+import ScreenBottomAchievement from '../../components/common/ScreenBottomAchievement/ScreenBottomAchievement';
 
 const BottomContainer = ({ icon, title }: any) => {
   return (
@@ -124,7 +125,7 @@ const FindADoctor = () => {
           ) 
         })}
 
-        <View style={localStyles.bottomContainer}>
+        {/* <View style={localStyles.bottomContainer}>
           <View style={localStyles.rowStyle}>
             <BottomContainer title="7000+ users" icon={<UserIcon />} />
             <BottomContainer
@@ -139,7 +140,8 @@ const FindADoctor = () => {
               icon={<ReviewsIcon />}
             />
           </View>
-        </View>
+        </View> */}
+        <ScreenBottomAchievement/>
         <View style={{ height: 120 }} />
       </ScrollView>
     </Container>

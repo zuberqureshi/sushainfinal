@@ -46,7 +46,8 @@ import SelectTimeSlot from "../screens/CommonScreens/SelectTimeSlot";
 import CategoryDoctorList from "../screens/CommonScreens/CategoryDoctorList";
 import DoctorProfile from "../screens/CommonScreens/DortorProfile";
 import InstantConsultation from "../screens/InstantConsultation/ConsultDoctor";
-import clinicConsultation from "../screens/clinicConsultation/DoctorDetailCard";
+import ClinicConsultation from "../screens/ClinicConsultation/DoctorDetailCard";
+import Appointments from "../screens/Appointments/Appointments";
 
 
 
@@ -86,7 +87,7 @@ export const StackRoute = {
   // PaymentScreen,
   SelectTimeSlot,
   InstantConsultation,
-  clinicConsultation,
+  ClinicConsultation,
   ProductByCategories,
   AppointmentBooked,
   RescheduleAppointment,
@@ -96,6 +97,7 @@ export const StackRoute = {
   MedicineCart,
   MedicineAddress,
   OrderSummery,
+  Appointments,
 
 
 };

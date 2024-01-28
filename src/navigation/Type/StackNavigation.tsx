@@ -110,9 +110,14 @@ export default function StackNavigation() {
         component={StackRoute.OrderSummery}
       /> 
       <Stack.Screen
-        name={StackNav.clinicConsultation}
-        component={StackRoute.clinicConsultation}
-      /> 
+        name={StackNav.ClinicConsultation}
+        component={StackRoute.ClinicConsultation}
+      />
+      <Stack.Screen
+        name={StackNav.Appointments}
+        component={StackRoute.Appointments}
+      />
+
 
     </Stack.Navigator>
   );

@@ -4,11 +4,12 @@ import React from 'react';
 // local imports
 import images from '../../assets/images';
 import {moderateScale} from '../../common/constants';
+import { Box } from '@gluestack-ui/themed';
 
 export default function RatingComponent({star, style}: any) {
-  const renderItem = ({item, index}: any) => {
+  const RenderItem = ({item, index}: any) => {
     return (
-      <Image
+      <Image key={item}
         source={item < star + 1 ? images.startFilled : images.startUnfilled}
         style={[localStyles.starImageStyle, style]}
       />
@@ -16,14 +17,22 @@ export default function RatingComponent({star, style}: any) {
   };
 
   return (
-    <FlatList
-      data={[1, 2, 3, 4, 5]}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      scrollEnabled={false}
-    />
+    // <FlatList
+    //   data={[1, 2, 3, 4, 5]}
+    //   renderItem={renderItem}
+    //   keyExtractor={(item, index) => index.toString()}
+    //   horizontal
+    //   showsHorizontalScrollIndicator={false}
+    //   scrollEnabled={false}
+    // />
+    <Box flexDirection='row' gap={2} >
+
+    {['1','2','3','4','5'].map((item,index)=>{
+     return(
+        <RenderItem key={index.toString()} item={item} />
+     )
+    })}
+    </Box>
   );
 }
 

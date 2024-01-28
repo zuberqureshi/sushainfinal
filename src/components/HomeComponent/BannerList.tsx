@@ -11,7 +11,7 @@ import {
 } from '../../common/constants';
 import {Banner} from '../../types/Types';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
-
+import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 type Props = {
   item: Banner;
   onPressItem: (item: Banner) => void;
@@ -25,7 +25,7 @@ const ImageCarousel = ({item, onPressItem}: Props) => {
       }}
       style={localStyles.imgContainer}>
       <Image
-        source={{uri: BASE_IMG_NEW_PATH + item.img}}
+        source={{uri: `${API_IMAGE_BASE_URL}${item}` }}
         resizeMode="contain"
         style={localStyles.imgStyle}
       />
@@ -50,7 +50,8 @@ const BannerList = ({bannerData}: any) => {
   return (
     <View style={localStyles.root}>
       <Carousel
-        data={getSortedArray(bannerData, 'order_no')}
+        // data={getSortedArray(bannerData, 'order_no')}
+        data={bannerData}
         renderItem={imageCarousel}
         sliderWidth={deviceWidth - 30}
         itemWidth={deviceWidth - 30}
@@ -72,7 +73,7 @@ const BannerList = ({bannerData}: any) => {
           inactiveDotStyle={[
             localStyles.dotStyle,
             {
-              backgroundColor: colors.dotColor,
+              backgroundColor: colors.primary3,
             },
           ]}
           inactiveDotOpacity={1}
@@ -94,7 +95,7 @@ const localStyles = StyleSheet.create({
   },
   imgStyle: {
     width: '100%',
-    height: moderateScale(134),
+    height: moderateScale(154),
   },
   dotStyle: {
     height: moderateScale(8),
