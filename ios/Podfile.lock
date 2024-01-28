@@ -1,5 +1,14 @@
 PODS:
   - boost (1.83.0)
+  - CashfreeAnalyticsSDK (2.0.5):
+    - CFNetworkSDK (~> 2.0.5)
+  - CashfreePG (2.0.9):
+    - CashfreePGUISDK (~> 2.0.8)
+  - CashfreePGCoreSDK (2.0.8):
+    - CashfreeAnalyticsSDK (~> 2.0.5)
+  - CashfreePGUISDK (2.0.8):
+    - CashfreePGCoreSDK (~> 2.0.8)
+  - CFNetworkSDK (2.0.5)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.73.2)
@@ -944,6 +953,9 @@ PODS:
   - React-Mapbuffer (0.73.2):
     - glog
     - React-debug
+  - react-native-cashfree-pg-sdk (2.1.8):
+    - CashfreePG (~> 2.0.9)
+    - React-Core
   - react-native-document-picker (9.1.0):
     - React-Core
   - react-native-progress-view (1.4.2):
@@ -1204,6 +1216,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-cashfree-pg-sdk (from `../node_modules/react-native-cashfree-pg-sdk`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - "react-native-progress-view (from `../node_modules/@react-native-community/progress-view`)"
   - react-native-restart (from `../node_modules/react-native-restart`)
@@ -1242,6 +1255,11 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - CashfreeAnalyticsSDK
+    - CashfreePG
+    - CashfreePGCoreSDK
+    - CashfreePGUISDK
+    - CFNetworkSDK
     - CocoaAsyncSocket
     - Flipper
     - Flipper-Boost-iOSX
@@ -1312,6 +1330,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-cashfree-pg-sdk:
+    :path: "../node_modules/react-native-cashfree-pg-sdk"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-progress-view:
@@ -1385,6 +1405,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
+  CashfreeAnalyticsSDK: 6d3825916b1f37e38e26cc3b825eef31c9a8b4b9
+  CashfreePG: 857dffd7e7ecec2b3efc572d3ff0ebf5f59dc342
+  CashfreePGCoreSDK: 8ad9ae1bc97668d5399e936e2de00d6d103a7bfb
+  CashfreePGUISDK: 891276c947bc2aea7f3990bb60c19cd62c631313
+  CFNetworkSDK: 02adc1210041ce65a6653049c730c9db2f73451a
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
   FBLazyVector: fbc4957d9aa695250b55d879c1d86f79d7e69ab4
@@ -1423,6 +1448,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 03644c063fc3621c9a4e8bf263a8150909129618
   React-logger: 66b168e2b2bee57bd8ce9e69f739d805732a5570
   React-Mapbuffer: 9ee041e1d7be96da6d76a251f92e72b711c651d6
+  react-native-cashfree-pg-sdk: a1a2e54798b14a1666f2c2842a37c159aede7b87
   react-native-document-picker: b4f4a23b73f864ce17965b284c0757648993805b
   react-native-progress-view: fda23a769e325dd94f08439f6cfca5867fca32c0
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
