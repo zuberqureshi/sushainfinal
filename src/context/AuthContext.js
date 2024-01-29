@@ -1,7 +1,6 @@
 //AuthContext.js
 import React, {createContext, useState} from 'react';
-import * as Keychain from 'react-native-keychain';
-
+ 
 const AuthContext = createContext(null);
 const {Provider} = AuthContext;
 
@@ -18,7 +17,7 @@ const AuthProvider = ({children}) => {
     walletCoin: null,
   });
   const logout = async () => {
-    await Keychain.resetGenericPassword();
+   // await Keychain.resetGenericPassword();
     setAuthState({
       accessToken: null,
       refreshToken: null,

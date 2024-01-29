@@ -4,12 +4,9 @@ import { Home, HomeSelected } from './assets/svgs'
 import { GluestackUIProvider} from "@gluestack-ui/themed"
 import { config } from '../gluestack-ui.config'
 import { QueryClientProvider } from '@tanstack/react-query';
-
+import { AuthProvider } from './context/AuthContext'
 import { queryClient } from './react-query/client'
-// import { QueryClientProvider } from '@tanstack/react-query';
  import AppNavigator from './navigation'
-   
-// import { queryClient } from './react-query/client'
 import { notificationListener, requestUserPermission } from './utils/notificationService'
 const App = () => {
 
@@ -30,9 +27,14 @@ const App = () => {
 
     <QueryClientProvider client={queryClient}>
         <GluestackUIProvider config={config}>
- 
+
+<AuthProvider >
+
+
             <AppNavigator/>
- 
+        
+
+  </AuthProvider>
         </GluestackUIProvider>
     </QueryClientProvider>
 

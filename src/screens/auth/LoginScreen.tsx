@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import { Text } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
@@ -23,13 +23,15 @@ import FaceBookLogin from '../../components/FaceBookLogin'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
+import { AuthContext } from '../../context/AuthContext'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
+  const authContext = useContext(AuthContext);
 
   const { data:categoryListMain, isPending:PendingCategoryList, isLoading:isLoadingCategoryList } =  useDoctorListSpec();
-  console.log( 'useDoctorListSpec', categoryListMain?.data)
+  console.log( 'authContext',authContext, 'useDoctorListSpec', categoryListMain?.data)
 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
