@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
 import React, { useContext, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
-import { Text } from '@gluestack-ui/themed'
+import { Text , Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -24,6 +24,7 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
 import { AuthContext } from '../../context/AuthContext'
+import useLoginByPassword from '../../hooks/auth/loginbypassword'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -32,6 +33,9 @@ const LoginScreen = () => {
 
   const { data:categoryListMain, isPending:PendingCategoryList, isLoading:isLoadingCategoryList } =  useDoctorListSpec();
   console.log( 'authContext',authContext, 'useDoctorListSpec', categoryListMain?.data)
+  const toast = useToast()
+
+  const createloginByPassword = useLoginByPassword()
 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
@@ -98,7 +102,36 @@ const LoginScreen = () => {
           validationSchema={loginSchema}
           onSubmit={(values, action) => {
             // updateProfile(values.country,values.address,values.name,values.mobile)
-            console.warn('updateProfile', values);
+            console.warn('formsubmit', values);
+
+            var body = {
+              mobile:values.userid,
+              password:values.password
+
+            }
+
+                createloginByPassword.mutate(body, {
+                  onSuccess: (data) => {
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }) => {
+            return (
+              <Toast nativeID={id} variant="accent" action="success">
+                <ToastTitle>Profile updated successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+                    console.log('dataafterlogibn', data?.data) 
+                  },
+                  onError: (error) => {
+                    console.log('errorafterlogin', error)
+                  }
+                })
+
+
             // action.resetForm()
             // loadUserInfo();
 

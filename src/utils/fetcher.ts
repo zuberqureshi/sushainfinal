@@ -16,7 +16,7 @@ export const fetcher = async (config: AxiosRequestConfig) => {
   // } 
   const { url, method, data, headers } = config;
  
- const API_uri = 'https://api-dev.merabuddy.online/';
+ const API_uri = 'http://43.205.130.207/api/v1/';
 
  console.log('tokenfetcher',token)
   return await Axios.request({
