@@ -270,10 +270,10 @@ const Appointments = () => {
             <Box backgroundColor='#F7F7F7' pb={25} mb={10} mt={10} >
               <Text fontFamily='$InikaRegular' fontSize={13} color={'#696767'} my={8} mx={16} >Don’t forget to take Follow up</Text>
 
-              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{
+              <Box backgroundColor='#FCFFFF' shadowOffset={{width:0,height:1}} shadowColor='#000' shadowOpacity={0.22} shadowRadius={2.22} elevation={3} mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{
                 shadowColor: "#000",
                 shadowOffset: {
-                  width: 0,
+                  width: 1,
                   height: 1,
                 },
                 shadowOpacity: 0.22,
