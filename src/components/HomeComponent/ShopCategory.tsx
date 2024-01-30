@@ -38,7 +38,7 @@ const RenderDoctorCard = ({item}: any) => {
 };
 
 const RenderFooterComponent = ({resultValue,isLoading}: any) => {
-  console.log(resultValue,'fff');
+  console.log( 'RenderFooterComponent', resultValue);
   
   return (
     <View style={localStyles.doctorListContaienr}>
@@ -49,7 +49,7 @@ const RenderFooterComponent = ({resultValue,isLoading}: any) => {
       </TouchableOpacity>
       <View style={{height:responsiveHeight(33),justifyContent:!isLoading?'flex-start':'center',}}  >
      { !isLoading ? <FlashList
-        data={resultValue?.splice(0, 6)}
+        data={resultValue?.slice(0, 6)}
         renderItem={RenderDoctorCard}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
@@ -106,15 +106,14 @@ const RenderDSpecialities = ({
 
 export default function ShopCategory({shopCategaryData,}: any) {
 
-  // console.log(s,'shopcattt');
-  
+   
   const [resultData, setResultData] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>(1);
   const [extraData, setExtraData] = useState<any>([]);
   const [homeopathyData, setHomeopathyDataData] = useState<any>([]);
 
-  const {data:categaryData,isLoading} = useGetHomeData()
-    //  console.log(categaryData?.data,resultData?.lifestyleCategoryList,'shopcattt');
+  const {data:categaryData,isLoading:homePageCategoryLoading} = useGetHomeData()
+      console.log('shopcatttuseGetHomeData' , categaryData?.data);
   // useEffect(() => {
   //   // !!shopCategaryData?.ayurvedicProduct &&
   //   //   setResultData([...shopCategaryData?.ayurvedicProduct]);
@@ -123,15 +122,13 @@ export default function ShopCategory({shopCategaryData,}: any) {
 
   
   useEffect(() => {
-    setSelectedTab(1)
-    if(categaryData?.data){
-
+     if(categaryData?.data && ( homePageCategoryLoading==false)  ){
       setResultData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList)
       setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
       setHomeopathyDataData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList)
     }
   
-  }, [isLoading]);
+  }, [homePageCategoryLoading]);
 
   // useEffect(() => {
   //   console.log('====================================');
@@ -159,27 +156,27 @@ export default function ShopCategory({shopCategaryData,}: any) {
   
   // }, [selectedTab,isLoading]);
 
-  const onPressTab = (id: number) => {
+  const onPressTab = async (id: number) => {
    
       
-      setSelectedTab(id);
-      // switch (id) {
-      //   case 1:
-      //     setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
-      //     break;
-      //   case 2:
-      //     setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
-      //     break;
-      //   case 3:
-      //     setExtraData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList);
-      //     break;
-      //   case 4:
-      //     setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
-      //     break;
-      //   default:
-      //     setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
-      //     break;
-      // }
+     await setSelectedTab(id);
+      switch (id) {
+        case 1:
+          setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+          break;
+        case 2:
+          setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+          break;
+        case 3:
+          setExtraData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList);
+          break;
+        case 4:
+          setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+          break;
+        default:
+          setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+          break;
+      }
       console.log(id,extraData);
     }
 
@@ -205,13 +202,13 @@ export default function ShopCategory({shopCategaryData,}: any) {
         data={shopCategaryData}
         renderItem={renderItem}
         horizontal
-        extraData={extraData}
+       // extraData={extraData}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}
         scrollEnabled={false}
       />
-   <RenderFooterComponent resultValue={selectedTab === 1 ?resultData:extraData} isLoading={isLoading} />
+   <RenderFooterComponent resultValue={extraData} isLoading={homePageCategoryLoading } />
     
     </View>
   );
