@@ -1,5 +1,5 @@
 import {StyleSheet, View,Text} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
@@ -10,9 +10,12 @@ import { styles } from '../../themes';
 import { StackNav } from '../../navigation/NavigationKeys';
 // import {getRefreshToken, getToken, getUserDetail} from '../utils/asyncstorage';
 // import {userSettingAPI} from '../api/authApi';
+import { AuthContext } from '../../context/AuthContext'
 
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+    const authContext:any = useContext(AuthContext  );
+
   useEffect(() => {
     SplashScreen.hide();
     asyncProcess();
@@ -43,13 +46,20 @@ export default function Splash() {
     //     routes: [{name: StackNav.AuthStack}],
     //   });
     // }
+    console.log( 'authContextinsplash', authContext?.authState.authenticated)
+    if (authContext?.authState?.authenticated === false) {
+
     navigation.navigate(StackNav.AuthStack)
+    }else{
+      navigation.navigate(StackNav.DrawerNavigation)
+
+    }
   };
 
   return (
     <CSafeAreaView style={localStyles.container}>
       <View />
-      <Text>jjkkj</Text>
+      <Text>Splash </Text>
     </CSafeAreaView>
   );
 }

@@ -50,7 +50,7 @@ import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
-
+import {getAccessToken} from '../../utils/network'
 // import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
 // import ShopCategory from '../../components/HomeComponent/ShopCategory';
 // import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
@@ -71,8 +71,21 @@ type Props = {
 const HomeMain = () => {
   const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
   const [search, setSearch] = useState('');
+  const [userInfo, setUserInfo] = useState();
+
   const [resultData, setResultData] = useState<any>({});
   const [searchResult, setSearchResult] = useState([]);
+
+
+  async function load(){
+      setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+   }
+  
+  useEffect(() => {
+    load();
+  }, []);
+
+
 //   const debounceSearch = CDebounce(search, 300);
    
 //   const selectedLng = async () => {
@@ -194,7 +207,7 @@ const HomeMain = () => {
             <Location />
             <View>
               <CText type={'s12'}>
-                {strings.hi}
+                {strings.hi}  { userInfo?.userName }
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
               <View style={localStyles.locationContainer}>

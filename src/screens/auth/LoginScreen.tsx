@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import { Text , Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
@@ -25,14 +25,25 @@ import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
 import { AuthContext } from '../../context/AuthContext'
 import useLoginByPassword from '../../hooks/auth/loginbypassword'
+import {setAccessToken, getAccessToken } from '../../utils/network'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
   const authContext = useContext(AuthContext);
 
+  async function load(){
+    const localUserInfo =  JSON.parse( await getAccessToken('userInfo') ) ;
+    const AccessTokenInfo =  JSON.parse( await getAccessToken('AccessTokenInfo') ) ;
+
+    console.log( 'localUserInfoOnlogin',AccessTokenInfo)
+  }
+  
+  useEffect(() => {
+    load();
+  }, []);
   const { data:categoryListMain, isPending:PendingCategoryList, isLoading:isLoadingCategoryList } =  useDoctorListSpec();
-  console.log( 'authContext',authContext, 'useDoctorListSpec', categoryListMain?.data)
+ 
   const toast = useToast()
 
   const createloginByPassword = useLoginByPassword()
@@ -111,20 +122,40 @@ const LoginScreen = () => {
             }
 
                 createloginByPassword.mutate(body, {
-                  onSuccess: (data) => {
+                  onSuccess: async (data) => {
+                    console.warn('afterlogindata', data?.data?.result[0]);
 
-        toast.show({
-          placement: "bottom",
-          render: ({ id }) => {
-            return (
-              <Toast nativeID={id} variant="accent" action="success">
-                <ToastTitle>Profile updated successfully</ToastTitle>
-              </Toast>
-            );
-          },
-        })
+                await setAccessToken('AccessTokenInfo',
+                 JSON.stringify({
+                   accessToken:data?.data?.result[0]?.token,
+                   refreshToken:data?.data?.result[0]?.refreshToken,
+                   expirationTime: data?.data?.result[0]?.ExpirationTime,
+                 }) )
+ 
 
-                    console.log('dataafterlogibn', data?.data) 
+                 await setAccessToken('userInfo',
+                 JSON.stringify({
+                   userName:data?.data?.result[0]?.user.first_name,
+                   userMobile:data?.data?.result[0]?.user.mobile,
+                  }) )
+
+                    toast.show({
+                      placement: "bottom",
+                      render: ({ id }) => {
+                        return (
+                          <Toast nativeID={id} variant="accent" action="success">
+                            <ToastTitle>Logged In   successfully</ToastTitle>
+                          </Toast>
+                        );
+                      },
+                    })
+
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: StackNav.DrawerNavigation }],
+                    });
+  
+
                   },
                   onError: (error) => {
                     console.log('errorafterlogin', error)

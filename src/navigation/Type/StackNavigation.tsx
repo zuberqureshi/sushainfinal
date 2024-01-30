@@ -1,26 +1,47 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackRoute } from '../NavigationRoutes';
 import { StackNav } from '../NavigationKeys';
 import { getLng } from '../../i18n/changeLng';
 import strings from '../../i18n/strings';
+import { AuthContext } from '../../context/AuthContext'
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigation() {
+  const authContext:any = useContext(AuthContext);
 
   useEffect(() => {
     selectedLng()
   }, [])
 
   const selectedLng = async () => {
-    const lngData = await getLng()
+    const lngData:any = await getLng()
     if (!!lngData) {
       strings.setLanguage(lngData)
     }
     console.log("Drawer LOggggggg", lngData);
 
   }
+  // if (authContext?.authState?.authenticated === false) {
+  //   return (
+  //     <Stack.Navigator
+  //     screenOptions={{
+  //       headerShown: false,
+  //     }}
+  //     initialRouteName={StackNav.Splash}>
+  //     <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
+
+
+  //     <Stack.Screen
+  //       name={StackNav.AuthStack}
+  //       component={StackRoute.AuthStack}
+  //     />
+  //   </Stack.Navigator>
+
+  //   )
+
+  // }else{
 
   return (
     <Stack.Navigator
@@ -29,10 +50,16 @@ export default function StackNavigation() {
       }}
       initialRouteName={StackNav.Splash}>
       <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
+
+ 
+{  (authContext?.authState?.authenticated === false) &&
+
       <Stack.Screen
         name={StackNav.AuthStack}
         component={StackRoute.AuthStack}
       />
+      
+ }  
       <Stack.Screen
         name={StackNav.DrawerNavigation}
         component={StackRoute.DrawerNavigation}
@@ -121,4 +148,6 @@ export default function StackNavigation() {
 
     </Stack.Navigator>
   );
+
+    
 }
