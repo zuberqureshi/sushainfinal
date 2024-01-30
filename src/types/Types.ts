@@ -117,6 +117,9 @@ export interface Banner {
   img_mbl: string;
   link_1: string;
   link_2: string;
+  app_link:any;
+  live:string;
+
 }
 
 export interface Category {

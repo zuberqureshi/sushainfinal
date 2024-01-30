@@ -2,7 +2,7 @@ import Axios, { AxiosRequestConfig } from "axios";
  import { useContext } from "react";
 // import { getAccessToken } from "./network";
 // import { getAuthValue } from "../hooks/common/useAuthValue";
- 
+import { API_BASE_URL, } from '@env'
 
 export const fetcher = async (config: AxiosRequestConfig) => {
   // const authContext = useContext(AuthContext);
@@ -16,11 +16,11 @@ export const fetcher = async (config: AxiosRequestConfig) => {
   // } 
   const { url, method, data, headers } = config;
  
- const API_uri = 'https://api-dev.merabuddy.online/';
+//  const API_uri = 'https://api-dev.merabuddy.online/';
 
  console.log('tokenfetcher',token)
   return await Axios.request({
-    baseURL: API_uri,
+    baseURL: API_BASE_URL,
     url,
     method: method ?? 'GET',
     data,

@@ -14,15 +14,18 @@ import strings from '../../i18n/strings';
 import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
 import {colors, styles} from '../../themes';
-import {BASE_IMG_NEW_PATH, shopByategoryData} from '../../api/constant';
+import  {API_IMAGE_BASE_URL} from '@env'
 import {getHeight, moderateScale} from '../../common/constants';
 import images from '../../assets/images';
+import useGetHomeData from '../../hooks/home/get-home-data';
+import { Box, Spinner } from '@gluestack-ui/themed';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
 
 const RenderDoctorCard = ({item}: any) => {
   return (
     <TouchableOpacity style={localStyles.illnessTypeStyle}>
       <Image
-        source={{uri: BASE_IMG_NEW_PATH + item?.image}}
+        source={{uri: `${API_IMAGE_BASE_URL}${item.app_icon}`}}
         style={localStyles.doctorImgStyle}
       />
       <View style={localStyles.illnessTextStyle}>
@@ -34,7 +37,9 @@ const RenderDoctorCard = ({item}: any) => {
   );
 };
 
-const RenderFooterComponent = memo(({resultValue}: any) => {
+const RenderFooterComponent = ({resultValue,isLoading}: any) => {
+  console.log(resultValue,'fff');
+  
   return (
     <View style={localStyles.doctorListContaienr}>
       <TouchableOpacity style={localStyles.viewAllContaiener}>
@@ -42,22 +47,26 @@ const RenderFooterComponent = memo(({resultValue}: any) => {
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <FlashList
+      <View style={{height:responsiveHeight(33),justifyContent:!isLoading?'flex-start':'center',}}  >
+     { !isLoading ? <FlashList
         data={resultValue?.splice(0, 6)}
         renderItem={RenderDoctorCard}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
         scrollEnabled={false}
         numColumns={3}
-        estimatedItemSize={6}
+        estimatedItemSize={10}
         contentContainerStyle={styles.ph10}
-      />
+      /> : 
+      <Box alignSelf='center' >
+      <Spinner size={'large'} color={colors.primary} /> 
+      </Box> }
+    </View>  
     </View>
   );
-});
+}
 
-const RenderDSpecialities = memo(
-  ({
+const RenderDSpecialities = ({
     item,
     onPressTab,
     selectedTabValue,
@@ -92,57 +101,95 @@ const RenderDSpecialities = memo(
         )}
       </View>
     );
-  },
-);
+  }
 
-export default function ShopCategory({shopCategaryData}: any) {
+
+export default function ShopCategory({shopCategaryData,}: any) {
+
+  // console.log(s,'shopcattt');
+  
   const [resultData, setResultData] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>(1);
-  const [extraData, setExtraData] = useState<boolean>(false);
+  const [extraData, setExtraData] = useState<any>([]);
+  const [homeopathyData, setHomeopathyDataData] = useState<any>([]);
 
+  const {data:categaryData,isLoading} = useGetHomeData()
+    //  console.log(categaryData?.data,resultData?.lifestyleCategoryList,'shopcattt');
+  // useEffect(() => {
+  //   // !!shopCategaryData?.ayurvedicProduct &&
+  //   //   setResultData([...shopCategaryData?.ayurvedicProduct]);
+  // }, [shopCategaryData]);
+  
+
+  
   useEffect(() => {
-    !!shopCategaryData?.ayurvedicProduct &&
-      setResultData([...shopCategaryData?.ayurvedicProduct]);
-  }, [shopCategaryData]);
+    setSelectedTab(1)
+    if(categaryData?.data){
 
-  useEffect(() => {
-    setExtraData(!extraData);
-  }, [selectedTab]);
+      setResultData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList)
+      setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+      setHomeopathyDataData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList)
+    }
+  
+  }, [isLoading]);
 
-  const onPressTab = useCallback(
-    (id: number) => {
+  // useEffect(() => {
+  //   console.log('====================================');
+  //   console.log(resultData?.lifestyleCategoryList);
+  //   console.log('====================================');
+  //   if(categaryData?.data){
+  //   switch (selectedTab) {
+  //       case 1:
+  //         setExtraData(resultData.medicineAyurvedicCategoryList);
+  //         break;
+  //       case 2:
+  //         setExtraData(resultData.lifestyleCategoryList);
+  //         break;
+  //       case 3:
+  //         setExtraData(resultData.medicineHomeopathyCategoryList);
+  //         break;
+  //       case 4:
+  //         setExtraData(resultData.medicineAyurvedicCategoryList);
+  //         break;
+  //       default:
+  //         setExtraData(resultData.lifestyleCategoryList);
+  //         break;
+  //     }
+  //   }
+  
+  // }, [selectedTab,isLoading]);
+
+  const onPressTab = (id: number) => {
+   
+      
       setSelectedTab(id);
-      switch (id) {
-        case 1:
-          setResultData([...shopCategaryData?.ayurvedicProduct]);
-          break;
-        case 2:
-          setResultData([...shopCategaryData?.personalCare]);
-          break;
-        case 3:
-          setResultData([...shopCategaryData?.homeopathy]);
-          break;
-        case 4:
-          setResultData([...shopCategaryData?.immunityWellness]);
-          break;
-        default:
-          setResultData([...shopCategaryData?.ayurvedicProduct]);
-          break;
-      }
-    },
-    [selectedTab, resultData],
-  );
+      // switch (id) {
+      //   case 1:
+      //     setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+      //     break;
+      //   case 2:
+      //     setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+      //     break;
+      //   case 3:
+      //     setExtraData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList);
+      //     break;
+      //   case 4:
+      //     setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+      //     break;
+      //   default:
+      //     setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+      //     break;
+      // }
+      console.log(id,extraData);
+    }
 
-  const selectedTabValue = useMemo(() => {
-    return selectedTab;
-  }, [selectedTab]);
 
   const renderItem = ({item}: {item: DoctorSpecialityListData}) => {
     return (
       <RenderDSpecialities
         item={item}
         onPressTab={onPressTab}
-        selectedTabValue={selectedTabValue}
+        selectedTabValue={selectedTab}
       />
     );
   };
@@ -155,7 +202,7 @@ export default function ShopCategory({shopCategaryData}: any) {
     <View style={styles.flex}>
       <SubHeader title={strings.shopByCategory} />
       <FlatList
-        data={shopByategoryData}
+        data={shopCategaryData}
         renderItem={renderItem}
         horizontal
         extraData={extraData}
@@ -164,7 +211,8 @@ export default function ShopCategory({shopCategaryData}: any) {
         contentContainerStyle={styles.ph20}
         scrollEnabled={false}
       />
-      {shopCategaryData && <RenderFooterComponent resultValue={resultValue} />}
+   <RenderFooterComponent resultValue={selectedTab === 1 ?resultData:extraData} isLoading={isLoading} />
+    
     </View>
   );
 }

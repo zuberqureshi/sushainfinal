@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, TouchableOpacity, View,FlatList } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
 // local imports
@@ -82,10 +82,10 @@ const FindADoctor = () => {
   }, []);
 
   // console.log(apiData?.topDoctorList,'ffff');
-  
+
   if (loader) {
-    return(
-     <Loader/>
+    return (
+      <Loader />
     )
   }
 
@@ -101,7 +101,7 @@ const FindADoctor = () => {
       </TouchableOpacity>
     );
   };
-   
+
 
 
   return (
@@ -113,16 +113,16 @@ const FindADoctor = () => {
         />
         <SearchWithLikeComponent />
         {bannerData && <TopBannerFindDoctor data={bannerData} />}
-     { specializationList ? <ADoctorHealthIssue data={specializationList} /> :  <Spinner size='large' />}
-     {  apiData?.topDoctorList && <TopDoctor data={apiData?.topDoctorList} />}
- 
-        {apiData?.listAppGeneralCategory?.map((item:any)=>{
-          return(
+        {specializationList ? <ADoctorHealthIssue data={specializationList} /> : <Spinner size='large' />}
+        {apiData?.topDoctorList && <TopDoctor data={apiData?.topDoctorList} />}
+
+        {apiData?.listAppGeneralCategory?.map((item: any) => {
+          return (
             <Box>
-{ item?.app_general_sub_category_doc && <DoctorCategoryComponent title={item?.name} data={item?.app_general_sub_category_doc} />}
+              {item?.app_general_sub_category_doc && <DoctorCategoryComponent title={item?.name} data={item?.app_general_sub_category_doc} />}
             </Box>
-            
-          ) 
+
+          )
         })}
 
         {/* <View style={localStyles.bottomContainer}>
@@ -141,7 +141,7 @@ const FindADoctor = () => {
             />
           </View>
         </View> */}
-        <ScreenBottomAchievement/>
+        <ScreenBottomAchievement />
         <View style={{ height: 120 }} />
       </ScrollView>
     </Container>

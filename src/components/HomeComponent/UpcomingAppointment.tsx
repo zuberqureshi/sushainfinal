@@ -39,7 +39,7 @@ export default function UpcomingAppointment({
   const onChnageReview = (text: string) => setReview(text);
   const iconStyle = moderateScale(13);
   return (
-    <View style={styles.mh20}>
+    <View style={styles.mh15}>
       <View style={localStyles.root}>
         <CText type="s14" numberOfLines={1} style={localStyles.titleTextStyle}>
           {isFollowUp
@@ -179,6 +179,7 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.white4,
     borderRadius: moderateScale(10),
     ...styles.shadowStyle,
+    ...styles.mh5
   },
   doctorImgStyle: {
     height: getHeight(85),
@@ -250,6 +251,7 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: moderateScale(10),
     ...styles.shadowStyle,
+    ...styles.mh5
   },
   reviewStarStyle: {
     height: moderateScale(14),

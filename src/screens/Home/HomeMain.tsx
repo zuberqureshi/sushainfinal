@@ -6,59 +6,34 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {FlashList} from '@shopify/flash-list';
 
 // local imports
-// const CSafeAreaView = React.lazy(() => import('../../components/common/CSafeAreaView'))
-// const CText = React.lazy(() => import('../../components/common/CText'))
-// const CInput = React.lazy(() => import('../../components/common/CInput'))
-// const BannerList = React.lazy(() => import('../../components/HomeComponent/BannerList'))
-// const CategoryList = React.lazy(() => import('../../components/HomeComponent/CategoryList'))
-// const KeyBoardAvoidWrapper = React.lazy(() => import('../../components/common/KeyBoardAvoidWrapper'))
-// const DoctorSpecialities = React.lazy(() => import('../../components/HomeComponent/DoctorSpecialities'))
-// const ShopCategory = React.lazy(() => import('../../components/HomeComponent/ShopCategory'))
-// const AyurvedicProducts = React.lazy(() => import('../../components/HomeComponent/AyurvedicProducts'))
-// const ExclusiveTherapy = React.lazy(() => import('../../components/HomeComponent/ExclusiveTherapy'))
-// const HonestReviews = React.lazy(() => import('../../components/HomeComponent/HonestReviews'))
-// const FeaturedIn = React.lazy(() => import('../../components/HomeComponent/FeaturedIn'))
-// const UpcomingAppointment = React.lazy(() => import('../../components/HomeComponent/UpcomingAppointment'))
-// const FrequentlyBoughtProducts = React.lazy(() => import('../../components/HomeComponent/FrequentlyBoughtProducts'))
-// const CDebounce = React.lazy(() => import('../../components/common/CDebounce'))
-
-
 import {colors, styles} from '../../themes';
 import typography from '../../themes/typography';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
-import {
-  ArrowDown,
-  Cart,
-  CloseIcon,
-  Heart,
-  Location,
-  Menu,
-  Mic,
-  Notification,
-  Search,
-  User,
-} from '../../assets/svgs';
+import { ArrowDown, Cart, CloseIcon, Heart, Location, Menu,Mic, Notification,Search, User,} from '../../assets/svgs';
 import CText from '../../components/common/CText';
-// import strings from '../../i18n/strings';
+
 import {getHeight, moderateScale} from '../../common/constants';
 import CInput from '../../components/common/CInput';
-// import BannerList from '../../components/HomeComponent/BannerList';
-// import CategoryList from '../../components/HomeComponent/CategoryList';
-import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
+import BannerList from '../../components/HomeComponent/BannerList';
+import CategoryList from '../../components/HomeComponent/CategoryList';
 import strings from '../../i18n/strings';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
+import useGetHomeData from '../../hooks/home/get-home-data';
 
-// import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
-// import ShopCategory from '../../components/HomeComponent/ShopCategory';
-// import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
-// import ExclusiveTherapy from '../../components/HomeComponent/ExclusiveTherapy';
-// import HonestReviews from '../../components/HomeComponent/HonestReviews';
-// import FeaturedIn from '../../components/HomeComponent/FeaturedIn';
-// import UpcomingAppointment from '../../components/HomeComponent/UpcomingAppointment';
-// import FrequentlyBoughtProducts from '../../components/HomeComponent/FrequentlyBoughtProducts';
+import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
+import ShopCategory from '../../components/HomeComponent/ShopCategory';
+import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
+import ExclusiveTherapy from '../../components/HomeComponent/ExclusiveTherapy';
+import HonestReviews from '../../components/HomeComponent/HonestReviews';
+import FeaturedIn from '../../components/HomeComponent/FeaturedIn';
+import UpcomingAppointment from '../../components/HomeComponent/UpcomingAppointment';
+import Loader from '../../common/Loader';
+import FrequentlyBoughtProducts from '../../components/HomeComponent/FrequentlyBoughtProducts';
+import useGetHomeBannerData from '../../hooks/home/get-home-banner';
+import { shopByategoryData } from '../../api/constant';
 // import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
@@ -71,8 +46,15 @@ type Props = {
 const HomeMain = () => {
   const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
   const [search, setSearch] = useState('');
-  const [resultData, setResultData] = useState<any>({});
+  const [resultData, setResultData] = useState<any>([]);
+  // const [homeBannerData, setResultData] = useState<any>([]);
   const [searchResult, setSearchResult] = useState([]);
+ 
+  const {data,isLoading} = useGetHomeData()
+  const {data:homeBannerData,isLoading:homeBannerIsLoading} = useGetHomeBannerData()
+
+  // console.log(homeBannerData?.data?.result,'HOMEEE');
+   
 //   const debounceSearch = CDebounce(search, 300);
    
 //   const selectedLng = async () => {
@@ -84,33 +66,13 @@ const HomeMain = () => {
 
 //   }
 
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       const data = await HomePageAPI();
-//       console.log('Homedata', data);
+  useEffect(() => {
     
-//         // selectedLng()
-        
-     
-      
-//       setResultData(data);
-//     };
-//     fetchData();
-//   }, []);
-
-
-
-//   useEffect(() => {
-//     searchAPICall();
-//   }, [debounceSearch]);
-
-//   const searchAPICall = async () => {
-//     if (!!debounceSearch) {
-//       const data = await SearchAPI(debounceSearch);
-//       console.log('debounceSearch', data);
-//       setSearchResult(data?.[0].medicineList);
-//     }
-//   };
+    if (data?.data) {
+      setResultData(data?.data?.result[0])
+     }
+   
+  }, [isLoading]);
 
   const onPressLike = () => {};
 
@@ -123,35 +85,6 @@ const HomeMain = () => {
   };
 
 //   const onPressDrawer = () => navigation.openDrawer();
-
-  const bannerData = useMemo(() => {
-    return resultData?.bannerList;
-  }, [resultData]);
-
-  const shopCategaryData = useMemo(() => {
-    return {
-      ayurvedicProduct: resultData?.medicineAyurvedicCategoryList,
-      personalCare: resultData?.lifestyleCategoryList,
-      homeopathy: resultData?.medicineAyurvedicCategoryList,
-      immunityWellness: resultData?.medicineAyurvedicCategoryList,
-    };
-  }, [resultData]);
-
-  const ayurvedicData = useMemo(() => {
-    return resultData?.bestSellingProductList;
-  }, [resultData]);
-
-  const reviewData = useMemo(() => {
-    return resultData?.customerReviewList;
-  }, [resultData]);
-
-  const bottomBannerData = useMemo(() => {
-    return resultData?.bottomBannerList;
-  }, [resultData]);
-
-  const feturedData = useMemo(() => {
-    return resultData?.mediaList;
-  }, [resultData]);
 
   const onPressRightIcon = () => {
     if (searchResult?.length) {
@@ -186,6 +119,10 @@ const HomeMain = () => {
 
   const RenderSeparator = () => <View style={localStyles.dividerStyle} />;
 
+  if (isLoading || homeBannerIsLoading) {
+    <Loader/>
+  }
+ 
   return (
     <Container statusBarStyle='dark-content' >
       <Body>
@@ -242,22 +179,22 @@ const HomeMain = () => {
             </View>
           )}
         </View>
-        {/* {!!resultData && (
+        {!!resultData && (
           <View>
-            <BannerList bannerData={bannerData} />
+            <BannerList bannerData={homeBannerData?.data?.result[0]?.Bannerlist}  />
             <UpcomingAppointment isFollowUp={false} />
             <UpcomingAppointment isFollowUp={true} />
-            <FrequentlyBoughtProducts />
+            {/* <FrequentlyBoughtProducts /> */}
             <CategoryList />
             <DoctorSpecialities />
-            <ShopCategory shopCategaryData={shopCategaryData} />
-            <AyurvedicProducts ayurvedicData={ayurvedicData} />
-            <ExclusiveTherapy bannerData={bottomBannerData} />
-            <HonestReviews reviewData={reviewData} />
-            <FeaturedIn data={feturedData} />
+            <ShopCategory shopCategaryData={shopByategoryData} data={resultData} lifeStyleData={resultData?.lifestyleCategoryList} />
+            <AyurvedicProducts ayurvedicData={resultData?.bestSellingProductList} />
+            <ExclusiveTherapy bannerData={homeBannerData?.data?.result[0]?.bottomBannerList} />
+            <HonestReviews data={resultData?.customerReviewList} />
+            <FeaturedIn data={homeBannerData?.data?.result[0]?.mediaList} />
             <View style={{height: 120}} />
           </View>
-        )} */}
+        )}
 
       </Body>
     </Container>

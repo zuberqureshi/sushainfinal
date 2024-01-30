@@ -18,7 +18,7 @@ const RenderItem = ({item, index}: any) => {
       </CText>
       <RatingComponent star={item?.rating} />
       <View style={localStyles.decStyle}>
-        <CText type="r8" align="center" numberOfLines={5} color={colors.black}>
+        <CText type="m8" align="center" numberOfLines={5} color={colors.black}>
           {item?.des}
         </CText>
       </View>
@@ -26,13 +26,14 @@ const RenderItem = ({item, index}: any) => {
   );
 };
 
-export default function HonestReviews({reviewData}: any) {
+export default function HonestReviews({data}:any) {
+  
   return (
     <View>
       <SubHeader title={strings.honestReviews} isViewHide={false} />
-      {!!reviewData && (
+      {!!data && (
         <FlashList
-          data={reviewData}
+          data={data}
           renderItem={RenderItem}
           keyExtractor={(item, index) => index.toString()}
           horizontal
@@ -55,9 +56,11 @@ const localStyles = StyleSheet.create({
     borderColor: colors.bColor2,
     width: moderateScale(176),
     borderRadius: moderateScale(10),
+    gap: moderateScale(5),
   },
   decStyle: {
     height: getHeight(80),
     ...styles.pt10,
+    ...styles.mt5
   },
 });
