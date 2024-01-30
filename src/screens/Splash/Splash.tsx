@@ -16,7 +16,7 @@ import { AuthContext } from '../../context/AuthContext'
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const authContext:any = useContext(AuthContext  );
-    var l=false;
+    var l = false;
   useEffect(() => {
     SplashScreen.hide();
     asyncProcess();
@@ -34,7 +34,7 @@ export default function Splash() {
 
       if( currentTime < v?.expirationTime ){
         console.log('tokenvalid ')
-        l =true;
+ 
         authContext.setAuthState({
           accessToken: v?.accessToken,
           refreshToken: v?.refreshToken,
