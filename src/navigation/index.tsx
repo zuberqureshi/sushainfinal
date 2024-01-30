@@ -7,9 +7,10 @@ import { getAccessToken, setAccessToken, CallApiJson } from '../../src/utils/net
 
 export default function AppNavigator() {
   const authContext:any = useContext(AuthContext);
+  console.log('APP Navigator')
 
      async function load () {
-      console.log('APP Navigator')
+      console.log('APP Navigatorloadfunct')
 
       let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
 
@@ -30,7 +31,7 @@ export default function AppNavigator() {
 
         }else{
 
-         let body2= {
+         let body2 = {
             token:v?.refreshToken
           }
           const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );

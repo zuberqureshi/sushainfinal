@@ -12,16 +12,82 @@ import { StackNav } from '../../navigation/NavigationKeys';
 // import {userSettingAPI} from '../api/authApi';
 import { AuthContext } from '../../context/AuthContext'
 
+ import { getAccessToken, setAccessToken, CallApiJson } from '../../utils/network'
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const authContext:any = useContext(AuthContext  );
-
+    var l=false;
   useEffect(() => {
     SplashScreen.hide();
     asyncProcess();
   }, [navigation]);
 
+  async function load () {
+    console.log('APP Navigatorloadfunct')
+
+    let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
+
+    if(  v?.accessToken){
+      console.log('tokeninfo from memoery',v)
+ 
+      let  currentTime = Math.floor(new Date().getTime() / 1000);
+
+      if( currentTime < v?.expirationTime ){
+        console.log('tokenvalid ')
+        l =true;
+        authContext.setAuthState({
+          accessToken: v?.accessToken,
+          refreshToken: v?.refreshToken,
+          expirationTime: v?.expirationTime,
+          authenticated: true,
+        });
+
+      }else{
+
+       let body2 = {
+          token:v?.refreshToken
+        }
+        const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );
+
+        console.log( 'expiredtokenFetchedNewToken', reftechAccessToken )
+        if( reftechAccessToken.result.success==true){
+          await setAccessToken('AccessTokenInfo',
+          JSON.stringify({
+            accessToken:reftechAccessToken.result.access_token,
+            refreshToken:v?.refreshToken,
+            expirationTime: reftechAccessToken.result.ExpirationTime,
+          }) )
+
+           authContext.setAuthState({
+          
+            accessToken:reftechAccessToken.result.access_token,
+            refreshToken:v?.refreshToken,
+            expirationTime: reftechAccessToken.result.ExpirationTime,
+            authenticated: true,
+
+          });
+
+
+
+        }else{
+          console.log('redirect to login ');
+        }
+
+
+
+      }
+ 
+
+
+    }else{
+      console.log('No tokeninfo from memoery' )
+
+    }
+
+
+}
   const asyncProcess = async () => {
+    await     load();
     // const settingData = await userSettingAPI();
     // console.log('settingData>>>', settingData);
 
@@ -47,13 +113,11 @@ export default function Splash() {
     //   });
     // }
     console.log( 'authContextinsplash', authContext?.authState.authenticated)
-    if (authContext?.authState?.authenticated === false) {
-
+    
+    if(l==false)
     navigation.navigate(StackNav.AuthStack)
-    }else{
-      navigation.navigate(StackNav.DrawerNavigation)
+    else     navigation.navigate(StackNav.DrawerNavigation)
 
-    }
   };
 
   return (

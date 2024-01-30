@@ -52,14 +52,12 @@ export default function StackNavigation() {
       <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
 
  
-{  (authContext?.authState?.authenticated === false) &&
-
+ 
       <Stack.Screen
         name={StackNav.AuthStack}
         component={StackRoute.AuthStack}
       />
-      
- }  
+  
       <Stack.Screen
         name={StackNav.DrawerNavigation}
         component={StackRoute.DrawerNavigation}
