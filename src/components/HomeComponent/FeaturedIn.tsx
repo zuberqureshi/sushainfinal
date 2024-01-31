@@ -8,7 +8,7 @@ import {getHeight, moderateScale} from '../../common/constants';
 import CText from '../common/CText';
 import SubHeader from '../common/CommonComponent/SubHeader';
 import {BrandIcon, DoctorIcon, ReviewsIcon, UserIcon} from '../../assets/svgs';
-import {BASE_IMG_NEW_PATH} from '../../api/constant';
+import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 
 const BottomContainer = ({icon, title}: any) => {
   return (
@@ -26,21 +26,24 @@ const BottomContainer = ({icon, title}: any) => {
   );
 };
 
-const RenderFeturedComponent = ({item, onPress}: any) => {
+const RenderFeturedComponent = ({item, onPress}:any) => {
+  
   return (
     <TouchableOpacity
       onPress={() => onPress(item?.url)}
       style={localStyles.featuredImageContainer}>
       <Image
-        source={{uri: BASE_IMG_NEW_PATH + item?.img}}
+        source={{uri:`${API_IMAGE_BASE_URL}${item?.img}`}}
         style={localStyles.featuredImageStyle}
       />
+
     </TouchableOpacity>
   );
 };
 export default function FeaturedIn({data}: any) {
+  
   const onPress = (item: any) => {
-    return Linking.openURL(item);
+    // return Linking.openURL(item);
   };
 
   const RenderItem = ({item, index}: any) => {

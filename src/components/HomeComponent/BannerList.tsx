@@ -11,21 +11,25 @@ import {
 } from '../../common/constants';
 import {Banner} from '../../types/Types';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
-import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
+import {  API_IMAGE_BASE_URL } from '@env'
+import Loader from '../../common/Loader';
+import { Spinner } from '@gluestack-ui/themed';
+
 type Props = {
   item: Banner;
   onPressItem: (item: Banner) => void;
+  type:string;
 };
 
-const ImageCarousel = ({item, onPressItem}: Props) => {
+const ImageCarousel = ({item, onPressItem,type}: Props) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        onPressItem(item);
+        // onPressItem(item);
       }}
       style={localStyles.imgContainer}>
       <Image
-        source={{uri: `${API_IMAGE_BASE_URL}${item}` }}
+        source={{uri: `${API_IMAGE_BASE_URL}${type==='bottom' ? item?.img :item?.img_mbl}` }}
         resizeMode="contain"
         style={localStyles.imgStyle}
       />
@@ -33,8 +37,9 @@ const ImageCarousel = ({item, onPressItem}: Props) => {
   );
 };
 
-const BannerList = ({bannerData}: any) => {
+const BannerList = ({bannerData,type}: any) => {
   const [index, setIndex] = useState(0);
+  
 
   const onPressItem = useCallback((item: Banner) => {
     Linking.openURL(item?.link_1);
@@ -42,25 +47,31 @@ const BannerList = ({bannerData}: any) => {
 
   const imageCarousel = useCallback(
     ({item}: {item: Banner}) => {
-      return <ImageCarousel item={item} onPressItem={onPressItem} />;
+      return <ImageCarousel item={item} onPressItem={onPressItem} type={type} />;
     },
     [onPressItem],
   );
+  
+  if (bannerData === undefined && bannerData?.length <=0 ) {
+    <Loader/>
+  }
+
 
   return (
     <View style={localStyles.root}>
-      <Carousel
+
+    { !!bannerData && <Carousel
         // data={getSortedArray(bannerData, 'order_no')}
         data={bannerData}
         renderItem={imageCarousel}
         sliderWidth={deviceWidth - 30}
         itemWidth={deviceWidth - 30}
-        onSnapToItem={index => setIndex(index)}
+        onSnapToItem={(index:number) => setIndex(index)}
         contentContainerStyle={styles.center}
         autoplay={true}
         loop={true}
-      />
-      <View style={[styles.justifyCenter]}>
+      />  }
+     { !!bannerData && <View style={[styles.justifyCenter]}>
         <Pagination
           dotsLength={bannerData?.length}
           activeDotIndex={index}
@@ -81,7 +92,7 @@ const BannerList = ({bannerData}: any) => {
           dotContainerStyle={styles.mh5}
           containerStyle={localStyles.paginationContainerStyle}
         />
-      </View>
+      </View>}
     </View>
   );
 };
@@ -110,5 +121,6 @@ const localStyles = StyleSheet.create({
   imgContainer: {
     ...styles.center,
     borderRadius: moderateScale(10),
+    overflow:'hidden'
   },
 });
