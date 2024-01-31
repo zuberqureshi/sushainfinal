@@ -5,27 +5,26 @@ import {
   View,
   FlatList,
 } from 'react-native';
-import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
-import {FlashList} from '@shopify/flash-list';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
 
 // local imports
 import SubHeader from '../common/CommonComponent/SubHeader';
 import strings from '../../i18n/strings';
-import {DoctorSpecialityListData} from '../../types/Types';
+import { DoctorSpecialityListData } from '../../types/Types';
 import CText from '../common/CText';
-import {colors, styles} from '../../themes';
-import  {API_IMAGE_BASE_URL} from '@env'
-import {getHeight, moderateScale} from '../../common/constants';
+import { colors, styles } from '../../themes';
+import { Api_Image_Base_Url, getHeight, moderateScale } from '../../common/constants';
 import images from '../../assets/images';
 import useGetHomeData from '../../hooks/home/get-home-data';
 import { Box, Spinner } from '@gluestack-ui/themed';
-import { responsiveHeight } from 'react-native-responsive-dimensions';
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const RenderDoctorCard = ({item}: any) => {
+const RenderDoctorCard = ({ item }: any) => {
   return (
     <TouchableOpacity style={localStyles.illnessTypeStyle}>
       <Image
-        source={{uri: `${API_IMAGE_BASE_URL}${item.app_icon}`}}
+        source={{ uri: `${Api_Image_Base_Url}${item.app_icon}` }}
         style={localStyles.doctorImgStyle}
       />
       <View style={localStyles.illnessTextStyle}>
@@ -37,9 +36,8 @@ const RenderDoctorCard = ({item}: any) => {
   );
 };
 
-const RenderFooterComponent = ({resultValue,isLoading}: any) => {
-  console.log( 'RenderFooterComponent', resultValue);
-  
+const RenderFooterComponent = ({ resultValue, isLoading }: any) => {
+
   return (
     <View style={localStyles.doctorListContaienr}>
       <TouchableOpacity style={localStyles.viewAllContaiener}>
@@ -47,141 +45,108 @@ const RenderFooterComponent = ({resultValue,isLoading}: any) => {
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <View style={{height:responsiveHeight(33),justifyContent:!isLoading?'flex-start':'center',}}  >
-     { !isLoading ? <FlashList
-        data={resultValue?.slice(0, 6)}
-        renderItem={RenderDoctorCard}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        scrollEnabled={false}
-        numColumns={3}
-        estimatedItemSize={10}
-        contentContainerStyle={styles.ph10}
-      /> : 
-      <Box alignSelf='center' >
-      <Spinner size={'large'} color={colors.primary} /> 
-      </Box> }
-    </View>  
+      <View style={{ height: '90%', justifyContent: !isLoading ? 'flex-start' : 'center', }}  >
+        {!isLoading ? <FlashList
+          data={resultValue?.slice(0, 6)}
+          renderItem={RenderDoctorCard}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+          numColumns={3}
+          estimatedItemSize={10}
+          contentContainerStyle={styles.ph10}
+        /> :
+          <Box alignSelf='center' >
+            <Spinner size={'large'} color={colors.primary} />
+          </Box>}
+      </View>
     </View>
   );
 }
 
 const RenderDSpecialities = ({
-    item,
-    onPressTab,
-    selectedTabValue,
-  }: {
-    item: DoctorSpecialityListData;
-    onPressTab: (id: number) => void;
-    selectedTabValue: number;
-  }) => {
-    return (
-      <View style={localStyles.mainContaienr}>
-        <TouchableOpacity
-          onPress={() => onPressTab(item?.id)}
-          style={localStyles.rootContaienr}>
-          <View style={localStyles.imgOuterContaiener}>
-            <Image source={item?.image} style={localStyles.imgStyle} />
-          </View>
-          <View style={localStyles.titleContainer}>
-            <CText
-              type="m12"
-              align="center"
-              style={styles.ph5}
-              numberOfLines={2}>
-              {item?.title}
-            </CText>
-          </View>
-        </TouchableOpacity>
-        {selectedTabValue === item?.id && (
-          <Image
-            source={images.tabSelectImage}
-            style={localStyles.tabSelectImageStyle}
-          />
-        )}
-      </View>
-    );
-  }
+  item,
+  onPressTab,
+  selectedTabValue,
+}: {
+  item:any;
+  onPressTab: (id: number) => void;
+  selectedTabValue: number;
+}) => {
+  return (
+    <View style={localStyles.mainContaienr}>
+      <TouchableOpacity
+        onPress={() => onPressTab(item?.id)}
+        style={localStyles.rootContaienr}>
+        <View style={localStyles.imgOuterContaiener}>
+          <Image source={item?.image} style={localStyles.imgStyle} />
+        </View>
+        <View style={localStyles.titleContainer}>
+          <CText
+            type="m12"
+            align="center"
+            style={styles.ph5}
+            numberOfLines={2}>
+            {item?.title}
+          </CText>
+        </View>
+      </TouchableOpacity>
+      {selectedTabValue === item?.id && (
+        <Image
+          source={images.tabSelectImage}
+          style={localStyles.tabSelectImageStyle}
+        />
+      )}
+    </View>
+  );
+}
 
 
-export default function ShopCategory({shopCategaryData,}: any) {
+export default function ShopCategory({ shopCategaryData, }: any) {
+ 
 
-   
+  
+
   const [resultData, setResultData] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>(1);
   const [extraData, setExtraData] = useState<any>([]);
   const [homeopathyData, setHomeopathyDataData] = useState<any>([]);
 
-  const {data:categaryData,isLoading:homePageCategoryLoading} = useGetHomeData()
-      console.log('shopcatttuseGetHomeData' , categaryData?.data);
-  // useEffect(() => {
-  //   // !!shopCategaryData?.ayurvedicProduct &&
-  //   //   setResultData([...shopCategaryData?.ayurvedicProduct]);
-  // }, [shopCategaryData]);
+  const { data: categaryData, isLoading: homePageCategoryLoading } = useGetHomeData()
   
 
-  
   useEffect(() => {
-     if(categaryData?.data && ( homePageCategoryLoading==false)  ){
+    if (categaryData?.data && (homePageCategoryLoading == false)) {
       setResultData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList)
-      setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
-      setHomeopathyDataData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList)
     }
-  
+
   }, [homePageCategoryLoading]);
 
-  // useEffect(() => {
-  //   console.log('====================================');
-  //   console.log(resultData?.lifestyleCategoryList);
-  //   console.log('====================================');
-  //   if(categaryData?.data){
-  //   switch (selectedTab) {
-  //       case 1:
-  //         setExtraData(resultData.medicineAyurvedicCategoryList);
-  //         break;
-  //       case 2:
-  //         setExtraData(resultData.lifestyleCategoryList);
-  //         break;
-  //       case 3:
-  //         setExtraData(resultData.medicineHomeopathyCategoryList);
-  //         break;
-  //       case 4:
-  //         setExtraData(resultData.medicineAyurvedicCategoryList);
-  //         break;
-  //       default:
-  //         setExtraData(resultData.lifestyleCategoryList);
-  //         break;
-  //     }
-  //   }
-  
-  // }, [selectedTab,isLoading]);
 
   const onPressTab = async (id: number) => {
-   
-      
-     await setSelectedTab(id);
-      switch (id) {
-        case 1:
-          setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
-          break;
-        case 2:
-          setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
-          break;
-        case 3:
-          setExtraData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList);
-          break;
-        case 4:
-          setExtraData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
-          break;
-        default:
-          setExtraData(categaryData?.data?.result[0]?.lifestyleCategoryList);
-          break;
-      }
-      console.log(id,extraData);
+
+    await setSelectedTab(id);
+    switch (id) {
+      case 1:
+        setResultData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+        break;
+      case 2:
+        setResultData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+        break;
+      case 3:
+        setResultData(categaryData?.data?.result[0]?.medicineHomeopathyCategoryList);
+        break;
+      case 4:
+        setResultData(categaryData?.data?.result[0]?.medicineAyurvedicCategoryList);
+        break;
+      default:
+        setResultData(categaryData?.data?.result[0]?.lifestyleCategoryList);
+        break;
     }
+  }
 
 
-  const renderItem = ({item}: {item: DoctorSpecialityListData}) => {
+  const renderItem = ({ item }: { item: DoctorSpecialityListData }) => {
     return (
       <RenderDSpecialities
         item={item}
@@ -202,14 +167,14 @@ export default function ShopCategory({shopCategaryData,}: any) {
         data={shopCategaryData}
         renderItem={renderItem}
         horizontal
-       // extraData={extraData}
+        // extraData={extraData}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}
         scrollEnabled={false}
       />
-   <RenderFooterComponent resultValue={extraData} isLoading={homePageCategoryLoading } />
-    
+      <RenderFooterComponent resultValue={resultData} isLoading={homePageCategoryLoading} />
+
     </View>
   );
 }
@@ -242,11 +207,14 @@ const localStyles = StyleSheet.create({
     ...styles.mh20,
   },
   doctorListContaienr: {
-    width: '100%',
+    width: '97%',
     ...styles.pv10,
     ...styles.pb15,
     backgroundColor: colors.lightBlue2,
     top: getHeight(-5),
+    height: responsiveHeight(40),
+    alignSelf: 'center',
+    borderRadius: responsiveWidth(3)
   },
   doctorImgStyle: {
     height: getHeight(93),
@@ -270,6 +238,7 @@ const localStyles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
+    overflow: 'hidden'
   },
   illnessTextStyle: {
     backgroundColor: colors.primary,

@@ -8,8 +8,7 @@ import strings from '../../i18n/strings';
 import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
 import {colors, styles} from '../../themes';
-import  {API_IMAGE_BASE_URL} from '@env'
-import {getHeight, moderateScale} from '../../common/constants';
+import {Api_Image_Base_Url, getHeight, moderateScale} from '../../common/constants';
 import {ThumbIcon} from '../../assets/svgs';
 import images from '../../assets/images';
 import moment from 'moment';
@@ -26,7 +25,7 @@ const RenderDoctorCard = ({item}: any) => {
     <TouchableOpacity style={localStyles.doctorCardStyle}>
       <Image
         source={{
-          uri: `${API_IMAGE_BASE_URL}${item.photo}`,
+          uri: `${Api_Image_Base_Url}${item.photo}`,
         }}
         style={localStyles.doctorImgStyle}
       />
@@ -45,6 +44,7 @@ const RenderDoctorCard = ({item}: any) => {
           numberOfLines={2}
           color={colors.textColor1}>
           {item?.services_offered}
+       
         </CText>
       </View>
       <View style={styles.rowSpaceBetween}>
@@ -77,7 +77,7 @@ const RenderFooterComponent = memo(({resultValue,isLoading}: any) => {
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <View style={{height:responsiveHeight(37),justifyContent:!isLoading?'flex-start':'center',}}  >
+      <View style={{height:'90%',justifyContent:!isLoading?'flex-start':'center',}}  >
 
      { !isLoading ? <FlashList
         data={resultValue?.slice(0, 6)}
@@ -115,7 +115,7 @@ const RenderDSpecialities = memo(
           style={localStyles.rootContaienr}>
           <View style={localStyles.imgOuterContainer}>
             <Image
-              source={{uri: `${API_IMAGE_BASE_URL}${item.app_icon}`}}
+              source={{uri: `${Api_Image_Base_Url}${item.app_icon}`}}
               style={localStyles.imgStyle}
             />
           </View>
@@ -233,7 +233,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.lightPink,
     top: getHeight(-5),
     borderRadius:responsiveWidth(5),
-    alignSelf:'center'
+    alignSelf:'center',
+    height:responsiveHeight(45)
   },
   doctorImgStyle: {
     height: moderateScale(42),

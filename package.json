@@ -40,6 +40,7 @@
     "react-native-dotenv": "^3.4.9",
     "react-native-element-dropdown": "^2.10.1",
     "react-native-gesture-handler": "^2.14.1",
+    "react-native-get-location": "^4.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-loading-spinner-overlay": "^3.0.1",
     "react-native-localization": "^2.3.2",

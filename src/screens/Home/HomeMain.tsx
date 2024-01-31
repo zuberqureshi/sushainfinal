@@ -34,6 +34,8 @@ import Loader from '../../common/Loader';
 import FrequentlyBoughtProducts from '../../components/HomeComponent/FrequentlyBoughtProducts';
 import useGetHomeBannerData from '../../hooks/home/get-home-banner';
 import { shopByategoryData } from '../../api/constant';
+import { getLocation } from '../../utils/service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
@@ -45,7 +47,8 @@ type Props = {
 
 const HomeMain = () => {
   const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
+  const [userLocation, setUserLocation] = useState('')
   const [resultData, setResultData] = useState<any>([]);
   // const [homeBannerData, setResultData] = useState<any>([]);
   const [searchResult, setSearchResult] = useState([]);
@@ -65,12 +68,20 @@ const HomeMain = () => {
 //     console.log("Drawer LOggggggg",lngData);
 
 //   }
+const locationSet = async() => {
+  const  location = await AsyncStorage.getItem('getUserCity')
+  setUserLocation(location as string)
+}
 
   useEffect(() => {
-    
+     
+    locationSet()
+
     if (data?.data) {
       setResultData(data?.data?.result[0])
+      
      }
+    
    
   }, [isLoading]);
 
@@ -136,7 +147,7 @@ const HomeMain = () => {
               </CText>
               <View style={localStyles.locationContainer}>
                 <CText type={'s10'} color={colors.gray4}>
-                  {strings.addLocation}
+                  {userLocation}
                 </CText>
                 <ArrowDown />
               </View>
@@ -187,7 +198,7 @@ const HomeMain = () => {
             {/* <FrequentlyBoughtProducts /> */}
             <CategoryList />
             <DoctorSpecialities />
-            <ShopCategory shopCategaryData={shopByategoryData} data={resultData} lifeStyleData={resultData?.lifestyleCategoryList} />
+            <ShopCategory shopCategaryData={shopByategoryData}/>
             <AyurvedicProducts ayurvedicData={resultData?.bestSellingProductList} />
             <ExclusiveTherapy bannerData={homeBannerData?.data?.result[0]?.bottomBannerList} />
             <HonestReviews data={resultData?.customerReviewList} />

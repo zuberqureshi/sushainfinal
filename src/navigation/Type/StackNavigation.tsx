@@ -4,19 +4,21 @@ import { StackRoute } from '../NavigationRoutes';
 import { StackNav } from '../NavigationKeys';
 import { getLng } from '../../i18n/changeLng';
 import strings from '../../i18n/strings';
+import { getLocation } from '../../utils/service';
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigation() {
 
   useEffect(() => {
+    getLocation()
     selectedLng()
   }, [])
 
   const selectedLng = async () => {
     const lngData = await getLng()
     if (!!lngData) {
-      strings.setLanguage(lngData)
+      strings.setLanguage(lngData as string) 
     }
     console.log("Drawer LOggggggg", lngData);
 

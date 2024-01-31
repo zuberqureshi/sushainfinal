@@ -1,4 +1,4 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Image, Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
 
 // local imports
@@ -17,6 +17,7 @@ import {
   WatchIcon,
 } from '../../assets/svgs';
 import CInput from '../common/CInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TimeComponent = ({icon, time, style}: any) => {
   return (
@@ -127,7 +128,14 @@ export default function UpcomingAppointment({
       </View>
 
       {isFollowUp && (
+           
+           
+
         <View style={localStyles.bottomCardContainer}>
+          <Pressable onPress={async()=>{console.log(await AsyncStorage.getItem('getUserCity'),'UUUPPPPPPPP');
+          }} >
+            <CText>jjjjjjjjjjjjjj</CText>
+          </Pressable>
           <CText type="r12" color={colors.black}>
             {
               'Please review your experience with the last doctor : Dr. Pallvi Rathee'
