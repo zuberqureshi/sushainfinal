@@ -27,7 +27,7 @@ const RenderDoctorCard = ({item}: any) => {
  
 
   return (
-    <TouchableOpacity onPress={()=>{   navigation.navigate(StackNav.DoctorProfile, {id:item?.id});}}  style={localStyles.doctorCardStyle}>
+    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.DoctorProfile,{id:item?.id})}}  style={localStyles.doctorCardStyle}>
       <Image
         source={{
           uri: `${Api_Image_Base_Url}${item.photo}`,
