@@ -9,6 +9,7 @@ import {Category} from '../../types/Types';
 import images from '../../assets/images';
 import { useNavigation } from '@react-navigation/native';
 import { StackNav } from '../../navigation/NavigationKeys';
+import { responsiveWidth } from 'react-native-responsive-dimensions';
 
 
 
@@ -59,18 +60,23 @@ const CategoryList = () => {
   const navigation = useNavigation()
   const renderItem = ({item, index}: props) => {
     return (
-      <Pressable onPress={()=>{navigation.navigate(StackNav.ConsultDoctor)}} >
+      <Pressable onPress={()=>{
+        if(index === 1){
+          navigation.navigate(StackNav.InstantConsultation)
+        }
+      }} >
         <View style={localStyles.itemStyle}>
 
         
         <Image source={item.img_mbl} style={localStyles.imgStyle} />
-        <CText type="s12" style={styles.mv5} numberOfLines={2} align="center">
+        <CText type="s12" style={{...styles.mv5,width:moderateScale(80)}} numberOfLines={2} align="center">
           {item.name}
         </CText>
         <CText
           type="m10"
           numberOfLines={2}
           color={colors.textColor8}
+          style={{width:moderateScale(94)}}
           align="center">
           {item.des}
         </CText>
@@ -95,22 +101,25 @@ export default CategoryList;
 
 const localStyles = StyleSheet.create({
   itemStyle: {
-    ...styles.mh25,
+    ...styles.mh20,
     ...styles.mv10,
     ...styles.itemsCenter,
     ...styles.p5,
-    width: moderateScale(115),
+    width: moderateScale(118),
     borderRadius: moderateScale(10),
     backgroundColor: colors.white,
     ...styles.shadowStyle,
+    height:moderateScale(145)
+ 
   },
   imgStyle: {
     height: moderateScale(65),
     width: moderateScale(105),
     resizeMode: 'cover',
+    borderRadius:responsiveWidth(1.5)
   },
   flatListStyle: {
-    ...styles.ph20,
+    ...styles.ph10,
     ...styles.mt10,
     ...styles.selfCenter,
   },

@@ -13,6 +13,7 @@ import BannerList from './BannerList';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
 import { useNavigation } from '@react-navigation/native';
 import { StackNav } from '../../navigation/NavigationKeys';
+import { Box } from '@gluestack-ui/themed';
 
 
 
@@ -20,7 +21,7 @@ export default function ExclusiveTherapy({bannerData}: any) {
 
 const navigation = useNavigation()
 
-  console.log('bannerData', bannerData, BASE_IMG_NEW_PATH + bannerData);
+  // console.log('bannerData', bannerData, BASE_IMG_NEW_PATH + bannerData);
   const RenderCardComponent = ({style, title, image}: any) => {
     return (
       <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ClinicDoctorDetailCard)}} style={[localStyles.subContainerStyle, style]}>
@@ -43,10 +44,13 @@ const navigation = useNavigation()
 
   return (
     <View>
+      <Box ml={8} >
       <SubHeader
         title={strings.ourExclusiveTherapyServices}
         isViewHide={false}
       />
+      </Box>
+    
       <View style={styles.mh20}>
         <Image
           source={images.exclusiveTherapyImage}
@@ -70,7 +74,7 @@ const navigation = useNavigation()
         image={images.hospitalImage}
         style={[styles.mh20, styles.mb10]}
       />
-      <BannerList bannerData={bannerData} />
+      <BannerList bannerData={bannerData} type={'bottom'} />
     </View>
   );
 }

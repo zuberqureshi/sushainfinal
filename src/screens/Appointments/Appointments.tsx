@@ -449,7 +449,7 @@ const Appointments = () => {
           )
         }
 
-        <BannerList bannerData={['16971297716815.png', '16971297716815.png', '16971297716815.png']} />
+        {/* <BannerList bannerData={['16971297716815.png', '16971297716815.png', '16971297716815.png']} /> */}
 
 
         {selectedAppointmentView === 'upcoming' && <Box>

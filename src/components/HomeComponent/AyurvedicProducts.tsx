@@ -15,16 +15,16 @@ import {getHeight, moderateScale} from '../../common/constants';
 import {colors, styles} from '../../themes';
 import images from '../../assets/images';
 import CText from '../common/CText';
-import {BASE_IMG_NEW_PATH} from '../../api/constant';
+import { API_IMAGE_BASE_URL } from '@env'
 
 export default function AyurvedicProducts({ayurvedicData}: any) {
-  console.log('ayurvedicData', ayurvedicData);
+  // console.log('ayurvedicData', ayurvedicData);
   const renderItem = ({item, index}: any) => {
     return (
       <TouchableOpacity style={localStyles.rootContainer}>
         <View>
           <Image
-            source={{uri: BASE_IMG_NEW_PATH + item?.images}}
+            source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}}
             style={localStyles.productImageStyle}
           />
           <ImageBackground
@@ -37,15 +37,15 @@ export default function AyurvedicProducts({ayurvedicData}: any) {
         </View>
         <View style={localStyles.bottomContaienr}>
           <CText
-            type="r10"
+            type="m10"
             style={localStyles.productTextStyle}
             numberOfLines={2}
             color={colors.black}>
-            {item?.seo_meta_title}
+            {item?.name}
           </CText>
           <View style={localStyles.priceContaienr}>
             <CText type="s10" numberOfLines={2} color={colors.black}>
-              {item?.final_price}
+              {'\u20B9'}{item?.final_price}
             </CText>
             <View>
               <CText
@@ -53,7 +53,7 @@ export default function AyurvedicProducts({ayurvedicData}: any) {
                 numberOfLines={2}
                 style={localStyles.dummyPriceContainer}
                 color={colors.black}>
-                {item?.retailer_price}
+                {'\u20B9'}{'667'}
               </CText>
             </View>
           </View>
