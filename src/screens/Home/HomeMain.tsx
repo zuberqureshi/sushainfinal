@@ -1,5 +1,5 @@
 // library imports
-import {StyleSheet, TouchableOpacity, View,Text} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useState, useEffect, useMemo} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -9,7 +9,7 @@ import {FlashList} from '@shopify/flash-list';
 import {colors, styles} from '../../themes';
 import typography from '../../themes/typography';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
-import { ArrowDown, Cart, CloseIcon, Heart, Location, Menu,Mic, Notification,Search, User,} from '../../assets/svgs';
+import { ArrowDown, Cart, CloseIcon, CrossIconBlack, Heart, Location, Menu,Mic, Notification,Search, User,} from '../../assets/svgs';
 import CText from '../../components/common/CText';
 
 import {getHeight, moderateScale} from '../../common/constants';
@@ -36,6 +36,7 @@ import useGetHomeBannerData from '../../hooks/home/get-home-banner';
 import { shopByategoryData } from '../../api/constant';
 import { getLocation } from '../../utils/service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Box, Pressable,Text } from '@gluestack-ui/themed';
 // import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
@@ -52,6 +53,7 @@ const HomeMain = () => {
   const [resultData, setResultData] = useState<any>([]);
   // const [homeBannerData, setResultData] = useState<any>([]);
   const [searchResult, setSearchResult] = useState([]);
+  const [slectedTypeNeed, setSlectedTypeNeed] = useState<string>('ayurvedic')
  
   const {data,isLoading} = useGetHomeData()
   const {data:homeBannerData,isLoading:homeBannerIsLoading} = useGetHomeBannerData()
@@ -190,11 +192,28 @@ const locationSet = async() => {
             </View>
           )}
         </View>
+        <Box alignSelf='flex-end' flexDirection='row' gap={10} mr={20} >
+            <Pressable onPress={()=>{setSlectedTypeNeed('ayurvedic')}} >
+            <Box backgroundColor={slectedTypeNeed === 'ayurvedic' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'ayurvedic' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'ayurvedic' && 5} px={slectedTypeNeed === 'ayurvedic' ? 0 : 5}  h={26} borderRadius={5} flexDirection='row' alignItems='center'  >
+            <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} >Ayurvedic</Text>
+            { slectedTypeNeed === 'ayurvedic' && <CrossIconBlack />}
+            </Box>   
+            </Pressable>
+
+            <Pressable onPress={()=>{setSlectedTypeNeed('homeopathy')}} >
+            <Box backgroundColor={slectedTypeNeed === 'homeopathy' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'homeopathy' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'homeopathy' && 5 } px={slectedTypeNeed === 'homeopathy' ? 0 : 5}     h={26} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' >
+            <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} textAlign='center' >Homeopathy</Text>
+            { slectedTypeNeed === 'homeopathy' && <CrossIconBlack />}
+            </Box>   
+            </Pressable>
+            
+    
+        </Box>
         {!!resultData && (
           <View>
             <BannerList bannerData={homeBannerData?.data?.result[0]?.Bannerlist}  />
-            <UpcomingAppointment isFollowUp={false} />
-            <UpcomingAppointment isFollowUp={true} />
+            {/* <UpcomingAppointment isFollowUp={false} />
+            <UpcomingAppointment isFollowUp={true} /> */}
             {/* <FrequentlyBoughtProducts /> */}
             <CategoryList />
             <DoctorSpecialities />

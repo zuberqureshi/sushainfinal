@@ -33,6 +33,7 @@ import DrawerNavigation from "./Type/DrawerNavigation";
 // import SelectTimeSlot from '../containers/FindADoctor/SelectTimeSlot';
 
 
+
 import ProductByCategories from "../screens/Medicines/ProductByCategories";
 import ProductDetail from "../screens/Medicines/ProductDetail";
 import ProductsReview from "../screens/Medicines/ProductsReview";
@@ -48,6 +49,7 @@ import DoctorProfile from "../screens/CommonScreens/DortorProfile";
 import InstantConsultation from "../screens/InstantConsultation/ConsultDoctor";
 import ClinicConsultation from "../screens/ClinicConsultation/DoctorDetailCard";
 import Appointments from "../screens/Appointments/Appointments";
+import PatientsReview from "../screens/CommonScreens/PatientsReview";
 
 
 
@@ -83,7 +85,7 @@ export const StackRoute = {
   DrawerNavigation,
   CategoryDoctorList,
   DoctorProfile,
-  // PatientsReview,
+  PatientsReview,
   // PaymentScreen,
   SelectTimeSlot,
   InstantConsultation,

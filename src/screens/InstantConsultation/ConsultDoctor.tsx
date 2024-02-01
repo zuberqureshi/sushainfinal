@@ -18,6 +18,7 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CheckBox from 'react-native-check-box'
 import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 import Loader from '../../components/Loader/Loader'
+import useGetFindADoctor from '../../hooks/doctor/find-a-doctor';
 
 const ConsultDoctor = () => {
 
@@ -25,54 +26,57 @@ const ConsultDoctor = () => {
   const [language, setLanguage] = useState('')
 
   const [isChecked, setIsChecked] = useState(false)
-  const [apiData, setApiData] = useState([])
-  const [loader, setLoader] = useState(true)
 
   const onChangeHealthIssue = (item: any) => setHealthIssue(item.value);
 
   const onChangeLanguage = (item: any) => setLanguage(item.value);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // const data = await findDoctorHomeAPI();
-      // console.log('FindADoctor', data);
-      const apiUrl = `${API_BASE_URL}booking/videomainpage`; // Replace with your API endpoint
+   //api call
+   const {data,isLoading} = useGetFindADoctor()
+   console.log(data?.data?.result[0],'INSTANAT')
+   if (isLoading) {
+     return (
+       <Loader />
+     )
+   }
 
-      // Make a GET request using the fetch method
-      fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json(); // Assuming the response is in JSON format
-        })
-        .then(data => {
-          // Handle the data from the successful API response
-          console.log('API response:', data?.data[0]?.bannerList);
-          // setBannerData(data?.data[0]?.bannerList)
-          // setSpecializationList(data?.data[0]?.specializationList)
-          setApiData(data?.data[0])
-          setLoader(false)
-        })
-        .catch(error => {
-          // Handle errors
-          console.error('API error:', error);
-        });
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   // const fetchData = async () => {
+  //   //   // const data = await findDoctorHomeAPI();
+  //   //   // console.log('FindADoctor', data);
+  //   //   const apiUrl = `${API_BASE_URL}booking/videomainpage`; // Replace with your API endpoint
 
-  if (loader) {
-    return(
-     <Loader/>
-    )
-  }
+  //   //   // Make a GET request using the fetch method
+  //   //   fetch(apiUrl, {
+  //   //     method: 'GET',
+  //   //     headers: {
+  //   //       // Add any headers if required (e.g., Authorization, Content-Type, etc.)
+  //   //       'Content-Type': 'application/json',
+  //   //     },
+  //   //   })
+  //   //     .then(response => {
+  //   //       if (!response.ok) {
+  //   //         throw new Error(`HTTP error! Status: ${response.status}`);
+  //   //       }
+  //   //       return response.json(); // Assuming the response is in JSON format
+  //   //     })
+  //   //     .then(data => {
+  //   //       // Handle the data from the successful API response
+  //   //       console.log('API response:', data?.data[0]?.bannerList);
+  //   //       // setBannerData(data?.data[0]?.bannerList)
+  //   //       // setSpecializationList(data?.data[0]?.specializationList)
+  //   //       setApiData(data?.data[0])
+  //   //       setLoader(false)
+  //   //     })
+  //   //     .catch(error => {
+  //   //       // Handle errors
+  //   //       console.error('API error:', error);
+  //   //     });
+  //   // };
+  //   // fetchData();
+  // }, []);
+
+  
 
   return (
    <SafeAreaView style={{flex:1,backgroundColor:'#EEEBEB'}} >
@@ -144,7 +148,7 @@ const ConsultDoctor = () => {
         </CText >
 {/* 
         <TopDoctor subHeader='false' /> */}
-          {  apiData?.topDoctorList && <TopDoctor data={apiData?.topDoctorList} />}
+      {data?.data?.result[0]?.topDoctorList && <TopDoctor data={data?.data?.result[0].topDoctorList} />}
      
   
      </View>

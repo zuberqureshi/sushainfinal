@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import homeService from '../../services/home-service';
+import doctorService from '../../services/doctor-service';
+
 
 
 function useGetDoctorBySpeclization(data:{specialization:string}) {
   return useQuery({
-    queryKey: [homeService.queryKeys.getDoctorsBySpeclization + data?.specialization],
-    queryFn: () => homeService.getDoctorsBySpeclization(data),
+    queryKey: [doctorService.queryKeys.getDoctorsBySpeclization + data?.specialization],
+    queryFn: () => doctorService.getDoctorsBySpeclization(data),
     enabled: !!data,
   });
 }

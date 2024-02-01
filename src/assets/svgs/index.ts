@@ -120,7 +120,7 @@ import ViewBlackEyeIcon from './viewBlackEyeIcon.svg'
 import StarUnFilledPrimaryColor from './starUnFilledPrimaryColor.svg'
 import StarFilledPrimaryColor from './starFilledPrimaryColor.svg'
 import DiscountGreenIcon from './discountGreenIcon.svg'
-
+import CrossIconBlack from './crossIconBlack.svg'
 
 
 export {
@@ -243,5 +243,7 @@ export {
   StarFilledPrimaryColor,
   StarUnFilledPrimaryColor,
   DiscountGreenIcon,
+  CrossIconBlack,
+
 
 };

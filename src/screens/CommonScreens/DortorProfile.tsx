@@ -17,20 +17,23 @@ import { BlackShareIcon, BottomIcon, ChatIcon, LikeIcon, RegistrationIcon, Servi
 import { colors, styles } from '../../themes';
 import CText from '../../components/common/CText';
 import RatingComponent from '../../components/HomeComponent/RatingComponent';
-import { TIME_FORMATE, TIME_YMD, deviceWidth, getHeight, moderateScale, } from '../../common/constants';
+import { API_IMAGE_BASE_URL, TIME_FORMATE, TIME_YMD, deviceWidth, getHeight, moderateScale, } from '../../common/constants';
 import CButton from '../../components/common/CButton';
 import SubHeader from '../../components/common/CommonComponent/SubHeader';
 import { DoctorSpecialityListData } from '../../types/Types';
-import { BASE_IMG_NEW_PATH, shopByategoryData } from '../../api/constant';
+import { shopByategoryData } from '../../api/constant';
 // import {DoctorDetailListAPI} from '../../api/FindDoctor';
 import moment from 'moment';
 import { StackNav } from '../../navigation/NavigationKeys';
 import { Container } from '../../components/Container';
-import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
-import { responsiveHeight } from 'react-native-responsive-dimensions';
+
+
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import images from '../../assets/images';
-import { Box, Spinner } from '@gluestack-ui/themed';
+import { Box, Spinner, Text } from '@gluestack-ui/themed';
 import Loader from '../../components/Loader/Loader';
+import { dataTagSymbol } from '@tanstack/react-query';
+import useGetDoctorsProfile from '../../hooks/doctor/get-doctor-profile';
 
 const RenderDSpecialities = ({ item }: { item: DoctorSpecialityListData }) => {
 
@@ -48,7 +51,7 @@ const RenderDSpecialities = ({ item }: { item: DoctorSpecialityListData }) => {
   );
 };
 
-const RenderReviewItem = ({ item }: any) => {
+const RenderReviewItem = ({ item, }: any) => {
   const formattedDate = moment(item?.time, TIME_FORMATE).format(TIME_YMD);
   return (
     <View style={localStyles.reviewContainerStyle}>
@@ -78,7 +81,7 @@ const RenderReviewItem = ({ item }: any) => {
       <CText type="s12" numberOfLines={1} style={styles.mt15}>
         {item?.heading}
       </CText>
-      <CText type="r10" numberOfLines={4} style={styles.mt5}>
+      <CText type="r10" numberOfLines={3}  style={styles.mt5}>
         {item?.des}
       </CText>
       <ReviewDivider />
@@ -86,18 +89,27 @@ const RenderReviewItem = ({ item }: any) => {
   );
 };
 
-const RenderFaqItem = ({ item }: any) => {
-  return (
-    <TouchableOpacity style={localStyles.faqContainer}>
-      <CText type="s12" numberOfLines={2}>
-        {
-          'What is the educational qualification and years of experience of Dr Preeti Chhabra?'
-        }
-      </CText>
-      <BottomIcon />
-    </TouchableOpacity>
-  );
-};
+// const RenderFaqItem = ({ item,doctorInfo,index,showFAQ,setShowFAQ,showFAQ1,setShowFAQ1 }: any) => {
+//   const [showFAQ1, setShowFAQ1] = useState(false)
+//   const [showFAQ2, setShowFAQ2] = useState(false)
+
+//   return (
+//     <Box>
+//     <TouchableOpacity onPress={()=>{setShowFAQ(!showFAQ)}}  style={localStyles.faqContainer}>
+//       <CText type="m12" color='#3D3D3D' numberOfLines={2} style={{width:responsiveWidth(80)}} >
+//         {item}{doctorInfo?.name} ?
+//       </CText>
+//       <BottomIcon />
+//     </TouchableOpacity>
+
+//     <Box px={20} display={showFAQ?'flex':'none'} >
+//       <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} >{doctorInfo?.max_qualification}| 25 YRS. EXP.</Text>
+//     </Box>
+
+
+//     </Box>
+//   );
+// };
 
 const ReviewDivider = () => {
   return <View style={localStyles.reviewDividerStyle} />;
@@ -109,75 +121,47 @@ interface Props {
 }
 
 export default function DoctorProfile({ route, navigation }: Props) {
+
+  //init
   const { id } = route.params;
+  console.log(id, 'PROFILE');
+
   const [doctorDetail, setDoctorDetail] = useState<any>();
-  const [loader, setLoader] = useState(true)
+  const [showFAQ1, setShowFAQ1] = useState(false)
+  const [showFAQ2, setShowFAQ2] = useState(false)
+
+  //APi call
+  const { data, isLoading } = useGetDoctorsProfile(id)
 
   useEffect(() => {
-    const fetchData = async () => {
-      // const doctorList = (await DoctorDetailListAPI(id)) as any;
-      // console.log('DoctorDetailListAPI', doctorList);
-      // setDoctorDetail(doctorList?.[0].doctorList);
-      const apiUrl = `${API_BASE_URL}/booking/docprofile`; // Replace with your API endpoint
+    if (data?.data) {
+      setDoctorDetail(data?.data?.result[0]?.doctorProfileDetail)
+    }
 
-      // Data to be sent in the POST request
-      const postData = {
-        doc_id: id,
+  }, [isLoading]);
 
-
-      };
-
-      // Make a POST request using the fetch method
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData), // Convert data to JSON format
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json(); // Assuming the response is in JSON format
-        })
-        .then(data => {
-          // Handle the data from the successful API response
-          // console.log('API response:', data?.data[0]?.doctorList,'PROFILE');
-          setDoctorDetail(data?.data[0]?.doctorList)
-          setLoader(false)
-        })
-        .catch(error => {
-          // Handle errors
-          console.error('API error:', error);
-        });
-    };
-    fetchData();
-  }, []);
-
-  if (loader) {
-    return(
-    <Loader/>
+  if (isLoading) {
+    return (
+      <Loader />
     )
   }
 
-  const onPressReview = () => {
-    // navigation.navigate(StackNav.PatientsReview, {
-    //   data: {
-    //     doctorId: id,
-    //     doctorName: doctorDetail?.name,
-    //     doctorImage: doctorDetail?.photo,
-    //     doctorRating: doctorDetail?.rating,
-    //     doctorReview: doctorDetail?.top_doc_review_per + ' reviews',
-    //     reviewData: doctorDetail?.doctor_customer_review,
-    //   },
-    // }
-    // );
+  const onPressAllReview = () => {
+    navigation.navigate(StackNav.PatientsReview, {
+      data: {
+        doctorId: id,
+        doctorName: doctorDetail?.name,
+        doctorImage: doctorDetail?.photo,
+        doctorRating: doctorDetail?.rating,
+        doctorReview: doctorDetail?.top_doc_review_per + ' reviews',
+        reviewData: doctorDetail?.doctor_customer_review,
+      },
+    }
+    );
   }
 
   const onPressBookAppointment = () => {
-    navigation.navigate(StackNav.SelectTimeSlot, {id});
+    navigation.navigate(StackNav.SelectTimeSlot, { id });
   }
 
   const renderItem = ({ item }: { item: DoctorSpecialityListData }) => {
@@ -254,7 +238,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
           </View>
         </View>
         <SubHeader title={strings.aboutDoctor} isViewHide={false} />
-        <CText type="r10" numberOfLines={4}  style={{...styles.ph20,textAlign:'center'}}>
+        <CText type="r10" numberOfLines={4} style={{ ...styles.ph20, textAlign: 'center' }}>
           {doctorDetail?.short_intro}
         </CText>
         <CButton
@@ -316,17 +300,18 @@ export default function DoctorProfile({ route, navigation }: Props) {
           />
         </View>
         <Divider />
-        <SubHeader title={strings.patientsReview} isViewHide={false} />
-        <View style={{ height: responsiveHeight(40) }} >
-        
-          {doctorDetail?.doctor_customer_review.splice(0, 2)?.map((item: any, index: number) => {
 
-            return (<RenderReviewItem key={index} item={item} />)
+        <SubHeader title={strings.patientsReview} isViewHide={false} />
+        <View style={{  overflow: 'hidden' }} >
+
+          {doctorDetail?.doctor_customer_review?.slice(0, 2)?.map((item: any, index: number) => {
+
+            return (<RenderReviewItem key={index} item={item}/>)
           })}
         </View>
         <CButton
           title={strings.viewAllReviews}
-          onPress={onPressReview}
+          onPress={onPressAllReview}
           type="m10"
           containerStyle={localStyles.viewAllReviewsStyle}
           bgColor={colors.white}
@@ -334,13 +319,35 @@ export default function DoctorProfile({ route, navigation }: Props) {
         />
         <Divider />
         <SubHeader title={strings.faqs} isViewHide={false} />
-        <View style={{ height: responsiveHeight(20) }} >
-       
-          {doctorDetail?.doctor_customer_review.splice(0, 2)?.map((item: any, index: number) => {
 
-            return (<RenderFaqItem key={index} item={item} />)
-          })}
-        </View>
+
+
+        <Box>
+          <TouchableOpacity onPress={() => { setShowFAQ1(!showFAQ1) }} style={localStyles.faqContainer}>
+            <CText type={showFAQ1 ? "b12" : "m12"} color='#3D3D3D' numberOfLines={2} style={{ width: responsiveWidth(80) }} >
+              What is the educational qualification and years of experience of {doctorDetail?.name} ?
+            </CText>
+            <BottomIcon />
+          </TouchableOpacity>
+
+          <Box px={20} display={showFAQ1 ? 'flex' : 'none'} >
+            <Text fontFamily='$InterMedium' numberOfLines={1} fontSize={10} color={colors.black2} >{doctorDetail?.max_qualification} | 25 YRS. EXP.</Text>
+          </Box>
+
+          <TouchableOpacity onPress={() => { setShowFAQ2(!showFAQ2) }} style={localStyles.faqContainer}>
+            <CText type={showFAQ1 ? "b12" : "m12"} color='#3D3D3D' numberOfLines={2} style={{ width: responsiveWidth(80) }} >
+              What are some of the most difficult cases handled by {doctorDetail?.name} ?
+            </CText>
+            <BottomIcon />
+          </TouchableOpacity>
+
+          <Box px={20} display={showFAQ2 ? 'flex' : 'none'} >
+            <Text fontFamily='$InterMedium' fontSize={10} numberOfLines={3} color={colors.black2} >{doctorDetail?.name} has successfully treated many complicated cases of {doctorDetail?.critical_diseases} .</Text>
+          </Box>
+
+
+        </Box>
+
 
         <CButton
           title={strings.readMore}
@@ -489,9 +496,10 @@ const localStyles = StyleSheet.create({
   },
   viewAllReviewsStyle: {
     ...styles.mh20,
-    ...styles.mb10,
-    height: getHeight(20),
+    // ...styles.m10,
+    height: getHeight(14),
     ...styles.selfStart,
+
   },
   faqContainer: {
     ...styles.pv10,

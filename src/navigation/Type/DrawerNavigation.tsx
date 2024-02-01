@@ -74,20 +74,7 @@ const DrawerContentComponent = (props: any) => {
   );
 };
 
-const changeLng = (lng:string) => {
-  if(lng ==='English' || lng === 'إنجليزي'){
-    // strings.setLanguage('en')
-    setLng('en')
-    RNRestart.Restart()
-    return
-  }else if(lng ==='Arabic' || lng === 'عربي'){
-    // strings.setLanguage('ar')
-    setLng('ar')
-    RNRestart.Restart()
-    
-    return
-  }
-}
+
 
 const InnerSubDrawerComponent = (props: any) => {
   const {icon, title,onPress} = props;
@@ -123,7 +110,7 @@ const InnerSubDrawerComponent = (props: any) => {
 
 
 const InnerDrawerComponent = (props: any) => {
-  const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress} = props;
+  const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress,onPress1,onPress2,onPress3} = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const onPressOpen = () => setIsOpen(!isOpen);
   
@@ -151,9 +138,9 @@ const InnerDrawerComponent = (props: any) => {
       </TouchableOpacity>
       {isOpen && (
         <View style={localStyles.subContainerStyle}>
-          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={changeLng} />
-          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={changeLng} />
-          {title3 && <InnerSubDrawerComponent icon={icon3} title={title3} />}
+          <InnerSubDrawerComponent icon={icon1} title={title1} onPress={onPress1} />
+          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={onPress2} />
+          {title3 && <InnerSubDrawerComponent icon={icon3} title={title3}  />}
         </View>
       )}
     </View>
@@ -185,6 +172,21 @@ const DrawerView = () => {
     //   },
     // ]);
   };
+
+  const changeLng = (lng:string) => {
+    if(lng ==='English' || lng === 'إنجليزي'){
+      // strings.setLanguage('en')
+      setLng('en')
+      RNRestart.Restart()
+      return
+    }else if(lng ==='Arabic' || lng === 'عربي'){
+      // strings.setLanguage('ar')
+      setLng('ar')
+      RNRestart.Restart()
+      
+      return
+    }
+  }
 
   
 
@@ -238,6 +240,7 @@ const DrawerView = () => {
             title={strings.myAppointments}
             icon1={<UpcomingVideoAppointmentsDrawerIcon />}
             title1={strings.upcomingVideoAppointments}
+            onPress1={()=>{navigation.navigate(StackNav.Appointments)}}
             icon2={<AppointmentsDrawerIcon />}
             title2={strings.pastAppointments}
             icon3={<UpcomingClinicAppointmentsDrawerIcon />}
@@ -262,8 +265,10 @@ const DrawerView = () => {
             title={strings.language}
             // icon1={<PastYogaDrawerIcon />}
             title1={strings.english}
+            onPress1={changeLng}
             // icon2={<UpcommingYogaDrawerIcon />}
             title2={strings.arabic}
+            onPress2={changeLng}
             
             
           />
@@ -286,7 +291,7 @@ const DrawerView = () => {
             {strings.support}
           </CText>
           <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.ClinicDoctorDetailCard)
+            // navigation.navigate(StackNav.ClinicDoctorDetailCard)
             }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}

@@ -10,9 +10,14 @@ import moment from 'moment';
 import {colors, styles} from '../../themes';
 import CText from '../../components/common/CText';
 import RatingComponent from '../../components/HomeComponent/RatingComponent';
-import {TIME_FORMATE, TIME_YMD, moderateScale} from '../../common/constants';
+import {Api_Image_Base_Url, TIME_FORMATE, TIME_YMD, moderateScale} from '../../common/constants';
 import SubHeader from '../../components/common/CommonComponent/SubHeader';
-import {BASE_IMG_NEW_PATH} from '../../api/constant';
+
+import { Box, Spinner } from '@gluestack-ui/themed';
+import Loader from '../../components/Loader/Loader';
+import { Container } from '../../components/Container';
+import Body from '../../components/Body/Body';
+
 
 interface Props {
   route: any;
@@ -20,6 +25,7 @@ interface Props {
 }
 
 const RenderReviewItem = ({item}: any) => {
+
   const formattedDate = moment(item?.time, TIME_FORMATE).format(TIME_YMD);
   return (
     <View style={localStyles.reviewContainerStyle}>
@@ -27,7 +33,7 @@ const RenderReviewItem = ({item}: any) => {
         <View style={styles.rowCenter}>
           <View style={localStyles.reviewImgContainer}>
             <CText type="b14" numberOfLines={1} color={colors.white}>
-              {item?.cust_name?.[0].toUpperCase()}
+              {item?.cust_name?.[0]?.toUpperCase()}
             </CText>
           </View>
           <View style={styles.flex}>
@@ -62,7 +68,7 @@ const RenderHeaderComponent = ({data}: any) => {
       <View style={localStyles.rootContainer}>
         <View style={styles.center}>
           <Image
-            source={{uri: BASE_IMG_NEW_PATH + data?.doctorImage}}
+            source={{uri: `${Api_Image_Base_Url}${data?.doctorImage}`}}
             style={localStyles.doctorImgStyle}
           />
           <CText type="s10" style={styles.mt5} numberOfLines={1}>
@@ -93,17 +99,23 @@ const RenderHeaderComponent = ({data}: any) => {
 export default function PatientsReview({route, navigation}: Props) {
   const data = route?.params?.data;
   return (
-    <CSafeAreaView>
+    <Container statusBarStyle='dark-content' >
+      <Body>
+
+
       <CHeader title={strings.patientsReviews} />
-      <FlashList
+     { data?.reviewData ? <FlashList
         data={data?.reviewData}
         renderItem={RenderReviewItem}
         keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={20}
+        estimatedItemSize={100}
         ListHeaderComponent={<RenderHeaderComponent data={data} />}
-      />
-    </CSafeAreaView>
+      /> : <Box alignSelf='center' >
+        <Loader/>
+        </Box>}
+        </Body>  
+    </Container>
   );
 }
 

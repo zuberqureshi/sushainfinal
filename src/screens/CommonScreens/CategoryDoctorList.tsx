@@ -35,7 +35,7 @@ export default function CategoryDoctorList(props: Props) {
   // console.log('itm', itm);
 
   return (
-    <Container>
+    <Container statusBarStyle='dark-content' >
       <CHeader title={itm + ' Doctors'} />
       <Body>
         <TouchableOpacity style={localStyles.bannerContaienr}>

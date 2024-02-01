@@ -14,15 +14,20 @@ import images from '../../assets/images';
 import moment from 'moment';
 import useGetSpeclizationlist from '../../hooks/home/get-speclization-list';
 import { Box, Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
-import useGetDoctorBySpeclization from '../../hooks/home/get-doctors-by-speclization';
+import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import {ParamListBase, useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Loader from '../../common/Loader';
+import { StackNav } from '../../navigation/NavigationKeys';
 
 const getYear = new Date().getFullYear();
-
+const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 const RenderDoctorCard = ({item}: any) => {
+ 
+
   return (
-    <TouchableOpacity style={localStyles.doctorCardStyle}>
+    <TouchableOpacity onPress={()=>{   navigation.navigate(StackNav.DoctorProfile, {id:item?.id});}}  style={localStyles.doctorCardStyle}>
       <Image
         source={{
           uri: `${Api_Image_Base_Url}${item.photo}`,

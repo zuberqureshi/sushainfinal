@@ -26,57 +26,20 @@ import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
 import { Box, Spinner } from '@gluestack-ui/themed';
 import { Container } from '../../components/Container';
 import Loader from '../../components/Loader/Loader';
+import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 
 export default function DoctorDetailCard({title}: any) {
   const [specDoctorList, setSpecDoctorList] = useState([]);
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [loader, setLoader] = useState(true)
+  const [selectedSpecDoctor, setSelectedSpecDoctor] = useState<string>('diabetes');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // const doctorList = (await DoctorListAPI(title)) as any;
-      // console.log('doctorList', doctorList);
-      // setSpecDoctorList(doctorList?.data[0].doctorList);
-      const apiUrl = `${API_BASE_URL}/booking/doclistingspec`; // Replace with your API endpoint
 
-// Data to be sent in the POST request
-const postData = {
-  specialization:title
-  ,
+  const {data:doctorBySpeclizationData,isLoading:doctorBySpeclizationIsLoading,isPending} = useGetDoctorBySpeclization({specialization:title})
+   console.log(isPending,doctorBySpeclizationIsLoading,'DOCTORCARD');
+   
 
-};
-
-// Make a POST request using the fetch method
-fetch(apiUrl, {
-  method: 'POST',
-  headers: {
-    // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(postData), // Convert data to JSON format
-})
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json(); // Assuming the response is in JSON format
-  })
-  .then(data => {
-    // Handle the data from the successful API response
-    // console.log('API response:', data?.data[0]?.doctorList);
-    setSpecDoctorList( data?.data[0]?.doctorList)
-    setLoader(false)
-  })
-  .catch(error => {
-    // Handle errors
-    console.error('API error:', error);
-  });
-
-    };
-    fetchData();
-  }, []);
-
-  if (loader) {
+  if (doctorBySpeclizationIsLoading) {
     return(
       <Loader/>
     )
@@ -192,15 +155,18 @@ fetch(apiUrl, {
   }
 
   return (
-    <FlashList
-      data={specDoctorList}
+    <>
+    { doctorBySpeclizationData?.data?.result[0]?.doctorList ?  <FlashList
+      data={doctorBySpeclizationData?.data?.result[0]?.doctorList}
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       showsVerticalScrollIndicator={false}
       estimatedItemSize={200}
       ListEmptyComponent={EmptyListMessage}
       
-    />
+    /> : <Loader/>}
+    </>
+  
    
   );
 }
