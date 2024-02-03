@@ -40,7 +40,18 @@ export const loginSchema = yup.object().shape({
     // cpass:yup.string().required('Confirm Password is must')
     // .oneOf([yup.ref('password'),null],'Both password must match'),
     
+})
 
+export const patientBookingValidationSchema = yup.object().shape({
+    
+  bookingfor:yup.string(),
+  patientname:yup.string().required("Patient name is required"),
+  patientnumber:yup.string().required("Patient number is required"),
+  patientage:yup.string().required("Age is required"),
+  patientweight:yup.string().required("Weight is required"),
+  patientgender:yup.string(),
+  slotdateday:yup.string(),
+  slottime:yup.string(),
 
 })
 

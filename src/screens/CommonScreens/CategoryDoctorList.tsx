@@ -35,61 +35,13 @@ export default function CategoryDoctorList(props: Props) {
   // console.log('itm', itm);
 
   return (
-    <Container>
+    <Container statusBarStyle='dark-content' >
       <CHeader title={itm + ' Doctors'} />
-      <Body>
-        <TouchableOpacity style={localStyles.bannerContaienr}>
-          <Image
-            source={images.exclusiveTherapyImage}
-            style={localStyles.bannerImageStyle}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-        <View style={localStyles.bottomBanerContainer}>
-          <FreeFollowUp />
-          <CText type="m8" style={styles.pl5}>
-            Free follow up
-          </CText>
-          <CText type="s12" color={colors.dividerColor} style={styles.ph5}>
-            {' | '}
-          </CText>
-          <DigitalPrecereption />
-          <CText type="m8" style={styles.pl5}>
-            {'Get Digital Prescription'}
-          </CText>
-          <CText type="s12" color={colors.dividerColor} style={styles.ph5}>
-            {' | '}
-          </CText>
-          <DigitalPrecereption />
-          <CText type="m8" numberOfLines={1} style={[styles.pl5, styles.flex]}>
-            {'Toxin-Free Natural Medications '}
-          </CText>
-        </View>
-        <View style={localStyles.buttonContinerStyle}>
-          <CButton
-            title={strings.sort}
-            onPress={() => {}}
-            containerStyle={localStyles.btnContainerStyle}
-            bgColor={colors.white}
-            color={colors.black}
-            style={styles.ml5}
-            type="r12"
-            frontIcon={<SortIcon />}
-          />
-          <CButton
-            title={strings.filter}
-            onPress={() => {}}
-            containerStyle={localStyles.btnContainerStyle}
-            bgColor={colors.white}
-            color={colors.black}
-            style={styles.ml5}
-            type="r12"
-            frontIcon={<FilterIcon />}
-          />
-        </View>
+      
+      
         <DoctorDetailCard title={itm} />
-        <View style={{height: 120}} />
-      </Body>
+       
+    
     </Container>
   );
 }

@@ -60,11 +60,11 @@ export default function StackNavigation() {
         name={StackNav.DoctorProfile}
         component={StackRoute.DoctorProfile}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name={StackNav.PatientsReview}
         component={StackRoute.PatientsReview}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.PaymentScreen}
         component={StackRoute.PaymentScreen}
       /> */}

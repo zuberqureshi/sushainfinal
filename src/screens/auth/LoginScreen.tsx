@@ -22,7 +22,6 @@ import GoogleLogin from '../../components/GoogleLogin'
 import FaceBookLogin from '../../components/FaceBookLogin'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
-import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
 import { AuthContext } from '../../context/AuthContext'
 
 const LoginScreen = () => {
@@ -30,8 +29,8 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(true)
   const authContext = useContext(AuthContext);
 
-  const { data:categoryListMain, isPending:PendingCategoryList, isLoading:isLoadingCategoryList } =  useDoctorListSpec();
-  console.log( 'authContext',authContext, 'useDoctorListSpec', categoryListMain?.data)
+
+  console.log( 'authContext',authContext, 'useDoctorListSpec')
 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 

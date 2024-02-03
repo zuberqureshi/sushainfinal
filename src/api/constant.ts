@@ -416,3 +416,14 @@ export const addressData = [
   },
  
 ]
+
+export const bookingFor = [
+  {label: 'Self', value: 'self'},
+  {label: 'Spouse', value: 'spouse'},
+  {label: 'Husband', value: 'husband'},
+  {label: 'Kid', value: 'kid'},
+  {label: 'Father', value: 'father'},
+  {label: 'Mother', value: 'mother'},
+  {label: 'Other', value: 'other'},
+
+]

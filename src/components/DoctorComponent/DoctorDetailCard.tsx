@@ -1,100 +1,54 @@
-import {Image, StyleSheet, TouchableOpacity, View,Text} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {FlashList} from '@shopify/flash-list';
-import {ParamListBase, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { Image, StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Spinner } from '@gluestack-ui/themed';
+import { responsiveHeight, responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-// local imports
-// const CText = React.lazy(() => import('../../components/common/CText'))
-// const RatingComponent = React.lazy(() => import('../../components/HomeComponent/RatingComponent'))
-// const CButton = React.lazy(() => import('../../components/common/CButton'))
-
-import {colors, styles} from '../../themes';
+import { colors, styles } from '../../themes';
 import CText from '../../components/common/CText';
-import {LikeIcon, ShareIcon} from '../../assets/svgs';
+import { DigitalPrecereption, FilterIcon, FreeFollowUp, LikeIcon, ShareIcon, SortIcon } from '../../assets/svgs';
 import RatingComponent from '../../components/HomeComponent/RatingComponent';
 import CButton from '../../components/common/CButton';
 import strings from '../../i18n/strings';
-// import {DoctorListAPI} from '../../api/homeApis';
-import {getHeight, moderateScale} from '../../common/constants';
-import {BASE_IMG_NEW_PATH} from '../../api/constant';
-import {StackNav} from '../../navigation/NavigationKeys';
+import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants';
+import { BASE_IMG_NEW_PATH } from '../../api/constant';
+import { StackNav } from '../../navigation/NavigationKeys';
 import images from '../../assets/images';
-import { responsiveHeight,responsiveFontSize,responsiveWidth } from 'react-native-responsive-dimensions';
 import typography from '../../themes/typography';
-import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
-import { Box, Spinner } from '@gluestack-ui/themed';
-import { Container } from '../../components/Container';
 import Loader from '../../components/Loader/Loader';
+import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 
-export default function DoctorDetailCard({title}: any) {
-  const [specDoctorList, setSpecDoctorList] = useState([]);
+export default function DoctorDetailCard({ title='diabetes' }: any) {
+
+  //init
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const [loader, setLoader] = useState(true)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // const doctorList = (await DoctorListAPI(title)) as any;
-      // console.log('doctorList', doctorList);
-      // setSpecDoctorList(doctorList?.data[0].doctorList);
-      const apiUrl = `${API_BASE_URL}/booking/doclistingspec`; // Replace with your API endpoint
+  //api call
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title })
+  console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
 
-// Data to be sent in the POST request
-const postData = {
-  specialization:title
-  ,
-
-};
-
-// Make a POST request using the fetch method
-fetch(apiUrl, {
-  method: 'POST',
-  headers: {
-    // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(postData), // Convert data to JSON format
-})
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json(); // Assuming the response is in JSON format
-  })
-  .then(data => {
-    // Handle the data from the successful API response
-    // console.log('API response:', data?.data[0]?.doctorList);
-    setSpecDoctorList( data?.data[0]?.doctorList)
-    setLoader(false)
-  })
-  .catch(error => {
-    // Handle errors
-    console.error('API error:', error);
-  });
-
-    };
-    fetchData();
-  }, []);
-
-  if (loader) {
-    return(
-      <Loader/>
+  //Loader
+  if (doctorBySpeclizationIsLoading) {
+    return (
+      <Loader />
     )
   }
 
-  const onPressDoctorProfile = (id: any) =>
-    navigation.navigate(StackNav.DoctorProfile, {id});
 
-  const renderItem = ({item, index}: any) => {
+  const onPressDoctorProfile = (id: any) =>
+    navigation.navigate(StackNav.DoctorProfile, { id });
+
+  const renderItem = ({ item, index }: any) => {
     // console.log(item);
-    
+
     return (
       <View style={localStyles.cardMainContainer}>
         <View style={[styles.flexRow, styles.justifyBetween]}>
           <View style={localStyles.leftContainer}>
             <Image
               source={{
-                uri:`${API_IMAGE_BASE_URL}${item?.photo}`,
+                uri: `${API_IMAGE_BASE_URL}${item?.photo}`,
               }}
               style={localStyles.doctorImgStyle}
             />
@@ -159,7 +113,7 @@ fetch(apiUrl, {
             <CButton
               title={strings.bookNow}
               containerStyle={localStyles.bookNowBtnStyle}
-              onPress={() => {}}
+              onPress={() => { }}
               bgColor={colors.success}
               color={colors.white}
               type="b12"
@@ -173,35 +127,99 @@ fetch(apiUrl, {
 
   const EmptyListMessage = () => {
 
-    return(
-       <View style={localStyles.notAvailableWrappeer} >
-         <Text style={localStyles.bareillSoonText} >{strings.wewillbeinBareillSoon}</Text>
+    return (
+      <View style={localStyles.notAvailableWrappeer} >
+        <Text style={localStyles.bareillSoonText} >{strings.wewillbeinBareillSoon}</Text>
 
-         <Text style={localStyles.globalExpertsOnlineText}  >{strings.connectWithOurGlobalExpertsOnline}</Text>
+        <Text style={localStyles.globalExpertsOnlineText}  >{strings.connectWithOurGlobalExpertsOnline}</Text>
 
-         <Image source={images.doctorNotAvailable} style={localStyles.notAvailableImg} />
+        <Image source={images.doctorNotAvailable} style={localStyles.notAvailableImg} />
 
-         {/* <TouchableOpacity style={localStyles.forVideoConsultationButtonWrapper}  >
+        {/* <TouchableOpacity style={localStyles.forVideoConsultationButtonWrapper}  >
            <Text style={localStyles.forVideoConsultationButtonText}  >{strings.forVideoConsultationClickHere}</Text>{}
          </TouchableOpacity> */}
-           
-           <Spinner size='large' />
-       </View>
+
+        <Spinner size='large' />
+      </View>
+
+    )
+  }
+
+  const ListHeaderComponent = () => {
+
+    return (
+      <View>
+        <TouchableOpacity style={localStyles.bannerContaienr}>
+          <Image
+            source={images.exclusiveTherapyImage}
+            style={localStyles.bannerImageStyle}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
+        <View style={localStyles.bottomBanerContainer}>
+          <FreeFollowUp />
+          <CText type="m8" style={styles.pl5}>
+            Free follow up
+          </CText>
+          <CText type="s12" color={colors.dividerColor} style={styles.ph5}>
+            {' | '}
+          </CText>
+          <DigitalPrecereption />
+          <CText type="m8" style={styles.pl5}>
+            {'Get Digital Prescription'}
+          </CText>
+          <CText type="s12" color={colors.dividerColor} style={styles.ph5}>
+            {' | '}
+          </CText>
+          <DigitalPrecereption />
+          <CText type="m8" numberOfLines={1} style={[styles.pl5, styles.flex]}>
+            {'Toxin-Free Natural Medications '}
+          </CText>
+        </View>
+        <View style={localStyles.buttonContinerStyle}>
+          <CButton
+            title={strings.sort}
+            onPress={() => { }}
+            containerStyle={localStyles.btnContainerStyle}
+            bgColor={colors.white}
+            color={colors.black}
+            style={styles.ml5}
+            type="r12"
+            frontIcon={<SortIcon />}
+          />
+          <CButton
+            title={strings.filter}
+            onPress={() => { }}
+            containerStyle={localStyles.btnContainerStyle}
+            bgColor={colors.white}
+            color={colors.black}
+            style={styles.ml5}
+            type="r12"
+            frontIcon={<FilterIcon />}
+          />
+        </View>
+      </View>
 
     )
   }
 
   return (
-    <FlashList
-      data={specDoctorList}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()}
-      showsVerticalScrollIndicator={false}
-      estimatedItemSize={200}
-      ListEmptyComponent={EmptyListMessage}
-      
-    />
-   
+    <>
+      {(!!(doctorBySpeclizationData?.data?.result[0]?.doctorList)) ? <FlatList
+        data={doctorBySpeclizationData?.data?.result[0]?.doctorList}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        showsVerticalScrollIndicator={false}
+        // estimatedItemSize={100}
+        ListHeaderComponent={ListHeaderComponent}
+        ListFooterComponent={() => { return (<View style={{ height: responsiveHeight(10) }} />) }}
+      // ListEmptyComponent={EmptyListMessage}
+
+
+      /> : <Loader />}
+    </>
+
+
   );
 }
 
@@ -274,39 +292,73 @@ const localStyles = StyleSheet.create({
     borderRadius: moderateScale(10),
     height: getHeight(36),
   },
-  notAvailableWrappeer:{
-    alignItems:'center',
-    marginTop:responsiveHeight(5),
-    marginBottom:responsiveHeight(20)
+  notAvailableWrappeer: {
+    alignItems: 'center',
+    marginTop: responsiveHeight(5),
+    marginBottom: responsiveHeight(20)
   },
-  bareillSoonText:{
+  bareillSoonText: {
     ...typography.fontWeights.Medium,
-    color:'#ACADAA',
+    color: '#ACADAA',
     ...typography.fontSizes.f16,
-    marginBottom:responsiveHeight(1)
+    marginBottom: responsiveHeight(1)
   },
-  globalExpertsOnlineText:{
+  globalExpertsOnlineText: {
     ...typography.fontWeights.Medium,
-    color:colors.black,
+    color: colors.black,
     ...typography.fontSizes.f18,
-    textAlign:'center',
-    width:responsiveWidth(70)
+    textAlign: 'center',
+    width: responsiveWidth(70)
   },
-  notAvailableImg:{
-    resizeMode:'contain',
-    width:responsiveWidth(65),
-    height:responsiveHeight(25)
+  notAvailableImg: {
+    resizeMode: 'contain',
+    width: responsiveWidth(65),
+    height: responsiveHeight(25)
   },
- forVideoConsultationButtonWrapper:{
-    backgroundColor:colors.success,
-    paddingHorizontal:responsiveWidth(10),
-    paddingVertical:responsiveHeight(1.5),
-    borderRadius:responsiveWidth(3)
+  forVideoConsultationButtonWrapper: {
+    backgroundColor: colors.success,
+    paddingHorizontal: responsiveWidth(10),
+    paddingVertical: responsiveHeight(1.5),
+    borderRadius: responsiveWidth(3)
   },
-  forVideoConsultationButtonText:{
+  forVideoConsultationButtonText: {
     ...typography.fontWeights.Bold,
-    color:colors.white,
+    color: colors.white,
     ...typography.fontSizes.f14
-   
-  }
+
+  },
+  bannerImageStyle: {
+    width: '100%',
+    height: moderateScale(140),
+    ...styles.mv10,
+    borderRadius: moderateScale(10),
+  },
+  bannerContaienr: {
+    ...styles.center,
+    ...styles.mh20,
+  },
+  bottomBanerContainer: {
+    ...styles.ph10,
+    ...styles.pv10,
+    backgroundColor: colors.lightOrange,
+    ...styles.flexRow,
+    ...styles.itemsCenter,
+    // ...styles.flex,
+    height: responsiveHeight(5)
+  },
+  buttonContinerStyle: {
+    ...styles.flexRow,
+    ...styles.itemsCenter,
+    ...styles.justifyEnd,
+    ...styles.mh20,
+    ...styles.mv10,
+  },
+  btnContainerStyle: {
+    ...styles.ml10,
+    ...styles.ph10,
+    borderWidth: moderateScale(1),
+    borderColor: colors.bColor2,
+    height: getHeight(28),
+    borderRadius: moderateScale(10),
+  },
 });

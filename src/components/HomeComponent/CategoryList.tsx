@@ -7,10 +7,10 @@ import CText from '../common/CText';
 import {moderateScale} from '../../common/constants';
 import {Category} from '../../types/Types';
 import images from '../../assets/images';
-import { useNavigation } from '@react-navigation/native';
-import { StackNav } from '../../navigation/NavigationKeys';
+import { StackNav, TabNav } from '../../navigation/NavigationKeys';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
-
+import {ParamListBase, useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 
 const data = [
@@ -57,12 +57,14 @@ type props = {
 
 const CategoryList = () => {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const renderItem = ({item, index}: props) => {
     return (
       <Pressable onPress={()=>{
         if(index === 1){
           navigation.navigate(StackNav.InstantConsultation)
+        }else if(index === 0){
+          navigation.navigate(TabNav?.FindADoctorHome)
         }
       }} >
         <View style={localStyles.itemStyle}>

@@ -118,9 +118,8 @@ const localStyles = StyleSheet.create({
        borderColor:'#DAD8D8',
        borderRadius:responsiveWidth(2.5),
        ...styles.mh20,
-       paddingVertical:responsiveHeight(3.5)
-      
-       
+       paddingVertical:responsiveHeight(3.5),
+       overflow:'hidden' 
     },
     imgStyle: {
         width: '100%',
