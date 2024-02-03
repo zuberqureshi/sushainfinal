@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>996922397465-0db5l2oi1ppuc9vrb2jnjpi8h9ebkjji.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.996922397465-0db5l2oi1ppuc9vrb2jnjpi8h9ebkjji</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>996922397465-88li080vcdkgs9e2hbkm2fpqn55p00ia.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA0XsdveDbwFnJhFe04B0MswgW1ftpvf7M</string>
+	<key>GCM_SENDER_ID</key>
+	<string>996922397465</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.sushain.marketplace</string>
+	<key>PROJECT_ID</key>
+	<string>sushain-abec8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>sushain-abec8.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:996922397465:ios:27a3254c0838e31e202b88</string>
+</dict>
+</plist>
