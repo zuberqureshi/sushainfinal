@@ -6,12 +6,11 @@ import {FlashList} from '@shopify/flash-list';
 import CText from '../common/CText';
 import {colors} from '../../themes';
 import {styles} from '../../themes';
-import {getHeight, moderateScale} from '../../common/constants';
+import {Api_Image_Base_Url, getHeight, moderateScale} from '../../common/constants';
 import images from '../../assets/images';
 import RatingComponent from '../HomeComponent/RatingComponent';
 import SubHeader from '../common/CommonComponent/SubHeader';
 import strings from '../../i18n/strings';
-import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
 import { Text } from '@gluestack-ui/themed';
 
 interface Top_Rate_Doctor_Data {
@@ -32,10 +31,10 @@ export default function TopDoctor({data}:{data:any}) {
    const RenderItem = ({item,index}:{item:Top_Rate_Doctor_Data,index:number}) => {
     console.log(item?.name,index,'lllkkk');
     return (
-      <View style={localStyles.cardMainContainer}>
+      <View key={item?.photo?.toString()} style={localStyles.cardMainContainer}>
         <View style={styles.flexRow}>
           <Image
-            source={{uri:`${API_IMAGE_BASE_URL}${item?.photo}`}}
+            source={{uri:`${Api_Image_Base_Url}${item?.photo}`}}
             style={localStyles.doctorImgStyle}
           />
           <View style={localStyles.rightContainer}>
@@ -65,7 +64,7 @@ export default function TopDoctor({data}:{data:any}) {
 
       <FlashList
         data={data}
-        renderItem={({item,index}) => <RenderItem key={`${item?.photo}${index}`} item={item} index={index} />}
+        renderItem={({item,index}:any) => <RenderItem item={item} index={index} />}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}
         horizontal

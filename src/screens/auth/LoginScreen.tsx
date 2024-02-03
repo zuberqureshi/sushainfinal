@@ -22,7 +22,6 @@ import GoogleLogin from '../../components/GoogleLogin'
 import FaceBookLogin from '../../components/FaceBookLogin'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
-import useDoctorListSpec from '../../hooks/doctor/doctorList_spec'
 import { AuthContext } from '../../context/AuthContext'
 import useLoginByPassword from '../../hooks/auth/loginbypassword'
 import {setAccessToken, getAccessToken } from '../../utils/network'
@@ -42,11 +41,12 @@ const LoginScreen = () => {
   useEffect(() => {
     load();
   }, []);
-  const { data:categoryListMain, isPending:PendingCategoryList, isLoading:isLoadingCategoryList } =  useDoctorListSpec();
- 
+  
   const toast = useToast()
 
   const createloginByPassword = useLoginByPassword()
+
+  console.log( 'authContext',authContext, 'useDoctorListSpec')
 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 

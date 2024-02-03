@@ -9,13 +9,14 @@ export const getLocation = async() => {
     
         // console.log(location,'LOCAAAA');
         fetch( `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location?.latitude}&lon=${location?.longitude}`, ) .then(response => response.json()) .then( async(data) => { 
-          console.log({data}); 
+        //   console.log({data}); 
         // Extract city and country information from the response
          const city = data.address.city || data.address.town || data.address.village || data.address.hamlet; 
          const country = data.address.country;
          await AsyncStorage.setItem('getUserCity',city)
          
-          console.log(city); }) .catch(error => {
+          console.log(city); 
+        }) .catch(error => {
              // Handle errors
               console.error('Error:', error); });
             

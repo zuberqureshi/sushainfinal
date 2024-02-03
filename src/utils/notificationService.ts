@@ -2,8 +2,6 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PermissionsAndroid, Platform} from 'react-native';
 
-
-
 export async function requestUserPermission() {
  
     if(Platform.OS === 'android'){PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);} //show allow notifucation dialog
@@ -22,17 +20,13 @@ export async function requestUserPermission() {
 const getFCMToken = async()=>{
     let fcmToken = await AsyncStorage.getItem('fcmToken')
      console.log(fcmToken,"Fcm old token")
-
      if(!fcmToken){
-
         try {
             const fcmToken = await messaging().getToken();
-
             if(fcmToken){
                 console.log(fcmToken,"new generate fcm token")
                 await AsyncStorage.setItem('fcmToken',fcmToken)
             }
-            
         } catch (error) {
             
             console.log(error,'error rasied in fcm token ')
@@ -40,8 +34,6 @@ const getFCMToken = async()=>{
      }
   }
   
-
-
   export const notificationListener= async()=>{
 
     messaging().onNotificationOpenedApp(remoteMessage => {

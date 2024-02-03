@@ -32,7 +32,7 @@ const Appointments = () => {
           <ShakeHand />
         </Box>
 
-        <Box backgroundColor='#EAE5E566' py={10} px={15} borderRadius={10} mt={10} style={{ marginHorizontal: responsiveWidth(3) }} >
+        <Box backgroundColor={colors.white4}  py={10} px={15} borderRadius={10} mt={10} style={{ marginHorizontal: responsiveWidth(3),...styles.shadowStyle }} >
           <Text fontFamily='$InikaBold' fontSize={16} color={colors.success}>Today <Text fontFamily='$InikaBold' fontSize={16} color={colors.primary}>Appointment</Text></Text>
           <Text fontFamily='$InterRegular' fontSize={8} color={colors.black}>Appointment Id: 345567872782889</Text>
 
@@ -126,16 +126,7 @@ const Appointments = () => {
                 {['Dr. Preeti Chhabra', 'Dr. Anshu Sharma'].map((item, index) => {
 
                   return (
-                    <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 0,
-                        height: 1,
-                      },
-                      shadowOpacity: 0.22,
-                      shadowRadius: 2.22,
-                      elevation: 3,
-                    }} >
+                    <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{...styles.shadowStyle}} >
                       <Box flexDirection='row' alignItems='center' gap={14} py={10}>
                         <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
                         <Box flexDirection='column' gap={9} >
@@ -208,16 +199,7 @@ const Appointments = () => {
 
               <Box backgroundColor='#D9D9D933' py={30} px={16} >
 
-                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
+                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentMedicinesIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
@@ -225,16 +207,7 @@ const Appointments = () => {
                   <GreaterThanBlack />
                 </Box>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentBeautyIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
@@ -242,16 +215,7 @@ const Appointments = () => {
                   <GreaterThanBlack />
                 </Box>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentOrderIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
@@ -270,16 +234,7 @@ const Appointments = () => {
             <Box backgroundColor='#F7F7F7' pb={25} mb={10} mt={10} >
               <Text fontFamily='$InikaRegular' fontSize={13} color={'#696767'} my={8} mx={16} >Don’t forget to take Follow up</Text>
 
-              <Box backgroundColor='#FCFFFF' shadowOffset={{width:0,height:1}} shadowColor='#000' shadowOpacity={0.22} shadowRadius={2.22} elevation={3} mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 1,
-                  height: 1,
-                },
-                shadowOpacity: 0.22,
-                shadowRadius: 2.22,
-                elevation: 3,
-              }} >
+              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{...styles.shadowStyle}} >
                 <Box flexDirection='row' alignItems='center' gap={18} py={10}>
                   <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
                   <Box flexDirection='column' gap={9} >
@@ -331,16 +286,7 @@ const Appointments = () => {
 
               </Box>
 
-              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.22,
-                shadowRadius: 2.22,
-                elevation: 3,
-              }} >
+              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{...styles.shadowStyle}} >
                 <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : Dr. Anshu Sharma</Text>
 
                 <Box flexDirection='row' gap={5} >

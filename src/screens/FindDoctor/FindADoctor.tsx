@@ -9,7 +9,7 @@ import TopDoctor from '../../components/DoctorComponent/TopDoctor';
 import DoctorCategoryComponent from '../../components/DoctorComponent/DoctorCategoryComponent';
 import strings from '../../i18n/strings';
 import CText from '../../components/common/CText';
-import { moderateScale } from '../../common/constants';
+import { Api_Image_Base_Url, moderateScale } from '../../common/constants';
 import { BrandIcon, DoctorIcon, ReviewsIcon, UserIcon } from '../../assets/svgs';
 import TopBannerFindDoctor from '../../components/DoctorComponent/TopBannerFindDoctor';
 // import {findDoctorHomeAPI} from '../../api/FindDoctor';
@@ -20,6 +20,7 @@ import { Box, Spinner, Text } from '@gluestack-ui/themed';
 import Loader from '../../components/Loader/Loader';
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
 import ScreenBottomAchievement from '../../components/common/ScreenBottomAchievement/ScreenBottomAchievement';
+import useGetFindADoctor from '../../hooks/doctor/find-a-doctor';
 
 const BottomContainer = ({ icon, title }: any) => {
   return (
@@ -45,49 +46,8 @@ const FindADoctor = () => {
   const [apiData, setApiData] = useState([])
   const [loader, setLoader] = useState(true)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // const data = await findDoctorHomeAPI();
-      // console.log('FindADoctor', data);
-      const apiUrl = `${API_BASE_URL}booking/videomainpage`; // Replace with your API endpoint
-
-      // Make a GET request using the fetch method
-      fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json(); // Assuming the response is in JSON format
-        })
-        .then(data => {
-          // Handle the data from the successful API response
-          console.log('API response:', data?.data[0]?.bannerList);
-          setBannerData(data?.data[0]?.bannerList)
-          setSpecializationList(data?.data[0]?.specializationList)
-          setApiData(data?.data[0])
-          setLoader(false)
-        })
-        .catch(error => {
-          // Handle errors
-          console.error('API error:', error);
-        });
-    };
-    fetchData();
-  }, []);
-
-  // console.log(apiData?.topDoctorList,'ffff');
-
-  if (loader) {
-    return (
-      <Loader />
-    )
-  }
+  //api call
+  const {data,isLoading} = useGetFindADoctor()
 
   const RightText = () => {
     return (
@@ -102,21 +62,34 @@ const FindADoctor = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+    <Container statusBarStyle='dark-content' >
+          <CHeader
+          title={strings.findDoctorVideoConsultation}
+          rightIcon={<RightText />}
+          isHideBack={true}
+        />
+        <Loader />
+    </Container>
+    )
+  }
 
-
+ 
   return (
     <Container statusBarStyle='dark-content' >
       <ScrollView style={styles.flexGrow1} showsVerticalScrollIndicator={false}>
         <CHeader
           title={strings.findDoctorVideoConsultation}
           rightIcon={<RightText />}
+          isHideBack={true}
         />
         <SearchWithLikeComponent />
-        {bannerData && <TopBannerFindDoctor data={bannerData} />}
-        {specializationList ? <ADoctorHealthIssue data={specializationList} /> : <Spinner size='large' />}
-        {apiData?.topDoctorList && <TopDoctor data={apiData?.topDoctorList} />}
+        {data?.data?.result[0]?.bannerList && <TopBannerFindDoctor data={data?.data?.result[0]?.bannerList} />}
+        {data?.data?.result[0]?.specializationList ? <ADoctorHealthIssue data={data?.data?.result[0]?.specializationList} /> :  <Loader />}
+        {data?.data?.result[0]?.topDoctorList && <TopDoctor data={data?.data?.result[0]?.topDoctorList} />}
 
-        {apiData?.listAppGeneralCategory?.map((item: any) => {
+        {data?.data?.result[0]?.listAppGeneralCategory?.map((item: any) => {
           return (
             <Box>
               {item?.app_general_sub_category_doc && <DoctorCategoryComponent title={item?.name} data={item?.app_general_sub_category_doc} />}
@@ -124,23 +97,6 @@ const FindADoctor = () => {
 
           )
         })}
-
-        {/* <View style={localStyles.bottomContainer}>
-          <View style={localStyles.rowStyle}>
-            <BottomContainer title="7000+ users" icon={<UserIcon />} />
-            <BottomContainer
-              title="1000+ Ayurvedic Doctors"
-              icon={<DoctorIcon />}
-            />
-          </View>
-          <View style={localStyles.rowStyle}>
-            <BottomContainer title="100+ Product Brands" icon={<BrandIcon />} />
-            <BottomContainer
-              title="3000+ Patient reviews"
-              icon={<ReviewsIcon />}
-            />
-          </View>
-        </View> */}
         <ScreenBottomAchievement />
         <View style={{ height: 120 }} />
       </ScrollView>

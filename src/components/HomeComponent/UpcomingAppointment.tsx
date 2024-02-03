@@ -132,10 +132,6 @@ export default function UpcomingAppointment({
            
 
         <View style={localStyles.bottomCardContainer}>
-          <Pressable onPress={async()=>{console.log(await AsyncStorage.getItem('getUserCity'),'UUUPPPPPPPP');
-          }} >
-            <CText>jjjjjjjjjjjjjj</CText>
-          </Pressable>
           <CText type="r12" color={colors.black}>
             {
               'Please review your experience with the last doctor : Dr. Pallvi Rathee'

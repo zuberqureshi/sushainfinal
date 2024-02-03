@@ -208,7 +208,7 @@ const localStyles = StyleSheet.create({
   },
   doctorListContaienr: {
     width: '97%',
-    ...styles.pv10,
+    ...styles.pv5,
     ...styles.pb15,
     backgroundColor: colors.lightBlue2,
     top: getHeight(-5),
