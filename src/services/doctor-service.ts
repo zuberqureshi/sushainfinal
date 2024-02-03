@@ -8,6 +8,7 @@ class DoctorService {
     getDoctorsBySpeclization: 'getDoctorsBySpeclization',
     getDoctorsProfile: 'getDoctorsProfile',
     getDoctorsReview: 'getDoctorsReview',
+    getDoctorsAllSlots: 'getDoctorsAllSlots',
     
   };
 
@@ -39,6 +40,14 @@ class DoctorService {
 
     return fetcher({
       url: `booking/docreview?doc_id=${data}`,
+      method: 'GET',
+    });
+  }
+
+  getDoctorsAllSlots = async () => {
+
+    return fetcher({
+      url: `booking/fetchslots`,
       method: 'GET',
     });
   }

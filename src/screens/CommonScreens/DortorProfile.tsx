@@ -132,6 +132,10 @@ export default function DoctorProfile({ route, navigation }: Props) {
 
   //APi call
   const { data, isLoading } = useGetDoctorsProfile(id)
+  
+  const practicingDate = moment(moment(data?.data?.result[0]?.doctorProfileDetail?.practicing_since).format('YYYY-MM-DD'));
+  const yearsOfEXP = moment().diff(practicingDate, 'years');
+
 
   useEffect(() => {
     if (data?.data) {
@@ -161,7 +165,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
   }
 
   const onPressBookAppointment = () => {
-    navigation.navigate(StackNav.SelectTimeSlot, { id });
+    navigation.navigate(StackNav.SelectTimeSlot, { id:id,doctorslots:doctorDetail?.slots });
   }
 
   const renderItem = ({ item }: { item: DoctorSpecialityListData }) => {
@@ -219,7 +223,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
                   {doctorDetail?.max_qualification}
                 </CText>
                 <CText type="r10" numberOfLines={1}>
-                  {doctorDetail?.experience + ' YRS. EXP.'}
+                  {yearsOfEXP + ' YRS. EXP.'}
                 </CText>
                 <View style={styles.rowStart}>
                   <ChatIcon />

@@ -49,12 +49,6 @@ const FindADoctor = () => {
   //api call
   const {data,isLoading} = useGetFindADoctor()
 
-  if (isLoading) {
-    return (
-      <Loader />
-    )
-  }
-
   const RightText = () => {
     return (
       <TouchableOpacity>
@@ -68,14 +62,27 @@ const FindADoctor = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+    <Container statusBarStyle='dark-content' >
+          <CHeader
+          title={strings.findDoctorVideoConsultation}
+          rightIcon={<RightText />}
+          isHideBack={true}
+        />
+        <Loader />
+    </Container>
+    )
+  }
 
-
+ 
   return (
     <Container statusBarStyle='dark-content' >
       <ScrollView style={styles.flexGrow1} showsVerticalScrollIndicator={false}>
         <CHeader
           title={strings.findDoctorVideoConsultation}
           rightIcon={<RightText />}
+          isHideBack={true}
         />
         <SearchWithLikeComponent />
         {data?.data?.result[0]?.bannerList && <TopBannerFindDoctor data={data?.data?.result[0]?.bannerList} />}

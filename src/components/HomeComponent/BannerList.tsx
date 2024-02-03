@@ -60,7 +60,7 @@ const BannerList = ({bannerData,type}: any) => {
   return (
     <View style={localStyles.root}>
 
-    { !!bannerData && <Carousel
+    { (!!bannerData) ? <Carousel
         // data={getSortedArray(bannerData, 'order_no')}
         data={bannerData}
         renderItem={imageCarousel}
@@ -70,7 +70,7 @@ const BannerList = ({bannerData,type}: any) => {
         contentContainerStyle={styles.center}
         autoplay={true}
         loop={true}
-      />  }
+      />  : <Spinner size={'small'} color={colors.primary} /> }
      { !!bannerData && <View style={[styles.justifyCenter]}>
         <Pagination
           dotsLength={bannerData?.length}

@@ -1,100 +1,105 @@
-import {FlatList, Image, StyleSheet, TouchableOpacity, View,} from 'react-native';
-import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
-import {FlashList} from '@shopify/flash-list';
+import { FlatList, Image, StyleSheet, TouchableOpacity, View, } from 'react-native';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
 
 // local imports
 import SubHeader from '../common/CommonComponent/SubHeader';
 import strings from '../../i18n/strings';
-import {DoctorSpecialityListData} from '../../types/Types';
+import { DoctorSpecialityListData } from '../../types/Types';
 import CText from '../common/CText';
-import {colors, styles} from '../../themes';
-import {Api_Image_Base_Url, getHeight, moderateScale} from '../../common/constants';
-import {ThumbIcon} from '../../assets/svgs';
+import { colors, styles } from '../../themes';
+import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants';
+import { ThumbIcon } from '../../assets/svgs';
 import images from '../../assets/images';
 import moment from 'moment';
 import useGetSpeclizationlist from '../../hooks/home/get-speclization-list';
-import { Box, Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
+import { Box, Spinner, } from '@gluestack-ui/themed';
 import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
-import {ParamListBase, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Loader from '../../common/Loader';
 import { StackNav } from '../../navigation/NavigationKeys';
 
 const getYear = new Date().getFullYear();
-const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-const RenderDoctorCard = ({item}: any) => {
- 
 
-  return (
-    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.DoctorProfile,{id:item?.id})}}  style={localStyles.doctorCardStyle}>
-      <Image
-        source={{
-          uri: `${Api_Image_Base_Url}${item.photo}`,
-        }}
-        style={localStyles.doctorImgStyle}
-      />
-      <CText
-        type="s10"
-        style={styles.mv5}
-        align="center"
-        numberOfLines={1}
-        color={colors.textColor1}>
-        {item?.name}
-      </CText>
-      <View style={localStyles.doctorSpeclistTextStyle}>
+const RenderFooterComponent = memo(({ resultValue, isLoading }: any) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
+  const renderDoctorCard = ({ item }: any) => {
+
+    const handleNaviagte = () => {
+      navigation.navigate(StackNav.DoctorProfile, { id: item?.id })
+    }
+    return (
+
+      <TouchableOpacity onPress={handleNaviagte} style={localStyles.doctorCardStyle}>
+        <Image
+          source={{
+            uri: `${API_IMAGE_BASE_URL}${item.photo}`,
+          }}
+          style={localStyles.doctorImgStyle}
+        />
         <CText
-          type="s8"
+          type="s10"
+          style={styles.mv5}
           align="center"
-          numberOfLines={2}
+          numberOfLines={1}
           color={colors.textColor1}>
-          {item?.services_offered}
-       
+          {item?.name}
         </CText>
-      </View>
-      <View style={styles.rowSpaceBetween}>
-        <View style={styles.rowCenter}>
-          <ThumbIcon />
-          <CText type="m8" style={styles.ml5} color={colors.black}>
-            {item?.ranking_value}
-            {'%'}
-          </CText>
-        </View>
-        <View style={styles.rowCenter}>
-          <CText type="s8" style={styles.mr5} color={colors.green1}>
-            EXP
-          </CText>
-          <CText type="m8" color={colors.black}>
-            {getYear - parseInt(moment(item?.experience, moment.ISO_8601).format('YYYY'))}
-          </CText>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
+        <View style={localStyles.doctorSpeclistTextStyle}>
+          <CText
+            type="s8"
+            align="center"
+            numberOfLines={2}
+            color={colors.textColor1}>
+            {item?.services_offered}
 
-const RenderFooterComponent = memo(({resultValue,isLoading}: any) => {
+          </CText>
+        </View>
+        <View style={styles.rowSpaceBetween}>
+          <View style={styles.rowCenter}>
+            <ThumbIcon />
+            <CText type="m8" style={styles.ml5} color={colors.black}>
+              {item?.ranking_value}
+              {'%'}
+            </CText>
+          </View>
+          <View style={styles.rowCenter}>
+            <CText type="s8" style={styles.mr5} color={colors.green1}>
+              EXP
+            </CText>
+            <CText type="m8" color={colors.black}>
+              {getYear - parseInt(moment(item?.experience, moment?.ISO_8601)?.format('YYYY'))}
+            </CText>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
 
   return (
     <View style={localStyles.doctorListContaienr}>
-      <TouchableOpacity style={localStyles.viewAllContaiener}>
+      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.SelectTimeSlot)}} style={localStyles.viewAllContaiener}>
         <CText type="s12" color={colors.success}>
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <View style={{height:'90%',justifyContent:!isLoading?'flex-start':'center',}}  >
+      <View style={{ height: '90%', justifyContent: !isLoading ? 'flex-start' : 'center', }}  >
 
-     { !isLoading ? <FlashList
-        data={resultValue?.slice(0, 6)}
-        renderItem={RenderDoctorCard}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        scrollEnabled={false}
-        numColumns={3}
-        estimatedItemSize={10}
-        contentContainerStyle={styles.ph10}
-      /> : <Box alignSelf='center' >
-        <Spinner size={'large'} color={colors.primary} /> 
+        {!!resultValue ? <FlashList
+          data={resultValue?.slice(0, 6)}
+          renderItem={renderDoctorCard}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+          numColumns={3}
+          estimatedItemSize={10}
+          contentContainerStyle={styles.ph10}
+        /> : <Box alignSelf='center' >
+          <Spinner size={'large'} color={colors.primary} />
         </Box>}
       </View>
     </View>
@@ -110,17 +115,17 @@ const RenderDSpecialities = memo(
   }: {
     item: DoctorSpecialityListData;
     index: number;
-    onPressTab: ({id, specType}: any) => void;
+    onPressTab: ({ id, specType }: any) => void;
     selectedTabValue: number;
   }) => {
     return (
       <View style={localStyles.mainContaienr}>
         <TouchableOpacity
-          onPress={() => onPressTab({id: item.id, specType: item.name})}
+          onPress={() => onPressTab({ id: item.id, specType: item.name })}
           style={localStyles.rootContaienr}>
           <View style={localStyles.imgOuterContainer}>
             <Image
-              source={{uri: `${Api_Image_Base_Url}${item.app_icon}`}}
+              source={{ uri: `${API_IMAGE_BASE_URL}${item.app_icon}` }}
               style={localStyles.imgStyle}
             />
           </View>
@@ -145,34 +150,35 @@ export default function DoctorSpecialities() {
   const [extraData, setExtraData] = useState<boolean>(false);
   const [selectedSpecDoctor, setSelectedSpecDoctor] = useState<string>('diabetes');
 
-  const {data:speclizationListData,isLoading:speclizationListIsLoading} = useGetSpeclizationlist() 
-  const {data:doctorBySpeclizationData,isLoading:doctorBySpeclizationIsLoading,isPending} = useGetDoctorBySpeclization({specialization:selectedSpecDoctor})
+  const { data: speclizationListData, isLoading: speclizationListIsLoading } = useGetSpeclizationlist()
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, } = useGetDoctorBySpeclization({ specialization: selectedSpecDoctor })
   // console.log(isPending,doctorBySpeclizationIsLoading,'specilzation HOME');
+
 
   useEffect(() => {
     setExtraData(!extraData);
   }, [selectedTab]);
 
   const onPressTab = useCallback(
-    async ({id, specType}: any) => {
+    async ({ id, specType }: any) => {
       console.log(specType);
-      
-      const index = speclizationListData?.data?.result[0]?.specList?.findIndex((item:any )=> item.id == id);
+
+      const index = speclizationListData?.data?.result[0]?.specList?.findIndex((item: any) => item.id == id);
       setSelectedTab(index);
       setSelectedSpecDoctor(specType)
 
-    }, [selectedTab], );
+    }, [selectedTab],);
 
-    useEffect(() => {
-      
+  useEffect(() => {
+
     setSelectedTab(0)
-    }, []);
+  }, []);
 
   const selectedTabValue = useMemo(() => {
     return selectedTab;
   }, [selectedTab]);
 
-  const renderItem = ({item, index}: any) => {
+  const renderItem = ({ item, index }: any) => {
     return (
       <RenderDSpecialities
         item={item}
@@ -187,18 +193,18 @@ export default function DoctorSpecialities() {
   return (
     <View style={styles.flex}>
       <SubHeader title={strings.findAyurvedicDoctorSpecialities} />
-    { !speclizationListIsLoading ?  
-    <FlatList
-        data={speclizationListData?.data?.result[0]?.specList}
-        renderItem={renderItem}
-        horizontal
-        extraData={selectedTab}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.ph20}
-      /> :  <Box alignSelf='center' py={10}>
-      <Spinner size={'small'} color={colors.primary} /> 
-      </Box> }
+      {!speclizationListIsLoading ?
+        <FlatList
+          data={speclizationListData?.data?.result[0]?.specList}
+          renderItem={renderItem}
+          horizontal
+          extraData={selectedTab}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.ph20}
+        /> : <Box alignSelf='center' py={10}>
+          <Spinner size={'small'} color={colors.primary} />
+        </Box>}
       <RenderFooterComponent resultValue={doctorBySpeclizationData?.data?.result[0]?.doctorList} isLoading={doctorBySpeclizationIsLoading} />
     </View>
   );
@@ -228,18 +234,18 @@ const localStyles = StyleSheet.create({
   viewAllContaiener: {
     ...styles.justifyEnd,
     ...styles.itemsEnd,
-    ...styles.mv10,
+    ...styles.mv5,
     ...styles.mh20,
   },
   doctorListContaienr: {
     width: '98%',
-    ...styles.pv10,
+    ...styles.pv20,
     ...styles.pb15,
     backgroundColor: colors.lightPink,
     top: getHeight(-5),
-    borderRadius:responsiveWidth(5),
-    alignSelf:'center',
-    height:responsiveHeight(45)
+    borderRadius: responsiveWidth(5),
+    alignSelf: 'center',
+    height: responsiveHeight(45)
   },
   doctorImgStyle: {
     height: moderateScale(42),
