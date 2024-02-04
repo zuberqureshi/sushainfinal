@@ -79,7 +79,7 @@ const LoginScreen = () => {
     //     showPopupWithOk('', otpSentResponse?.message);
     //   }
     // }
-    navigation.navigate(StackNav.VerifyLoginOtp);
+    navigation.navigate(StackNav.VerifyLoginOtp , {  }  );
   };
 
   return (
@@ -141,8 +141,10 @@ const LoginScreen = () => {
                     toast.show({
                       placement: "bottom",
                       render: ({ id }) => {
+                        const toastId = "toast-" + id
+
                         return (
-                          <Toast nativeID={id} variant="accent" action="success">
+                          <Toast nativeID={toastId} variant="accent" action="success">
                             <ToastTitle>Logged In   successfully</ToastTitle>
                           </Toast>
                         );
