@@ -21,6 +21,7 @@
 		F6DB37012B8148489FFDFFC2 /* Inika-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 314324E009554428BBD540C2 /* Inika-Regular.ttf */; };
 		F99A4FC7A69838BDAFD4A9CD /* libPods-sushain-sushainTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EC3491D17E7102373986D29 /* libPods-sushain-sushainTests.a */; };
 		FBE1FD54B1174A2AB78DB86A /* Inika-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 38C5D80CEC1145A49A32CD26 /* Inika-Bold.ttf */; };
+		72D3340652C6485A8EFE8CAE /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 877AC8FCDC324B43B63D5908 /* Inter-Light.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		D9BF420BB081499493B1540A /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../src/assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EF7AC7AF54483C3E4447D2E1 /* Pods-sushain.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sushain.debug.xcconfig"; path = "Target Support Files/Pods-sushain/Pods-sushain.debug.xcconfig"; sourceTree = "<group>"; };
+		877AC8FCDC324B43B63D5908 /* Inter-Light.ttf */ = {isa = PBXFileReference; name = "Inter-Light.ttf"; path = "../src/assets/fonts/Inter-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +131,7 @@
 				B95DD57598BD4E3B98866EB0 /* Inter-SemiBold.ttf */,
 				38C5D80CEC1145A49A32CD26 /* Inika-Bold.ttf */,
 				314324E009554428BBD540C2 /* Inika-Regular.ttf */,
+				877AC8FCDC324B43B63D5908 /* Inter-Light.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 				4B361526AAFA42DBAD0399C3 /* Inter-SemiBold.ttf in Resources */,
 				FBE1FD54B1174A2AB78DB86A /* Inika-Bold.ttf in Resources */,
 				F6DB37012B8148489FFDFFC2 /* Inika-Regular.ttf in Resources */,
+				72D3340652C6485A8EFE8CAE /* Inter-Light.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

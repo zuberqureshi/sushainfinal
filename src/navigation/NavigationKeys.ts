@@ -20,6 +20,7 @@ export const StackNav = {
   DrawerNavigation: 'DrawerNavigation',
   TermsOfService: 'TermsOfService',
   PrivacyPolicy: 'PrivacyPolicy',
+  CategoryDoctorListTab: 'CategoryDoctorListTab',
   CategoryDoctorList: 'CategoryDoctorList',
   DoctorProfile: 'DoctorProfile',
   PatientsReview: 'PatientsReview',

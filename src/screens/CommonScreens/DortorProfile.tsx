@@ -43,7 +43,7 @@ const RenderDSpecialities = ({ item }: { item: DoctorSpecialityListData }) => {
         <Image source={images.ayurvedicProduct} style={localStyles.imgStyle} />
       </View>
       <View style={localStyles.titleContainer}>
-        <CText type="m12" align="center" style={styles.ph5} numberOfLines={2}>
+        <CText type="m12" align="center" style={{...styles.ph5,height:responsiveWidth(8)}} numberOfLines={3}>
           {item?.title}
         </CText>
       </View>
@@ -53,6 +53,8 @@ const RenderDSpecialities = ({ item }: { item: DoctorSpecialityListData }) => {
 
 const RenderReviewItem = ({ item, }: any) => {
   const formattedDate = moment(item?.time, TIME_FORMATE).format(TIME_YMD);
+  
+  
   return (
     <View style={localStyles.reviewContainerStyle}>
       <View style={styles.rowSpaceBetween}>
@@ -73,7 +75,7 @@ const RenderReviewItem = ({ item, }: any) => {
         </View>
         <View style={styles.selfStart}>
           <RatingComponent
-            star={item?.rating}
+            star={!!item?.rating ? item?.rating :5}
             style={[localStyles.straStyle, styles.mt5]}
           />
         </View>

@@ -19,14 +19,17 @@ import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimen
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Loader from '../../common/Loader';
-import { StackNav } from '../../navigation/NavigationKeys';
+import { StackNav, TabNav } from '../../navigation/NavigationKeys';
 
 const getYear = new Date().getFullYear();
 
-const RenderFooterComponent = memo(({ resultValue, isLoading }: any) => {
+const RenderFooterComponent = memo(({ resultValue, isLoading ,selectedSpecDoctor}: any) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const renderDoctorCard = ({ item }: any) => {
+
+    const practicingDate = moment(moment(item?.practicing_since).format('YYYY-MM-DD'));
+    const yearsOfEXP = moment().diff(practicingDate, 'years');
 
     const handleNaviagte = () => {
       navigation.navigate(StackNav.DoctorProfile, { id: item?.id })
@@ -71,7 +74,7 @@ const RenderFooterComponent = memo(({ resultValue, isLoading }: any) => {
               EXP
             </CText>
             <CText type="m8" color={colors.black}>
-              {getYear - parseInt(moment(item?.experience, moment?.ISO_8601)?.format('YYYY'))}
+              {yearsOfEXP}
             </CText>
           </View>
         </View>
@@ -82,14 +85,14 @@ const RenderFooterComponent = memo(({ resultValue, isLoading }: any) => {
 
   return (
     <View style={localStyles.doctorListContaienr}>
-      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.SelectTimeSlot)}} style={localStyles.viewAllContaiener}>
+      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.CategoryDoctorList, {itm:selectedSpecDoctor})}} style={localStyles.viewAllContaiener}>
         <CText type="s12" color={colors.success}>
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <View style={{ height: '90%', justifyContent: !isLoading ? 'flex-start' : 'center', }}  >
+      <View style={{ justifyContent: !isLoading ? 'flex-start' : 'center', }}  >
 
-        {!!resultValue ? <FlashList
+        {(!!resultValue) ? <FlashList
           data={resultValue?.slice(0, 6)}
           renderItem={renderDoctorCard}
           showsHorizontalScrollIndicator={false}
@@ -97,6 +100,7 @@ const RenderFooterComponent = memo(({ resultValue, isLoading }: any) => {
           scrollEnabled={false}
           numColumns={3}
           estimatedItemSize={10}
+
           contentContainerStyle={styles.ph10}
         /> : <Box alignSelf='center' >
           <Spinner size={'large'} color={colors.primary} />
@@ -145,6 +149,8 @@ const RenderDSpecialities = memo(
 );
 
 export default function DoctorSpecialities() {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
   const [resultData, setResultData] = useState<[DoctorSpecialityListData]>();
   const [selectedTab, setSelectedTab] = useState<any>(0);
   const [extraData, setExtraData] = useState<boolean>(false);
@@ -155,9 +161,9 @@ export default function DoctorSpecialities() {
   // console.log(isPending,doctorBySpeclizationIsLoading,'specilzation HOME');
 
 
-  useEffect(() => {
-    setExtraData(!extraData);
-  }, [selectedTab]);
+  // useEffect(() => {
+  //   setExtraData(!extraData);
+  // }, [selectedTab]);
 
   const onPressTab = useCallback(
     async ({ id, specType }: any) => {
@@ -170,13 +176,14 @@ export default function DoctorSpecialities() {
     }, [selectedTab],);
 
   useEffect(() => {
+    
 
     setSelectedTab(0)
   }, []);
 
-  const selectedTabValue = useMemo(() => {
-    return selectedTab;
-  }, [selectedTab]);
+  // const selectedTabValue = useMemo(() => {
+  //   return selectedTab;
+  // }, [selectedTab]);
 
   const renderItem = ({ item, index }: any) => {
     return (
@@ -184,7 +191,7 @@ export default function DoctorSpecialities() {
         item={item}
         index={index}
         onPressTab={onPressTab}
-        selectedTabValue={selectedTabValue}
+        selectedTabValue={selectedTab}
       />
     );
   };
@@ -192,7 +199,7 @@ export default function DoctorSpecialities() {
 
   return (
     <View style={styles.flex}>
-      <SubHeader title={strings.findAyurvedicDoctorSpecialities} />
+      <SubHeader title={strings.findAyurvedicDoctorSpecialities} onPress={()=>{navigation.navigate(TabNav.FindADoctorHome)}} />
       {!speclizationListIsLoading ?
         <FlatList
           data={speclizationListData?.data?.result[0]?.specList}
@@ -205,7 +212,7 @@ export default function DoctorSpecialities() {
         /> : <Box alignSelf='center' py={10}>
           <Spinner size={'small'} color={colors.primary} />
         </Box>}
-      <RenderFooterComponent resultValue={doctorBySpeclizationData?.data?.result[0]?.doctorList} isLoading={doctorBySpeclizationIsLoading} />
+      <RenderFooterComponent resultValue={doctorBySpeclizationData?.data?.result[0]?.doctorList} isLoading={doctorBySpeclizationIsLoading} selectedSpecDoctor={selectedSpecDoctor} />
     </View>
   );
 }
@@ -245,7 +252,7 @@ const localStyles = StyleSheet.create({
     top: getHeight(-5),
     borderRadius: responsiveWidth(5),
     alignSelf: 'center',
-    height: responsiveHeight(45)
+    // height: responsiveHeight(45)
   },
   doctorImgStyle: {
     height: moderateScale(42),

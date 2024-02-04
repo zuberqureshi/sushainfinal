@@ -72,6 +72,10 @@ export default function StackNavigation() {
         name={StackNav.SelectTimeSlot}
         component={StackRoute.SelectTimeSlot}
       />
+      <Stack.Screen
+        name={StackNav.CategoryDoctorList}
+        component={StackRoute.CategoryDoctorList}
+      />
       {/* <Stack.Screen
         name={StackNav.ProductByCategories}
         component={StackRoute.ProductByCategories}

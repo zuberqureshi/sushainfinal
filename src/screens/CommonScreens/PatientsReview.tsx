@@ -46,7 +46,7 @@ const RenderReviewItem = ({item}: any) => {
               </CText>
             </View>
             <RatingComponent
-              star={item?.rating}
+              star={!!item?.rating ? item?.rating :5 }
               style={localStyles.straStyle}
             />
             <CText type="r10" numberOfLines={1} style={styles.flex}>
@@ -63,6 +63,7 @@ const RenderReviewItem = ({item}: any) => {
 };
 
 const RenderHeaderComponent = ({data}: any) => {
+
   return (
     <View>
       <View style={localStyles.rootContainer}>
@@ -83,7 +84,7 @@ const RenderHeaderComponent = ({data}: any) => {
             {data?.doctorRating}
           </CText>
           <RatingComponent
-            star={data?.doctorRating}
+            star={!!data?.doctorRating ? data?.doctorRating : 5}
             style={localStyles.straStyle}
           />
           <CText type="s12" numberOfLines={1}>

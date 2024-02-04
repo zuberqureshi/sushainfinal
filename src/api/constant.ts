@@ -20,24 +20,24 @@ export const BASE_IMG_NEW_PATH =
 export const shopByategoryData = [
   {
     id: 1,
-    title: 'Ayurvedic Products',
+    title: 'General Medicines & Consulting',
     image: images.ayurvedicProduct,
   },
   {
     id: 2,
-    title: 'Personal Care',
+    title: 'Infertility',
     image: images.personalCare,
   },
   {
     id: 3,
-    title: 'Homeopathic Products',
+    title: 'Special Diets',
     image: images.homeopathicProducts,
   },
-  {
-    id: 4,
-    title: 'Immunity & Wellness',
-    image: images.immunityWellness,
-  },
+  // {
+  //   id: 4,
+  //   title: 'Immunity & Wellness',
+  //   image: images.immunityWellness,
+  // },
 ];
 
 export const medicinesCategoryOptions = [
