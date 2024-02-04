@@ -16,8 +16,10 @@ export default function useLoginByPassword() {
         toast.show({
         placement: "bottom",
         render: ({ id }) => {
+          const toastId = "toast-" + id
+
           return (
-            <Toast nativeID={id} variant="accent" action="success">
+            <Toast nativeID={toastId} variant="accent" action="success">
               <ToastTitle>Something went wrong while Login {error.message}  </ToastTitle>
             </Toast>
           );
