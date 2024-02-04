@@ -44,14 +44,14 @@ export const loginSchema = yup.object().shape({
 
 export const patientBookingValidationSchema = yup.object().shape({
     
-  bookingfor:yup.string(),
-  patientname:yup.string().required("Patient name is required"),
-  patientnumber:yup.string().required("Patient number is required"),
-  patientage:yup.string().required("Age is required"),
-  patientweight:yup.string().required("Weight is required"),
-  patientgender:yup.string(),
-  slotdateday:yup.string(),
-  slottime:yup.string(),
+  // bookingfor:yup.string(),
+  patientname:yup.string().typeError('Input must be a string').required("Patient name is required"),
+  // patientnumber:yup.string().required("Patient number is required"),
+  // patientage:yup.string().required("Age is required"),
+  // patientweight:yup.string().required("Weight is required"),
+  // patientgender:yup.string(),
+  // slotdateday:yup.string(),
+  // slottime:yup.string(),
 
 })
 

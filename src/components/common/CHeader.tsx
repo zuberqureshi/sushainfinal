@@ -58,5 +58,6 @@ const localStyles = StyleSheet.create({
     ...styles.pr10,
     ...styles.mr10,
     ...styles.flex,
+    textTransform:'capitalize',
   },
 });

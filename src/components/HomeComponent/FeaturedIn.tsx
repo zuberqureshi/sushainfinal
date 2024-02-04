@@ -43,7 +43,7 @@ const RenderFeturedComponent = ({item, onPress}:any) => {
 export default function FeaturedIn({data}: any) {
   
   const onPress = (item: any) => {
-    // return Linking.openURL(item);
+    Linking.openURL(item);
   };
 
   const RenderItem = ({item, index}: any) => {

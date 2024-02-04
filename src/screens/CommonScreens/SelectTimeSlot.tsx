@@ -38,6 +38,7 @@ import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
 import useGetDoctorsAllSlots from '../../hooks/doctor/get-doctor-all-slots';
 import { patientBookingValidationSchema } from '../../utils/validators';
+import Loader from '../../common/Loader';
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
 interface Props {
@@ -55,9 +56,8 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
-  console.log(slotListMorningArray,'Mornig');
-  console.log(slotListEveningArray,'EVVVin');
-  // console.log(allSlotsData?.data?.result[0]?.slotList, doctorSlotsArray,slotArray,'TIMESLOTSS');
+ 
+
 
 
 
@@ -163,9 +163,7 @@ const  startCheckout = () => {
 
     );
   };
-//   <CText type="r14" numberOfLines={1} color={colors.success}>
-//   No Slots Available
-// </CText>
+
   const renderEveningSlotItem = ({ item, index }: any) => {
     return (
       <>
@@ -195,8 +193,8 @@ const  startCheckout = () => {
         {/* use formik   */}
         <Formik
           enableReinitialize={true}
-          initialValues={{ bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: "", slottime: "" }}
-          // validationSchema={patientBookingValidationSchema}
+          initialValues={{ bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottime: "" }}
+          validationSchema={patientBookingValidationSchema}
           onSubmit={(values, action) => {
             // updateProfile(values.country,values.address,values.name,values.mobile)
             console.warn('updatePatient', values);
@@ -237,10 +235,12 @@ const  startCheckout = () => {
                 value={values.patientname}
                 style={localStyles.inputTextField}
                 onChangeText={handleChange('patientname')}
+                onBlur={handleBlur('patientname')}
                 placeholderTextColor={colors.placeHolderColor}
                 placeholder={strings.enterPatientName}
 
               />
+                {(errors.patientname && touched.patientname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{errors.patientname}</Text> : null}
 
               <CText type="s12" style={styles.mt5}>
                 {strings.patientMobileNo}
@@ -350,14 +350,18 @@ const  startCheckout = () => {
                 </CText>
               </View>
               <View style={{  }}>
-                <FlashList
+              { !!slotListMorningArray ? <FlashList
                   data={slotListMorningArray}
                   renderItem={renderSlotItem}
                   keyExtractor={(item, index) => index.toString()}
                   numColumns={5}
+                  ListEmptyComponent={()=>{return(
+                    <CText type="r14" numberOfLines={1} color={colors.success}>
+                    No Slots Available
+                 </CText>)}}
                   estimatedItemSize={100}
                 // justifyContent="space-between"
-                />
+                /> : <Loader/> }
               </View>
 
               <View style={localStyles.rowStyle}>
@@ -368,14 +372,18 @@ const  startCheckout = () => {
               </View>
 
               <View style={{  }} >
-                <FlashList
+               { !!slotListEveningArray ? <FlashList
                   data={slotListEveningArray}
                   renderItem={renderEveningSlotItem}
                   keyExtractor={(item, index) => index.toString()}
                   numColumns={5}
+                  ListEmptyComponent={()=>{return(
+                     <CText type="r14" numberOfLines={1} color={colors.success}>
+                     No Slots Available
+                  </CText>)}}
                   estimatedItemSize={100}
                 // justifyContent="space-between"
-                />
+                /> : <Loader/> }
               </View>
 
 
@@ -476,7 +484,7 @@ const  startCheckout = () => {
 
               <DatePicker
                 mode='calendar'
-                selected={ !!values.slotdateday ? startDate : values.slotdateday}
+                selected={values.slotdateday}
                 onDateChange={(propDate) => { setFieldValue('slotdateday',propDate) }}
                 minimumDate={startDate}
               />

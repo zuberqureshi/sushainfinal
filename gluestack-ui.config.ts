@@ -229,6 +229,7 @@ const config = createConfig({
     },
     fonts: {
       ...defaultConfig.tokens.fonts,
+      InterLight:'Inter-Light',
       InterBold :'Inter-Bold',
       InterMedium:'Inter-Medium',
       InterRegular:'Inter-Regular',

@@ -43,7 +43,7 @@ const tabRouteDoctor = () => {
         component={TabRoute.FindADoctor}
       />
       <Stack.Screen
-        name={StackNav.CategoryDoctorList}
+        name={StackNav.CategoryDoctorListTab}
         component={StackRoute.CategoryDoctorList}
       />
       {/* <Stack.Screen
