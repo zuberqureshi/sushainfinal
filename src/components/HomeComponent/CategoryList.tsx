@@ -8,9 +8,10 @@ import {moderateScale} from '../../common/constants';
 import {Category} from '../../types/Types';
 import images from '../../assets/images';
 import { StackNav, TabNav } from '../../navigation/NavigationKeys';
-import { responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { Box } from '@gluestack-ui/themed';
 
 
 const data = [
@@ -68,8 +69,11 @@ const CategoryList = () => {
         }
       }} >
         <View style={localStyles.itemStyle}>
+         
+       { index === 1 && <View style={{backgroundColor:colors.success,borderTopLeftRadius:responsiveWidth(2.4),alignSelf:'flex-start',paddingHorizontal:responsiveWidth(1.5),paddingVertical:responsiveHeight(0.5),borderBottomRightRadius:responsiveWidth(2.4),position:'absolute',zIndex:1}} >
+        <CText type='m10' color={colors.white} >In 60sec</CText>
+        </View>}
 
-        
         <Image source={item.img_mbl} style={localStyles.imgStyle} />
         <CText type="s12" style={{...styles.mv5,width:moderateScale(80)}} numberOfLines={2} align="center">
           {item.name}
