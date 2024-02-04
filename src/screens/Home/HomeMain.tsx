@@ -21,6 +21,15 @@ import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
+import {getAccessToken} from '../../utils/network'
+// import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
+// import ShopCategory from '../../components/HomeComponent/ShopCategory';
+// import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
+// import ExclusiveTherapy from '../../components/HomeComponent/ExclusiveTherapy';
+// import HonestReviews from '../../components/HomeComponent/HonestReviews';
+// import FeaturedIn from '../../components/HomeComponent/FeaturedIn';
+// import UpcomingAppointment from '../../components/HomeComponent/UpcomingAppointment';
+// import FrequentlyBoughtProducts from '../../components/HomeComponent/FrequentlyBoughtProducts';
 import useGetHomeData from '../../hooks/home/get-home-data';
 
 import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
@@ -49,10 +58,24 @@ type Props = {
 const HomeMain = () => {
   const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
   const [search, setSearch] = useState<string>('');
-  const [userLocation, setUserLocation] = useState('')
-  const [resultData, setResultData] = useState<any>([]);
-  // const [homeBannerData, setResultData] = useState<any>([]);
+  const [userInfo, setUserInfo] = useState();
+
+  const [resultData, setResultData] = useState<any>({});
   const [searchResult, setSearchResult] = useState([]);
+
+
+  async function load(){
+      setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+   }
+  
+  useEffect(() => {
+    load();
+  }, []);
+
+
+  const [userLocation, setUserLocation] = useState('')
+   // const [homeBannerData, setResultData] = useState<any>([]);
+  
   const [slectedTypeNeed, setSlectedTypeNeed] = useState<string>('ayurvedic')
  
   const {data,isLoading} = useGetHomeData()
@@ -144,7 +167,7 @@ const locationSet = async() => {
             <Location />
             <View>
               <CText type={'s12'}>
-                {strings.hi}
+                {strings.hi}  { userInfo?.userName }
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
               <View style={localStyles.locationContainer}>

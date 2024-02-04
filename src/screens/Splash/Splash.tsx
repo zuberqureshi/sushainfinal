@@ -1,5 +1,5 @@
 import {StyleSheet, View,Text} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
@@ -10,15 +10,86 @@ import { styles } from '../../themes';
 import { StackNav } from '../../navigation/NavigationKeys';
 // import {getRefreshToken, getToken, getUserDetail} from '../utils/asyncstorage';
 // import {userSettingAPI} from '../api/authApi';
+import { AuthContext } from '../../context/AuthContext'
 
+ import { getAccessToken, setAccessToken, CallApiJson } from '../../utils/network'
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+    const authContext:any = useContext(AuthContext  );
+    var loginstatus = false;
   useEffect(() => {
     SplashScreen.hide();
     asyncProcess();
   }, [navigation]);
 
+  async function load () {
+    console.log('APP aload splash')
+
+    let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
+
+    if(  v?.accessToken){
+ 
+      let  currentTime = Math.floor(new Date().getTime());
+      console.log('tokeninfo from memoery',currentTime,v)
+
+      if( currentTime < v?.expirationTime ){
+        console.log('tokenvalid ')
+ 
+        authContext.setAuthState({
+          accessToken: v?.accessToken,
+          refreshToken: v?.refreshToken,
+          expirationTime: v?.expirationTime,
+          authenticated: true,
+        });
+
+ 
+      }else{
+        console.log('tokenINvalid ')
+
+       let body2 = {
+          token:v?.refreshToken
+        }
+        const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );
+
+        console.log( 'expiredtokenFetchedNewToken', body2, reftechAccessToken,  )
+        if( reftechAccessToken.result.success==true){
+          await setAccessToken('AccessTokenInfo',
+          JSON.stringify({
+            accessToken:reftechAccessToken.result.access_token,
+            refreshToken:v?.refreshToken,
+            expirationTime: reftechAccessToken.result.ExpirationTime,
+          }) )
+
+           authContext.setAuthState({
+          
+            accessToken:reftechAccessToken.result.access_token,
+            refreshToken:v?.refreshToken,
+            expirationTime: reftechAccessToken.result.ExpirationTime,
+            authenticated: true,
+
+          });
+
+
+ 
+        }else{
+          console.log('redirect to login ');
+        }
+
+
+
+      }
+ 
+
+
+    }else{
+      console.log('No tokeninfo from memoery' )
+
+    }
+
+
+}
   const asyncProcess = async () => {
+    await     load();
     // const settingData = await userSettingAPI();
     // console.log('settingData>>>', settingData);
 
@@ -43,13 +114,18 @@ export default function Splash() {
     //     routes: [{name: StackNav.AuthStack}],
     //   });
     // }
+    console.log( 'authContextinsplash', authContext?.authState.authenticated)
+    
+    if(loginstatus==false)
     navigation.navigate(StackNav.AuthStack)
+    else     navigation.navigate(StackNav.DrawerNavigation)
+
   };
 
   return (
     <CSafeAreaView style={localStyles.container}>
       <View />
-      <Text>jjkkj</Text>
+      <Text>Splash </Text>
     </CSafeAreaView>
   );
 }

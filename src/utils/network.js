@@ -81,27 +81,26 @@ function CallApiJson(endpoint, method = 'GET', body = null, token = null) {
 //     .then(() => 'success')
 //     .catch(e => 'error');
 // }
-async function setAccessToken(token) {
+async function setAccessToken(name,data) {
 
-  console.log( 'setacesstokn', token );
-  await AsyncStorage.setItem(
-    'accessToken',
-    token,
+   await AsyncStorage.setItem(
+    name,
+    data,
   );
 
 
 }
-async function getAccessToken() {
-  const value = await AsyncStorage.getItem('accessToken');
+async function getAccessToken(name) {
+  const value = await AsyncStorage.getItem(name);
   return value;
 
  
 
 }
 
-async function removeAccessToken() {
-  const token = await AsyncStorage.removeItem('accessToken');
-      console.log("Token Removed",token)
+async function removeAccessToken(name) {
+  const token = await AsyncStorage.removeItem(name);
+      console.log("Token Removed",name)
   return token;
 }
 
@@ -121,4 +120,4 @@ async function removeAccessToken() {
 
 export default CallApi  ;
  
-export {setToken, getToken , removeToken , setAccessToken , getAccessToken,removeAccessToken,  CallApiJson};
+export { setAccessToken , getAccessToken,removeAccessToken,  CallApiJson};

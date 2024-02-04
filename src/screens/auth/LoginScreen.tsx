@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
-import { Text } from '@gluestack-ui/themed'
+import { Text , Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -23,15 +23,30 @@ import FaceBookLogin from '../../components/FaceBookLogin'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import { AuthContext } from '../../context/AuthContext'
+import useLoginByPassword from '../../hooks/auth/loginbypassword'
+import {setAccessToken, getAccessToken } from '../../utils/network'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
   const authContext = useContext(AuthContext);
 
+  async function load(){
+    const localUserInfo =  JSON.parse( await getAccessToken('userInfo') ) ;
+    const AccessTokenInfo =  JSON.parse( await getAccessToken('AccessTokenInfo') ) ;
 
-  console.log( 'authContext',authContext, 'useDoctorListSpec')
+    console.log( 'localUserInfoOnlogin',AccessTokenInfo)
+  }
+  
+  useEffect(() => {
+    load();
+  }, []);
+  
+  const toast = useToast()
 
+  const createloginByPassword = useLoginByPassword()
+
+ 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();
@@ -97,7 +112,56 @@ const LoginScreen = () => {
           validationSchema={loginSchema}
           onSubmit={(values, action) => {
             // updateProfile(values.country,values.address,values.name,values.mobile)
-            console.warn('updateProfile', values);
+            console.warn('formsubmit', values);
+
+            var body = {
+              mobile:values.userid,
+              password:values.password
+
+            }
+
+                createloginByPassword.mutate(body, {
+                  onSuccess: async (data) => {
+                    console.warn('afterlogindata', data?.data?.result[0]);
+
+                await setAccessToken('AccessTokenInfo',
+                 JSON.stringify({
+                   accessToken:data?.data?.result[0]?.token,
+                   refreshToken:data?.data?.result[0]?.refreshToken,
+                   expirationTime: data?.data?.result[0]?.ExpirationTime,
+                 }) )
+ 
+
+                 await setAccessToken('userInfo',
+                 JSON.stringify({
+                   userName:data?.data?.result[0]?.user.first_name,
+                   userMobile:data?.data?.result[0]?.user.mobile,
+                  }) )
+
+                    toast.show({
+                      placement: "bottom",
+                      render: ({ id }) => {
+                        return (
+                          <Toast nativeID={id} variant="accent" action="success">
+                            <ToastTitle>Logged In   successfully</ToastTitle>
+                          </Toast>
+                        );
+                      },
+                    })
+
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: StackNav.DrawerNavigation }],
+                    });
+  
+
+                  },
+                  onError: (error) => {
+                    console.log('errorafterlogin', error)
+                  }
+                })
+
+
             // action.resetForm()
             // loadUserInfo();
 
