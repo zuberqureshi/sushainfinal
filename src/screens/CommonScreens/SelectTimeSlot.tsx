@@ -1,8 +1,19 @@
 import { StyleSheet, TouchableOpacity, View, Text, Modal, FlatList, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { Dropdown } from 'react-native-element-dropdown';
-
+import {
+  CFErrorResponse,
+  CFPaymentGatewayService,
+} from 'react-native-cashfree-pg-sdk';
+import {
+      CFDropCheckoutPayment,
+  CFEnvironment,
+  CFPaymentComponentBuilder,
+  CFPaymentModes,
+  CFSession,
+  CFThemeBuilder,
+} from 'cashfree-pg-api-contract';
 // local imports
 import CSafeAreaView from '../../components/common/CSafeAreaView';
 import CHeader from '../../components/common/CHeader';
@@ -88,12 +99,58 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   // Loop to add the next five dates to the array
   for (let i = 0; i <= 4; i++) {
-    const nextDate = moment(currentDate).add(i, 'days');
+    const nextDate:any = moment(currentDate).add(i, 'days');
     nextFiveDates.push(nextDate.format('YYYY-MM-DD'));
   }
 
 
+  useEffect(() => {
+    CFPaymentGatewayService.setCallback({
+      onVerify(orderID: string): void {
+        console.log('success ', orderID);
+      //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
+       // navigation.navigate(NAVIGATION.PaymentSuccess);
+      },
+      onError(error: CFErrorResponse, orderID: string): void {
+        console.log('failed ', orderID);
+       // navigation.navigate(NAVIGATION.PaymentFailed);
+      },
+    });
+    return () => CFPaymentGatewayService.removeCallback();
+  }, []);
 
+const  startCheckout = () => {
+    try {
+      const session = new CFSession(
+        'session_nfELAxM5ckTG_uOPoXK8EP37UpGFbWP_Tkieyj0SNb5EV5TrR0kNjoT5zPn09JCfNm_zURcfkxs2e2bbI9y7JYthZHNXCog1n6HkxqajTp_F',
+        'order_838112btyhbcL5PcsEy4eDmR8Dge22hm',
+        CFEnvironment.SANDBOX
+      );
+      const paymentModes = new CFPaymentComponentBuilder()
+        .add(CFPaymentModes.CARD)
+        .add(CFPaymentModes.UPI)
+        .add(CFPaymentModes.NB)
+        .add(CFPaymentModes.WALLET)
+        .add(CFPaymentModes.PAY_LATER)
+        .build();
+      const theme = new CFThemeBuilder()
+        .setNavigationBarBackgroundColor('#49b0c5')
+        .setNavigationBarTextColor('#FFFFFF')
+        .setButtonBackgroundColor('#80b841')
+        .setButtonTextColor('#FFFFFF')
+        .setPrimaryTextColor('#212121')
+        .setSecondaryTextColor('#757575')
+        .build();
+      const dropPayment = new CFDropCheckoutPayment(
+        session,
+        paymentModes,
+        theme
+      );
+      CFPaymentGatewayService.doPayment(dropPayment);
+    } catch (e: any) {
+      console.log('startcheckout eeror ',e.message);
+    }
+  }
 
 
   const renderSlotItem = ({ item, index }: any) => {
@@ -393,7 +450,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             </CText>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => { navigation.navigate(StackNav.AppointmentBooked) }}
+            onPress={() => { startCheckout()  }}
             style={[localStyles.btn, { backgroundColor: colors.success }]}>
             <CText
               type="r16"
