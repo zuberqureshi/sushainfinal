@@ -16,21 +16,21 @@ import { AuthContext } from '../../context/AuthContext'
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const authContext:any = useContext(AuthContext  );
-    var l = false;
+    var loginstatus = false;
   useEffect(() => {
     SplashScreen.hide();
     asyncProcess();
   }, [navigation]);
 
   async function load () {
-    console.log('APP Navigatorloadfunct')
+    console.log('APP aload splash')
 
     let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
 
     if(  v?.accessToken){
-      console.log('tokeninfo from memoery',v)
  
-      let  currentTime = Math.floor(new Date().getTime() / 1000);
+      let  currentTime = Math.floor(new Date().getTime());
+      console.log('tokeninfo from memoery',currentTime,v)
 
       if( currentTime < v?.expirationTime ){
         console.log('tokenvalid ')
@@ -42,14 +42,16 @@ export default function Splash() {
           authenticated: true,
         });
 
+ 
       }else{
+        console.log('tokenINvalid ')
 
        let body2 = {
           token:v?.refreshToken
         }
         const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );
 
-        console.log( 'expiredtokenFetchedNewToken', reftechAccessToken )
+        console.log( 'expiredtokenFetchedNewToken', body2, reftechAccessToken,  )
         if( reftechAccessToken.result.success==true){
           await setAccessToken('AccessTokenInfo',
           JSON.stringify({
@@ -68,7 +70,7 @@ export default function Splash() {
           });
 
 
-
+ 
         }else{
           console.log('redirect to login ');
         }
@@ -114,7 +116,7 @@ export default function Splash() {
     // }
     console.log( 'authContextinsplash', authContext?.authState.authenticated)
     
-    if(l==false)
+    if(loginstatus==false)
     navigation.navigate(StackNav.AuthStack)
     else     navigation.navigate(StackNav.DrawerNavigation)
 

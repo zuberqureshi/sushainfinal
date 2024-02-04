@@ -46,8 +46,7 @@ const LoginScreen = () => {
 
   const createloginByPassword = useLoginByPassword()
 
-  console.log( 'authContext',authContext, 'useDoctorListSpec')
-
+ 
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();

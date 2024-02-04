@@ -3,14 +3,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import StackNavigation from './Type/StackNavigation';
 import {StatusBar} from 'react-native';
 import { AuthContext } from '../context/AuthContext'
-import { getAccessToken, setAccessToken, CallApiJson } from '../../src/utils/network'
+import { getAccessToken, removeAccessToken, setAccessToken, CallApiJson } from '../../src/utils/network'
 
 export default function AppNavigator() {
   const authContext:any = useContext(AuthContext);
-  console.log('APP Navigator')
-
-     async function load () {
-      console.log('APP Navigatorloadfunct')
+  console.log('APP Navigator index')
+      async function load () {
+      console.log('APP load index')
 
       let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
 
