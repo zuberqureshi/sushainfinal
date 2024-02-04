@@ -177,9 +177,9 @@ export default function DoctorProfile({ route, navigation }: Props) {
   const RightIcon = () => {
     return (
       <View style={styles.rowCenter}>
-        <TouchableOpacity style={styles.ph5}>
+        {/* <TouchableOpacity style={styles.ph5}>
           <LikeIcon />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.pl5}>
           <BlackShareIcon />
         </TouchableOpacity>

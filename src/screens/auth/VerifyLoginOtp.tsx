@@ -38,7 +38,7 @@ type Props = {
 };
 
 const VerifyLoginOtp = ({route, navigation}:Props) => {
-  // const {mobile} = route.params;
+  const {mobile} = route.params;
   const [otpInput, setOtpInput] = useState<string>('');
   const onPinChange = (code: React.SetStateAction<string>) => setPin(code);
   const [isTimeOver, setIsTimeOver] = useState(false);
@@ -122,11 +122,11 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
         {strings.verificationCode}
       </Text>
       <Text
-      fontFamily='$InterRegular' fontSize={12}
+      fontFamily='$InterRegular' fontSize={12} color={colors.black} textAlign='center'
 
-        style={[styles.mt20, styles.mh40, styles.ph30]}
+        style={[styles.mt20, styles.mh25, styles.ph30]}
         alignSelf='center'>
-        {strings.otpDescription}
+        {strings.otpDescription} +91 {mobile}
       </Text>
     
       <OTPTextView

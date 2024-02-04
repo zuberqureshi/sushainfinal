@@ -67,13 +67,13 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
             </View>
           </View>
           <View>
-            <View style={localStyles.iconContainer}>
+            <View style={{alignSelf:'flex-end'}}>
               <TouchableOpacity style={styles.ph5}>
                 <ShareIcon />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.ph5}>
+              {/* <TouchableOpacity style={styles.ph5}>
                 <LikeIcon />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={localStyles.iconContainer}>
               <CText type="s12" numberOfLines={2} color={colors.black}>
