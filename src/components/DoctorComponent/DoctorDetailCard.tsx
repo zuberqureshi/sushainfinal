@@ -18,6 +18,7 @@ import images from '../../assets/images';
 import typography from '../../themes/typography';
 import Loader from '../../components/Loader/Loader';
 import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
+import moment from 'moment';
 
 export default function DoctorDetailCard({ title='diabetes' }: any) {
 
@@ -40,7 +41,10 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
     navigation.navigate(StackNav.DoctorProfile, { id });
 
   const renderItem = ({ item, index }: any) => {
-    // console.log(item);
+    // console.log(item?.slots);
+
+    const practicingDate = moment(moment(item?.practicing_since).format('YYYY-MM-DD'));
+    const yearsOfEXP = moment().diff(practicingDate, 'years');
 
     return (
       <View style={localStyles.cardMainContainer}>
@@ -59,7 +63,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
                 style={styles.mv5}
                 color={colors.textColor5}
                 numberOfLines={2}>
-                {item?.major_disease + ' | ' + item?.experience + ' YRS EXP'}
+                {!!item?.major_disease ? item?.major_disease : 'N/A' + ' | ' + yearsOfEXP + ' YRS EXP'}
               </CText>
               <CText type="r10" numberOfLines={2} color={colors.textColor2}>
                 {item?.services_offered}
@@ -79,19 +83,19 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
               <CText type="s12" numberOfLines={2} color={colors.black}>
                 {'₹ ' + item?.vc_fees}
               </CText>
-              <View style={styles.ph5}>
-                <CText type="r12" numberOfLines={2} color={colors.black}>
+             { item?.vc_fees !== item?.vc_fees_dummy && <View style={styles.ph5}>
+                <CText type="r12" numberOfLines={2} style={{textDecorationLine:'line-through'}} color={colors.black}>
                   {item?.vc_fees_dummy}
                 </CText>
-                <View style={localStyles.upperLineStyle} />
-              </View>
+                {/* <View style={localStyles.upperLineStyle} /> */}
+              </View>}
             </View>
           </View>
         </View>
         <View style={localStyles.bottomContainer}>
           <View style={localStyles.starContainer}>
             <RatingComponent
-              star={item?.rating}
+              star={!!item?.rating ? item?.rating : 5}
               style={localStyles.straStyle}
             />
             <CText
@@ -113,7 +117,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
             <CButton
               title={strings.bookNow}
               containerStyle={localStyles.bookNowBtnStyle}
-              onPress={() => { }}
+              onPress={() => {navigation.navigate(StackNav.SelectTimeSlot, { id:item?.id,doctorslots:item?.slots }) }}
               bgColor={colors.success}
               color={colors.white}
               type="b12"

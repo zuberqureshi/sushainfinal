@@ -23,7 +23,7 @@ import CText from '../../components/common/CText';
 import { colors, styles } from '../../themes';
 import typography from '../../themes/typography';
 import { deviceHeight, deviceWidth, moderateScale } from '../../common/constants';
-import { Formik } from 'formik'
+import { Formik, useFormik  } from 'formik'
 
 
 import { genderData, bookingFor } from '../../api/constant';
@@ -39,6 +39,9 @@ import Body from '../../components/Body/Body';
 import useGetDoctorsAllSlots from '../../hooks/doctor/get-doctor-all-slots';
 import { patientBookingValidationSchema } from '../../utils/validators';
 import Loader from '../../common/Loader';
+import { SelectItemText, Toast, ToastDescription, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
+import useCheckCouponCode from '../../hooks/booking/check-coupon-code';
+
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
 interface Props {
@@ -48,48 +51,108 @@ interface Props {
 export default function SelectTimeSlot({ route, }: Props) {
 
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  
+  //states
+  const [applyCoupons, setApplyCoupons] = useState('');
+  const [coloredCheckBoxValue, setColoredCheckBoxValue] = useState(false);
+  const [selectedDateOption, setSelectedDateOption] = useState(0)
+  const [datePickerModel, setDatePickerModel] = useState(false)
+
   //init
   const { id, doctorslots } = route.params;
   const { data: allSlotsData, isLoading } = useGetDoctorsAllSlots()
+  const useCheckCouponCodeMutation = useCheckCouponCode()
+ 
+
+  const toast = useToast()
 
   const doctorSlotsArray = doctorslots.split(',').map(Number)
+  const today = new Date()
+  const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
 
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
+ 
+  const formik = useFormik({
+    enableReinitialize:true,
+          initialValues:{ bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate , slottimeid: "" , couponcode: "" },
+          validationSchema:patientBookingValidationSchema,
+          onSubmit: values => {
+            // updateProfile(values.country,values.address,values.name,values.mobile)
+            console.log('updatePatient', values);
+            // action.resetForm()
+            // loadUserInfo();
+            if(!(!!values.slottimeid ) || !(!!values.slotdateday)){
+              toast.show({
+                placement: "bottom",
+                render: ({ id }) => {
+                  const toastId = "toast-" + id
+                  return (
+                    <Toast nativeID={toastId} action="error" variant="accent">
+                      <VStack space="xs">
+                        <ToastTitle>Please select slottime and date</ToastTitle>
+                     
+                      </VStack>
+                    </Toast>
+                  )
+                },
+              })
+              
+            }
+
+          },
+          
+  });
+
+  const onClickCheckCoupon = () => {
+
+    const payload = {
+      coupon_code: formik.values.couponcode,
+      type: "APPOINTMENT",
+      displayMode: "NATIVEAPP",
+      Totalmrp:540
+    }
+
+    useCheckCouponCodeMutation.mutate(payload, {
+      onSuccess: (data) => {
+          console.log(data?.data);
+          
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Coupon successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+      },
+      onError: (error: any) => {
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+      }
+    })
+  }
+
  
 
 
 
 
-
-  const [bookingForSelected, setBookingForSelected] = useState('');
-  const [patientName, setPatientName] = useState('');
-  const [applyCoupons, setApplyCoupons] = useState('');
-  const [patientNumber, setPatientNumber] = useState('');
-  const [patientAge, setPatientAge] = useState('');
-  const [patientWeight, setPatientWeight] = useState('');
-  const [patientGender, setPatientGender] = useState('');
-  const [coloredCheckBoxValue, setColoredCheckBoxValue] = useState(false);
-
-  const [selectedDateOption, setSelectedDateOption] = useState(0)
-
-  const [datePickerModel, setDatePickerModel] = useState(false)
-
-  const today = new Date()
-  const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY/MM/DD')
-  const [selectedDate, setSelectedDate] = useState(startDate);
-
-  // console.log("selectedtdt Datee",selectedDate);
-
-  const onChangeBooking = (item: any) => setBookingForSelected(item.value);
-  const onChangePatientName = (item: any) => setPatientName(item);
-  const onChangeApplyCoupons = (item: any) => setApplyCoupons(item);
-  const onChangePatientNumber = (item: any) => setPatientNumber(item);
-  const onChangePatientAge = (item: any) => setPatientAge(item);
-  const onChangePatientWeight = (item: any) => setPatientWeight(item);
-  const onChangePatientGender = (item: any) => setPatientGender(item.value);
-
-
+  // console.log('date see ',selectedDate);
 
   // Get the current date
   const currentDate = moment();
@@ -154,10 +217,11 @@ const  startCheckout = () => {
 
 
   const renderSlotItem = ({ item, index }: any) => {
+  
     return (
       <>
-        {item?.slot === 'MORNING' && <TouchableOpacity style={localStyles.slotContainer}>
-          <CText type="m10">{moment(item?.slot_start_time).format('h:mm A')}</CText>
+        {item?.slot === 'MORNING' && <TouchableOpacity onPress={()=>{formik.setFieldValue('slottimeid',item?.id)}} style={[localStyles.slotContainer,{backgroundColor:formik.values.slottimeid === item?.id ? colors.primary:colors.white} ]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{moment(item?.slot_start_time).format('h:mm A')}</CText>
         </TouchableOpacity> }
       </>
 
@@ -165,10 +229,12 @@ const  startCheckout = () => {
   };
 
   const renderEveningSlotItem = ({ item, index }: any) => {
+     
+      
     return (
       <>
-        {item?.slot === 'EVENING' && <TouchableOpacity style={localStyles.slotContainer}>
-          <CText type="m10">{moment(item?.slot_start_time).format('h:mm A')}</CText>
+        {item?.slot === 'EVENING' && <TouchableOpacity onPress={()=>{formik.setFieldValue('slottimeid',item?.id)}} style={[localStyles.slotContainer,{backgroundColor:formik.values.slottimeid === item?.id ? colors.primary:colors.white} ]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black} >{moment(item?.slot_start_time).format('h:mm A')}</CText>
         </TouchableOpacity> }
       </>
 
@@ -190,21 +256,6 @@ const  startCheckout = () => {
       <CHeader title={strings.selectTimeSlot} />
       <Body contentContainerStyle={localStyles.mainRoot}>
 
-        {/* use formik   */}
-        <Formik
-          enableReinitialize={true}
-          initialValues={{ bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottime: "" }}
-          validationSchema={patientBookingValidationSchema}
-          onSubmit={(values, action) => {
-            // updateProfile(values.country,values.address,values.name,values.mobile)
-            console.warn('updatePatient', values);
-            // action.resetForm()
-            // loadUserInfo();
-
-          }
-          }
-        >
-          {({ handleChange, handleBlur, handleSubmit, values, touched, errors, isValid, setFieldValue }) => (
             <View>
 
 
@@ -220,8 +271,8 @@ const  startCheckout = () => {
                 labelField="label"
                 valueField="value"
                 placeholder={'Relationship With user'}
-                value={bookingForSelected}
-                onChange={(item)=>{setFieldValue('bookingfor',item?.value)}}
+                value={formik.values.bookingfor}
+                onChange={(item)=>{formik.setFieldValue('bookingfor',item?.value)}}
                 renderRightIcon={() => <BottomIcon />}
                 itemTextStyle={localStyles.selectedTextStyle}
                 itemContainerStyle={localStyles.itemContainerStyle}
@@ -232,53 +283,59 @@ const  startCheckout = () => {
               </CText>
 
               <TextInput
-                value={values.patientname}
+                value={formik.values.patientname}
                 style={localStyles.inputTextField}
-                onChangeText={handleChange('patientname')}
-                onBlur={handleBlur('patientname')}
+                onChangeText={formik.handleChange('patientname')}
+                onBlur={formik.handleBlur('patientname')}
                 placeholderTextColor={colors.placeHolderColor}
                 placeholder={strings.enterPatientName}
 
               />
-                {(errors.patientname && touched.patientname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{errors.patientname}</Text> : null}
+                {(formik.errors.patientname && formik.touched.patientname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientname}</Text> : null}
 
               <CText type="s12" style={styles.mt5}>
                 {strings.patientMobileNo}
               </CText>
 
               <TextInput
-                value={values.patientnumber}
+                value={formik.values.patientnumber}
                 style={localStyles.inputTextField}
-                onChangeText={handleChange('patientnumber')}
+                onChangeText={formik.handleChange('patientnumber')}
+                onBlur={formik.handleBlur('patientnumber')}
                 placeholderTextColor={colors.placeHolderColor}
                 placeholder={strings.enterPatientNumber}
                 keyboardType='number-pad'
 
               />
+                 {(formik.errors.patientnumber && formik.touched.patientnumber) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientnumber}</Text> : null}
               <View style={localStyles.ageGenderContainer}>
                 <View style={localStyles.widthStyle}>
                   <CText type="s12">{strings.patientAge}</CText>
                   <TextInput
-                     value={values.patientage}
+                     value={formik.values.patientage}
                      style={localStyles.inputTextField}
-                     onChangeText={handleChange('patientage')}
+                     onChangeText={formik.handleChange('patientage')}
+                     onBlur={formik.handleBlur('patientage')}
                     placeholderTextColor={colors.placeHolderColor}
                     placeholder={strings.age}
                     keyboardType='number-pad'
 
                   />
+                    {(formik.errors.patientage && formik.touched.patientage) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientage}</Text> : null}
                 </View>
                 <View style={localStyles.widthStyle}>
                   <CText type="s12">{strings.patientWeight}</CText>
                   <TextInput
-                    value={values.patientweight}
+                    value={formik.values.patientweight}
                     style={localStyles.inputTextField}
-                    onChangeText={handleChange('patientweight')}
+                    onChangeText={formik.handleChange('patientweight')}
+                    onBlur={formik.handleBlur('patientweight')}
                     placeholderTextColor={colors.placeHolderColor}
                     placeholder={strings.weight}
                     keyboardType='number-pad'
 
                   />
+                    {(formik.errors.patientweight && formik.touched.patientweight) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientweight}</Text> : null}
                 </View>
                 <View style={localStyles.widthStyle}>
                   <CText type="s12">{strings.PatientGender}</CText>
@@ -290,8 +347,8 @@ const  startCheckout = () => {
                     labelField="label"
                     valueField="value"
                     placeholder={strings.gender}
-                    value={patientGender}
-                    onChange={(item)=>{setFieldValue('patientgender',item?.value)}}
+                    value={formik.values.patientgender}
+                    onChange={(item)=>{formik.setFieldValue('patientgender',item?.value)}}
                     renderRightIcon={() => <BottomIcon />}
                     itemTextStyle={localStyles.selectedTextStyle}
                     itemContainerStyle={localStyles.itemContainerStyle}
@@ -324,9 +381,13 @@ const  startCheckout = () => {
 
                   {
                     nextFiveDates.map((item, index) => {
-
+                       
+                        
+                        
                       return (
-                        <TouchableOpacity key={index.toString()} activeOpacity={0.6} onPress={() => { setSelectedDateOption(index) }} >
+                        <TouchableOpacity key={index.toString()} activeOpacity={0.6} onPress={() => { setSelectedDateOption(index)
+                          formik.setFieldValue('slotdateday',item)
+                         }} >
                           <View style={{ backgroundColor: selectedDateOption === index ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
                             <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
                             <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
@@ -390,6 +451,7 @@ const  startCheckout = () => {
 
 
               <View style={localStyles.couponStyle}>
+                <TouchableOpacity activeOpacity={0.6} onPress={()=>{onClickCheckCoupon()}} >
                 <CText
                   type="r14"
 
@@ -398,10 +460,13 @@ const  startCheckout = () => {
                   {strings.ApplyCoupon}
                 </CText>
 
+                </TouchableOpacity>
+              
+
                 <TextInput
                   value={applyCoupons}
                   style={localStyles.inputTextField}
-                  onChangeText={(t) => { setApplyCoupons(t) }}
+                  onChangeText={(t) => { formik.setFieldValue('couponcode',t) }}
                   placeholderTextColor={colors.placeHolderColor}
 
 
@@ -448,7 +513,7 @@ const  startCheckout = () => {
           </CText>
         </View>
         <View style={localStyles.btnSection}>
-          <TouchableOpacity onPress={handleSubmit} style={localStyles.btn}>
+          <TouchableOpacity onPress={formik.handleSubmit} style={localStyles.btn}>
             <CText
               type="r16"
               numberOfLines={1}
@@ -484,8 +549,8 @@ const  startCheckout = () => {
 
               <DatePicker
                 mode='calendar'
-                selected={values.slotdateday}
-                onDateChange={(propDate) => { setFieldValue('slotdateday',propDate) }}
+                selected={formik.values.slotdateday}
+                onDateChange={(propDate) => { formik.setFieldValue('slotdateday', moment(propDate, 'YYYY/MM/DD').format('YYYY-MM-DD')) }}
                 minimumDate={startDate}
               />
 
@@ -510,8 +575,7 @@ const  startCheckout = () => {
         </Modal>
 
         </View>
-          )}
-        </Formik> 
+   
       </Body>
     </Container>
   );
