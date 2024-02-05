@@ -42,10 +42,10 @@ const tabRouteDoctor = () => {
         name={StackNav.FindADoctor}
         component={TabRoute.FindADoctor}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.CategoryDoctorListTab}
         component={StackRoute.CategoryDoctorList}
-      />
+      /> */}
       {/* <Stack.Screen
         name={StackNav.ClinicDoctorDetailCard}
         component={StackRoute.ClinicDoctorDetailCard}

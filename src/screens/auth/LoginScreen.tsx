@@ -1,11 +1,11 @@
 import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
-import { Text , Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
+import { Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Formik } from 'formik'
+import { Formik, useFormik } from 'formik'
 import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
 
 import images from '../../assets/images'
@@ -24,32 +24,101 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import { AuthContext } from '../../context/AuthContext'
 import useLoginByPassword from '../../hooks/auth/loginbypassword'
-import {setAccessToken, getAccessToken } from '../../utils/network'
+import { setAccessToken, getAccessToken } from '../../utils/network'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
   const authContext = useContext(AuthContext);
 
-  async function load(){
-    const localUserInfo =  JSON.parse( await getAccessToken('userInfo') ) ;
-    const AccessTokenInfo =  JSON.parse( await getAccessToken('AccessTokenInfo') ) ;
+  async function load() {
+    const localUserInfo = JSON.parse(await getAccessToken('userInfo'));
+    const AccessTokenInfo = JSON.parse(await getAccessToken('AccessTokenInfo'));
 
-    console.log( 'localUserInfoOnlogin',AccessTokenInfo)
+    console.log('localUserInfoOnlogin', AccessTokenInfo)
   }
-  
+
+
   useEffect(() => {
     load();
   }, []);
-  
+
   const toast = useToast()
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: { userid: "", password: "" },
+    validationSchema: loginSchema,
+    onSubmit: values => {
+      // updateProfile(values.country,values.address,values.name,values.mobile)
+      console.warn('formsubmit', values);
+
+      var body = {
+        mobile: values.userid,
+        password: values.password
+
+      }
+
+      createloginByPassword.mutate(body, {
+        onSuccess: async (data) => {
+          console.warn('afterlogindata', data?.data?.result[0]);
+
+          await setAccessToken('AccessTokenInfo',
+            JSON.stringify({
+              accessToken: data?.data?.result[0]?.token,
+              refreshToken: data?.data?.result[0]?.refreshToken,
+              expirationTime: data?.data?.result[0]?.ExpirationTime,
+            }))
+
+
+          await setAccessToken('userInfo',
+            JSON.stringify({
+              userName: data?.data?.result[0]?.user.first_name,
+              userMobile: data?.data?.result[0]?.user.mobile,
+            }))
+
+          toast.show({
+            placement: "bottom",
+            render: ({ id }) => {
+              const toastId = "toast-" + id
+
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>Logged In   successfully</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+
+          navigation.reset({
+            index: 0,
+            routes: [{ name: StackNav.DrawerNavigation }],
+          });
+
+
+        },
+        onError: (error) => {
+          console.log('errorafterlogin', error)
+        }
+      })
+
+
+      // action.resetForm()
+      // loadUserInfo();
+
+    }
+
+  });
 
   const createloginByPassword = useLoginByPassword()
 
- 
+
+
   const forgotePasswordRef = useRef<ActionSheetRef>(null);
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();
+
+
 
 
   const onPressSkip = async () => {
@@ -79,7 +148,7 @@ const LoginScreen = () => {
     //     showPopupWithOk('', otpSentResponse?.message);
     //   }
     // }
-    navigation.navigate(StackNav.VerifyLoginOtp , {  }  );
+    navigation.navigate(StackNav.VerifyLoginOtp, { mobile: formik.values.userid });
   };
 
   return (
@@ -105,167 +174,94 @@ const LoginScreen = () => {
           </View>
         </View>
 
-        {/* use formik   */}
-        <Formik
-          enableReinitialize={true}
-          initialValues={{ userid: "", password: "" }}
-          validationSchema={loginSchema}
-          onSubmit={(values, action) => {
-            // updateProfile(values.country,values.address,values.name,values.mobile)
-            console.warn('formsubmit', values);
+        <View style={{ marginTop: responsiveHeight(1.5) }} >
+          <View style={{
+            borderWidth: moderateScale(1),
+            borderRadius: moderateScale(6),
+            height: moderateScale(40),
+            borderColor: colors.borderColor,
+            width: '100%', justifyContent: 'center', paddingHorizontal: responsiveWidth(0.7)
+          }}>
+            {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
+            <TextInput
+              onChangeText={formik.handleChange('userid')}
+              onBlur={formik.handleBlur('userid')}
+              value={formik.values.userid}
+              placeholder={strings.enterMobileOrEmail}
+              placeholderTextColor={colors.placeHolderColor}
 
-            var body = {
-              mobile:values.userid,
-              password:values.password
+              autoCorrect={false}
+              style={[
+                localStyles.inputContainerStyle
 
-            }
+              ]}
 
-                createloginByPassword.mutate(body, {
-                  onSuccess: async (data) => {
-                    console.warn('afterlogindata', data?.data?.result[0]);
+            />
 
-                await setAccessToken('AccessTokenInfo',
-                 JSON.stringify({
-                   accessToken:data?.data?.result[0]?.token,
-                   refreshToken:data?.data?.result[0]?.refreshToken,
-                   expirationTime: data?.data?.result[0]?.ExpirationTime,
-                 }) )
- 
+          </View>
+          {(formik.errors.userid && formik.touched.userid) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.userid}</Text> : null}
 
-                 await setAccessToken('userInfo',
-                 JSON.stringify({
-                   userName:data?.data?.result[0]?.user.first_name,
-                   userMobile:data?.data?.result[0]?.user.mobile,
-                  }) )
+          <View style={{ ...styles.rowSpaceBetween, ...styles.mv15, alignSelf: 'flex-end' }}>
+            <TouchableOpacity
+              onPress={onPressSignInWithOtp}
+              style={styles.selfEnd}>
+              <Text
+                fontFamily='$InterSemiBold'
+                fontSize={12}
+                style={localStyles.underLineStyle}
+                color={colors.success}>
+                {strings.signInWithOtp}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-                    toast.show({
-                      placement: "bottom",
-                      render: ({ id }) => {
-                        const toastId = "toast-" + id
+          <View style={{
+            borderWidth: moderateScale(1),
+            borderRadius: moderateScale(6),
+            height: moderateScale(40),
+            borderColor: colors.borderColor,
+            width: '100%', paddingHorizontal: responsiveWidth(0.7), flexDirection: 'row', alignItems: 'center',
+          }}>
+            {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
+            <TextInput
+              onChangeText={formik.handleChange('password')}
+              onBlur={formik.handleBlur('password')}
+              value={formik.values.password}
+              placeholder={strings.password}
+              placeholderTextColor={colors.placeHolderColor}
+              secureTextEntry={showPassword}
 
-                        return (
-                          <Toast nativeID={toastId} variant="accent" action="success">
-                            <ToastTitle>Logged In   successfully</ToastTitle>
-                          </Toast>
-                        );
-                      },
-                    })
+              style={[
+                localStyles.inputContainerStyle, { width: '90%' }
 
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: StackNav.DrawerNavigation }],
-                    });
-  
+              ]}
 
-                  },
-                  onError: (error) => {
-                    console.log('errorafterlogin', error)
-                  }
-                })
+            />
 
+            <TouchableOpacity style={{}} onPress={() => { setShowPassword(!showPassword) }}>
+              {showPassword ? <EyeDashed /> : <Eye />}
+            </TouchableOpacity>
 
-            // action.resetForm()
-            // loadUserInfo();
-
-          }
-          }
-        >
-          {({ handleChange, handleBlur, handleSubmit, values, touched, errors, isValid }) => (
-
-
-            <View style={{ marginTop: responsiveHeight(1.5) }} >
-              <View style={{
-                borderWidth: moderateScale(1),
-                borderRadius: moderateScale(6),
-                height: moderateScale(40),
-                borderColor: colors.borderColor,
-                width: '100%', justifyContent: 'center', paddingHorizontal: responsiveWidth(0.7)
-              }}>
-                {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
-                <TextInput
-                  onChangeText={handleChange('userid')}
-                  onBlur={handleBlur('userid')}
-                  value={values.userid}
-                  placeholder={strings.enterMobileOrEmail}
-                  placeholderTextColor={colors.placeHolderColor}
-
-                  autoCorrect={false}
-                  style={[
-                    localStyles.inputContainerStyle
-
-                  ]}
-
-                />
-
-              </View>
-              {(errors.userid && touched.userid) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{errors.userid}</Text> : null}
-
-              <View style={{ ...styles.rowSpaceBetween, ...styles.mv15, alignSelf: 'flex-end' }}>
-                <TouchableOpacity
-                  onPress={onPressSignInWithOtp}
-                  style={styles.selfEnd}>
-                  <Text
-                    fontFamily='$InterSemiBold'
-                    fontSize={12}
-                    style={localStyles.underLineStyle}
-                    color={colors.success}>
-                    {strings.signInWithOtp}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={{
-                borderWidth: moderateScale(1),
-                borderRadius: moderateScale(6),
-                height: moderateScale(40),
-                borderColor: colors.borderColor,
-                width: '100%', paddingHorizontal: responsiveWidth(0.7), flexDirection: 'row', alignItems: 'center',
-              }}>
-                {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
-                <TextInput
-                  onChangeText={handleChange('password')}
-                  onBlur={handleBlur('password')}
-                  value={values.password}
-                  placeholder={strings.password}
-                  placeholderTextColor={colors.placeHolderColor}
-                  secureTextEntry={showPassword}
-
-                  style={[
-                    localStyles.inputContainerStyle, { width: '90%' }
-
-                  ]}
-
-                />
-
-                <TouchableOpacity style={{}} onPress={() => { setShowPassword(!showPassword) }}>
-                  {showPassword ? <EyeDashed /> : <Eye />}
-                </TouchableOpacity>
-
-              </View>
-              {(errors.password && touched.password) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{errors.password}</Text> : null}
+          </View>
+          {(formik.errors.password && formik.touched.password) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.password}</Text> : null}
 
 
 
-              <TouchableOpacity
-                style={[styles.selfEnd, styles.mb10]}
-                onPress={onPressResetPassword}>
-                <Text
+          <TouchableOpacity
+            style={[styles.selfEnd, styles.mb10]}
+            onPress={onPressResetPassword}>
+            <Text
 
-                  fontFamily='$InterSemiBold'
-                  fontSize={12}
-                  style={localStyles.underLineStyle}
-                  color={colors.success}>
-                  {strings.resetPassword}
-                </Text>
-              </TouchableOpacity>
+              fontFamily='$InterSemiBold'
+              fontSize={12}
+              style={localStyles.underLineStyle}
+              color={colors.success}>
+              {strings.resetPassword}
+            </Text>
+          </TouchableOpacity>
 
-              <PrimaryButton onPress={handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
-            </View>
-
-
-          )}
-        </Formik>
-
+          <PrimaryButton onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
+        </View>
 
         <View style={localStyles.dividerContainer}>
           <View style={localStyles.dividerStyle} />
@@ -329,9 +325,9 @@ const LoginScreen = () => {
           </Text>
         </Text>
 
-        
+
       </Body>
-  
+
       <ForgotePassword SheetRef={forgotePasswordRef} />
     </Container>
 

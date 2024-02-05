@@ -146,9 +146,25 @@ export default function DoctorProfile({ route, navigation }: Props) {
 
   }, [isLoading]);
 
+  const RightIcon = () => {
+    return (
+      <View style={styles.rowCenter}>
+        {/* <TouchableOpacity style={styles.ph5}>
+          <LikeIcon />
+        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.pl5}>
+          <BlackShareIcon />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   if (isLoading) {
     return (
-      <Loader />
+      <Container>
+        <CHeader title={strings.doctorsProfile} rightIcon={<RightIcon />} />
+        <Loader/>
+      </Container>
     )
   }
 
@@ -174,18 +190,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
     return <RenderDSpecialities item={item} />;
   };
 
-  const RightIcon = () => {
-    return (
-      <View style={styles.rowCenter}>
-        <TouchableOpacity style={styles.ph5}>
-          <LikeIcon />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.pl5}>
-          <BlackShareIcon />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+ 
 
   const Divider = () => {
     return <View style={localStyles.dividerStyle} />;
@@ -269,7 +274,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
           </View>
           <CButton
             title={strings.VIEWALLSLOTS}
-            onPress={() => { }}
+            onPress={() => { onPressBookAppointment() }}
             type="m10"
             containerStyle={localStyles.viewAllSlotBtnStyle}
             bgColor={colors.white}
