@@ -99,7 +99,7 @@ const ProductByCategories = ({ route, navigation }:any) => {
    }
     
   return (
-   <Container>
+   <Container statusBarStyle='dark-content' >
     
 
             <View style={[localStyles.headerWrapper,]}>
@@ -173,7 +173,7 @@ const ProductByCategories = ({ route, navigation }:any) => {
 
 
 
- <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',marginBottom:responsiveHeight(9),height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
+ <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
 
   <Text style={{color:colors.black,   ...typography.fontSizes.f14,...typography.fontWeights.Bold,}}>3 Items | {'\u20B9'}526</Text>
 

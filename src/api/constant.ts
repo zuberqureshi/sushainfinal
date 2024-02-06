@@ -66,6 +66,22 @@ export const medicinesCategoryOptions = [
     title: 'Peptic Ulcers',
     image: images.pepticUlcersIcon,
   },
+
+  // {
+  //   id: 6,
+  //   title: 'Peptic Ulcers',
+  //   image: images.pepticUlcersIcon,
+  // },
+  // {
+  //   id: 7,
+  //   title: 'Peptic Ulcers',
+  //   image: images.pepticUlcersIcon,
+  // },
+  // {
+  //   id: 8,
+  //   title: 'Gas & Acidity',
+  //   image: images.gasacidityIcon,
+  // },
 ];
 
 export const medicineBestSellingData = [
@@ -274,11 +290,9 @@ export const healthIssuesData = [
 ]
 
 export const languageData = [
-  {label: 'Item 1', value: '1'},
-  {label: 'Item 2', value: '2'},
-  {label: 'Item 3', value: '3'},
-  {label: 'Item 4', value: '4'},
-  {label: 'Item 5', value: '5'},
+  {label: 'Hindi', value: 'hindi'},
+  {label: 'English', value: 'english'},
+ 
 ]
 
 export const sampleData = [

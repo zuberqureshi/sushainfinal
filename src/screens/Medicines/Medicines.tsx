@@ -19,6 +19,7 @@ import { medicineBestSellingData, saveBigData, sushainProductData } from '../../
 import strings from '../../i18n/strings';
 import SimilarProduct from '../../components/Medicines/SimilarProduct';
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
+import { Container } from '../../components/Container';
 
 
 
@@ -40,7 +41,7 @@ const BottomContainer = ({ icon, title }: any) => {
 
 const Medicines = () => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <Container  statusBarStyle='dark-content' >
       <CHeader
         title={strings.medicines}
       //   rightIcon={<RightText />}
@@ -155,7 +156,7 @@ const Medicines = () => {
           </TouchableOpacity>
         </View>
 
-        <SubHeader title={'Save Big With Combos'} isViewHide={true} style={{marginTop:responsiveHeight(4)}} />
+        {/* <SubHeader title={'Save Big With Combos'} isViewHide={true} style={{marginTop:responsiveHeight(4)}} /> */}
 
 
         <SellingProduct title={'Save Big With Combos'} data={saveBigData} bestSeller={true} />
@@ -236,7 +237,7 @@ const Medicines = () => {
 
 
       </ScrollView>
-    </SafeAreaView>
+    </Container>
   );
 };
 

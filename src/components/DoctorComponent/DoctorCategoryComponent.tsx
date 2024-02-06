@@ -10,6 +10,8 @@ import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
 import {moderateScale} from '../../common/constants';
 import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
+import { useNavigation } from '@react-navigation/native';
+import { StackNav } from '../../navigation/NavigationKeys';
 
 interface general_sub_category {
   id: number;
@@ -23,10 +25,10 @@ interface general_sub_category {
 }
 
 const RenderDSpecialities = ({item}: {item: general_sub_category}) => {
-
+  const navigation = useNavigation();
   
   return (
-    <TouchableOpacity style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{ navigation.navigate(StackNav.CategoryDoctorList, {itm:item?.specilization_name });}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
         <Image source={{uri : `${API_IMAGE_BASE_URL}${item?.img}`}} style={localStyles.imgStyle} />
       </View>

@@ -28,6 +28,7 @@ export const StackNav = {
   SelectTimeSlot: 'SelectTimeSlot',
   InstantConsultation:'InstantConsultation',
   ClinicConsultation:'ClinicConsultation',
+  ProductByCategoriesTab:'ProductByCategoriesTab',
   ProductByCategories:'ProductByCategories',
   ProductDetail:'ProductDetail',
   AppointmentBooked:'AppointmentBooked',

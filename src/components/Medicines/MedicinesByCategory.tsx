@@ -85,7 +85,7 @@ import typography from '../../themes/typography'
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{...styles.ph1,}}
-          scrollEnabled={false}
+          // scrollEnabled={false}
           style={{alignSelf:'center'}}
        
         />

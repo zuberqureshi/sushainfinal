@@ -101,10 +101,14 @@ export default function StackNavigation() {
         name={StackNav.CategoryDoctorList}
         component={StackRoute.CategoryDoctorList}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name={StackNav.ProductByCategories}
         component={StackRoute.ProductByCategories}
-      /> */}
+      />
+       <Stack.Screen
+        name={StackNav.ProductDetail}
+        component={StackRoute.ProductDetail}
+      />
 
       <Stack.Screen
         name={StackNav.AppointmentBooked}

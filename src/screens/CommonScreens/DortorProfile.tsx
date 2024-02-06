@@ -13,7 +13,7 @@ import { FlashList } from '@shopify/flash-list';
 import CHeader from '../../components/common/CHeader';
 import strings from '../../i18n/strings';
 // import CSafeAreaView from '../../components/common/CSafeAreaView';
-import { BlackShareIcon, BottomIcon, ChatIcon, LikeIcon, RegistrationIcon, ServiceOfferdIcon, VideoCallDrawerIcon, } from '../../assets/svgs';
+import { BlackShareIcon, BottomIcon, ChatIcon, LikeIcon, MedicineBottleLineGreen, PlanNotebookIcon, RegistrationIcon, ServiceOfferdIcon, UterusIcon, VideoCallDrawerIcon, } from '../../assets/svgs';
 import { colors, styles } from '../../themes';
 import CText from '../../components/common/CText';
 import RatingComponent from '../../components/HomeComponent/RatingComponent';
@@ -35,16 +35,17 @@ import Loader from '../../components/Loader/Loader';
 import { dataTagSymbol } from '@tanstack/react-query';
 import useGetDoctorsProfile from '../../hooks/doctor/get-doctor-profile';
 
-const RenderDSpecialities = ({ item }: { item: DoctorSpecialityListData }) => {
+const RenderDSpecialities = ({ item,index }: { item: any , index:number}) => {
 
   return (
     <TouchableOpacity style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
-        <Image source={images.ayurvedicProduct} style={localStyles.imgStyle} />
+        {/* <Image source={images.ayurvedicProduct} style={localStyles.imgStyle} /> */}
+        {index === 0 ? <MedicineBottleLineGreen /> : index ===1 ? <UterusIcon  /> : <PlanNotebookIcon /> }
       </View>
       <View style={localStyles.titleContainer}>
-        <CText type="m12" align="center" style={{...styles.ph5,height:responsiveWidth(8)}} numberOfLines={3}>
-          {item?.title}
+        <CText type="s8" align="center" style={{...styles.ph5,height:responsiveWidth(8)}} numberOfLines={2}>
+          {item}
         </CText>
       </View>
     </TouchableOpacity>
@@ -183,11 +184,11 @@ export default function DoctorProfile({ route, navigation }: Props) {
   }
 
   const onPressBookAppointment = () => {
-    navigation.navigate(StackNav.SelectTimeSlot, { id:id,doctorslots:doctorDetail?.slots });
+    navigation.navigate(StackNav.SelectTimeSlot, { doctorid:id,doctorslots:doctorDetail?.slots,instantconsultation:'NO' });
   }
 
-  const renderItem = ({ item }: { item: DoctorSpecialityListData }) => {
-    return <RenderDSpecialities item={item} />;
+  const renderItem = ({ item ,index}: { item: any}) => {
+    return <RenderDSpecialities item={item} index={index} />;
   };
 
  
@@ -299,9 +300,9 @@ export default function DoctorProfile({ route, navigation }: Props) {
             {strings.servicesOffered}
           </CText>
         </View>
-        <View>
+        <View style={{height:responsiveHeight(10)}} >
           <FlashList
-            data={shopByategoryData}
+            data={['General Medicines & Consulting','Infertility','Special Diets']}
             renderItem={renderItem}
             horizontal
             keyExtractor={(item, index) => index.toString()}
@@ -313,13 +314,13 @@ export default function DoctorProfile({ route, navigation }: Props) {
         <Divider />
 
         <SubHeader title={strings.patientsReview} isViewHide={false} />
-        <View style={{  overflow: 'hidden' }} >
+     { !!doctorDetail?.doctor_customer_review ?  <View style={{  overflow: 'hidden' }} >
 
           {doctorDetail?.doctor_customer_review?.slice(0, 2)?.map((item: any, index: number) => {
 
             return (<RenderReviewItem key={index} item={item}/>)
           })}
-        </View>
+        </View> : <Spinner size={'small'} color={colors.primary} /> }
         <CButton
           title={strings.viewAllReviews}
           onPress={onPressAllReview}
@@ -360,14 +361,14 @@ export default function DoctorProfile({ route, navigation }: Props) {
         </Box>
 
 
-        <CButton
+        {/* <CButton
           title={strings.readMore}
           onPress={() => { }}
           type="m10"
           containerStyle={localStyles.readMoreWithBgBtnStyle}
           bgColor={colors.success}
           color={colors.white}
-        />
+        /> */}
         <CButton
           title={strings.bookAppointment}
           onPress={onPressBookAppointment}
@@ -469,19 +470,22 @@ const localStyles = StyleSheet.create({
     resizeMode: 'contain',
   },
   rootContaienr: {
-    width: moderateScale(84),
+    width: moderateScale(85),
     ...styles.center,
   },
   imgOuterContaiener: {
-    width: moderateScale(62),
-    height: moderateScale(62),
-    borderRadius: moderateScale(31),
+    width: moderateScale(35),
+    height: moderateScale(35),
+    borderRadius: moderateScale(35),
     ...styles.mv10,
     ...styles.center,
-    backgroundColor: colors.lightBlue,
+    // backgroundColor: colors.lightBlue,
+    borderWidth:1,
+    borderColor:colors.success
   },
   titleContainer: {
     height: moderateScale(34),
+    // width:responsiveWidth(45)
   },
   dividerStyle: {
     height: getHeight(4),

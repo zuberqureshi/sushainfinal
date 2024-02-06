@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Text, Modal, FlatList, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Text, Modal, FlatList, TextInput, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -7,7 +7,7 @@ import {
   CFPaymentGatewayService,
 } from 'react-native-cashfree-pg-sdk';
 import {
-      CFDropCheckoutPayment,
+  CFDropCheckoutPayment,
   CFEnvironment,
   CFPaymentComponentBuilder,
   CFPaymentModes,
@@ -18,12 +18,12 @@ import {
 import CSafeAreaView from '../../components/common/CSafeAreaView';
 import CHeader from '../../components/common/CHeader';
 import strings from '../../i18n/strings';
-import { BottomIcon, EveningSlotIcon, MorningSlotIcon, BottomIconWhite } from '../../assets/svgs';
+import { BottomIcon, EveningSlotIcon, MorningSlotIcon, BottomIconWhite, CrossIconBlack, CrossBottomTab } from '../../assets/svgs';
 import CText from '../../components/common/CText';
 import { colors, styles } from '../../themes';
 import typography from '../../themes/typography';
 import { deviceHeight, deviceWidth, moderateScale } from '../../common/constants';
-import { Formik, useFormik  } from 'formik'
+import { Formik, useFormik } from 'formik'
 
 
 import { genderData, bookingFor } from '../../api/constant';
@@ -38,9 +38,12 @@ import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
 import useGetDoctorsAllSlots from '../../hooks/doctor/get-doctor-all-slots';
 import { patientBookingValidationSchema } from '../../utils/validators';
-import Loader from '../../common/Loader';
-import { SelectItemText, Toast, ToastDescription, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
+import { Box, Button, ButtonText, SelectItemText, Toast, ToastDescription, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
 import useCheckCouponCode from '../../hooks/booking/check-coupon-code';
+import PrimaryButton from '../../components/common/Button/PrimaryButton';
+import { Spinner } from '@gluestack-ui/themed';
+import useCreateConsultation from '../../hooks/booking/create-consultation';
+import Loader from '../../components/Loader/Loader';
 
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
@@ -51,18 +54,20 @@ interface Props {
 export default function SelectTimeSlot({ route, }: Props) {
 
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  
+
   //states
-  const [applyCoupons, setApplyCoupons] = useState('');
+  const [applyCoupon, setApplyCoupon] = useState(false);
   const [coloredCheckBoxValue, setColoredCheckBoxValue] = useState(false);
   const [selectedDateOption, setSelectedDateOption] = useState(0)
   const [datePickerModel, setDatePickerModel] = useState(false)
+  const [payPrice, setPayPrice] = useState('')
 
   //init
-  const { id, doctorslots } = route.params;
+  const { doctorid, doctorslots,instantconsultation } = route.params;
   const { data: allSlotsData, isLoading } = useGetDoctorsAllSlots()
   const useCheckCouponCodeMutation = useCheckCouponCode()
- 
+  const useCreateConsultationMutation = useCreateConsultation()
+
 
   const toast = useToast()
 
@@ -72,36 +77,94 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
- 
-  const formik = useFormik({
-    enableReinitialize:true,
-          initialValues:{ bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate , slottimeid: "" , couponcode: "" },
-          validationSchema:patientBookingValidationSchema,
-          onSubmit: values => {
-            // updateProfile(values.country,values.address,values.name,values.mobile)
-            console.log('updatePatient', values);
-            // action.resetForm()
-            // loadUserInfo();
-            if(!(!!values.slottimeid ) || !(!!values.slotdateday)){
-              toast.show({
-                placement: "bottom",
-                render: ({ id }) => {
-                  const toastId = "toast-" + id
-                  return (
-                    <Toast nativeID={toastId} action="error" variant="accent">
-                      <VStack space="xs">
-                        <ToastTitle>Please select slottime and date</ToastTitle>
-                     
-                      </VStack>
-                    </Toast>
-                  )
-                },
-              })
-              
-            }
 
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" },
+    validationSchema: patientBookingValidationSchema,
+    onSubmit: values => {
+      // updateProfile(values.country,values.address,values.name,values.mobile)
+      // console.log('updatePatient', values);
+      // action.resetForm()
+      // loadUserInfo();
+      if (!(!!values.slottimeid) || !(!!values.slotdateday)) {
+        toast.show({
+          placement: "bottom",
+          render: ({ id }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} action="error" variant="accent">
+                <VStack space="xs">
+                  <ToastTitle>Please select slottime and date</ToastTitle>
+
+                </VStack>
+              </Toast>
+            )
           },
-          
+        })
+
+      } else {
+        const payload = {
+          userId: "",
+          "doc_id": doctorid,
+          "slot_id": formik.values.slottimeid,
+          "booking_date": formik.values.slotdateday,
+          "voucher": formik.values.couponcode,
+          "instant_consultation": instantconsultation,  // YES , NO 
+          "bookingspecilization": "",
+          "usercity": "Gwalior",
+          "country_code": "IN",
+          "person_name": formik.values.patientname,
+          "person": formik.values.bookingfor,
+          "person_age": formik.values.patientage,
+          "person_mobile": formik.values.patientnumber,
+          "person_weight": formik.values.patientweight,
+          "person_gender": formik.values.patientgender
+        }
+
+        console.log({payload});
+        
+
+        // useCreateConsultationMutation.mutate(payload, {
+        //   onSuccess: (data) => {
+        //     console.log(data?.data);
+
+        //     toast.show({
+        //       placement: "bottom",
+        //       render: ({ id }: { id: string }) => {
+        //         const toastId = "toast-" + id
+        //         return (
+        //           <Toast nativeID={toastId} variant="accent" action="success">
+        //             <ToastTitle>Submit Succesfully</ToastTitle>
+        //           </Toast>
+        //         );
+        //       },
+        //     })
+        //     setPayPrice(data?.data?.result[0]?.finalPrice)
+        //     setApplyCoupon(true)
+
+        //   },
+        //   onError: (error: any) => {
+
+        //     toast.show({
+        //       placement: "bottom",
+        //       render: ({ id }: { id: string }) => {
+        //         const toastId = "toast-" + id
+        //         return (
+        //           <Toast nativeID={toastId} variant="accent" action="error">
+        //             <ToastTitle>Something went wrong, please try again later</ToastTitle>
+        //           </Toast>
+        //         );
+        //       },
+        //     })
+        //   }
+        // })
+      }
+
+
+
+    },
+
   });
 
   const onClickCheckCoupon = () => {
@@ -109,25 +172,28 @@ export default function SelectTimeSlot({ route, }: Props) {
     const payload = {
       coupon_code: formik.values.couponcode,
       type: "APPOINTMENT",
+      userid: '',
       displayMode: "NATIVEAPP",
-      Totalmrp:540
+      Totalmrp: '715'
     }
 
     useCheckCouponCodeMutation.mutate(payload, {
       onSuccess: (data) => {
-          console.log(data?.data);
-          
+        console.log(data?.data?.result[0]?.finalPrice);
+
         toast.show({
           placement: "bottom",
           render: ({ id }: { id: string }) => {
             const toastId = "toast-" + id
             return (
               <Toast nativeID={toastId} variant="accent" action="success">
-                <ToastTitle>Coupon successfully</ToastTitle>
+                <ToastTitle>Coupon Applied</ToastTitle>
               </Toast>
             );
           },
         })
+        setPayPrice(data?.data?.result[0]?.finalPrice)
+        setApplyCoupon(true)
 
       },
       onError: (error: any) => {
@@ -147,7 +213,7 @@ export default function SelectTimeSlot({ route, }: Props) {
     })
   }
 
- 
+
 
 
 
@@ -158,11 +224,11 @@ export default function SelectTimeSlot({ route, }: Props) {
   const currentDate = moment();
 
   // Array to store the next five dates
-  const nextFiveDates = [];
+  const nextFiveDates:any = [];
 
   // Loop to add the next five dates to the array
   for (let i = 0; i <= 4; i++) {
-    const nextDate:any = moment(currentDate).add(i, 'days');
+    const nextDate: any = moment(currentDate).add(i, 'days');
     nextFiveDates.push(nextDate.format('YYYY-MM-DD'));
   }
 
@@ -171,18 +237,18 @@ export default function SelectTimeSlot({ route, }: Props) {
     CFPaymentGatewayService.setCallback({
       onVerify(orderID: string): void {
         console.log('success ', orderID);
-      //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-       // navigation.navigate(NAVIGATION.PaymentSuccess);
+        //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
+        // navigation.navigate(NAVIGATION.PaymentSuccess);
       },
       onError(error: CFErrorResponse, orderID: string): void {
         console.log('failed ', orderID);
-       // navigation.navigate(NAVIGATION.PaymentFailed);
+        // navigation.navigate(NAVIGATION.PaymentFailed);
       },
     });
     return () => CFPaymentGatewayService.removeCallback();
   }, []);
 
-const  startCheckout = () => {
+  const startCheckout = () => {
     try {
       const session = new CFSession(
         'session_nfELAxM5ckTG_uOPoXK8EP37UpGFbWP_Tkieyj0SNb5EV5TrR0kNjoT5zPn09JCfNm_zURcfkxs2e2bbI9y7JYthZHNXCog1n6HkxqajTp_F',
@@ -211,31 +277,66 @@ const  startCheckout = () => {
       );
       CFPaymentGatewayService.doPayment(dropPayment);
     } catch (e: any) {
-      console.log('startcheckout eeror ',e.message);
+      console.log('startcheckout eeror ', e.message);
     }
+  }
+
+  if(!(!!slotListMorningArray) || !(!!slotListEveningArray)){
+    return(
+      <Container statusBarStyle='dark-content' >
+      <CHeader title={strings.selectTimeSlot}  />
+      <Loader/>
+    </Container>
+    )
   }
 
 
   const renderSlotItem = ({ item, index }: any) => {
-  
+    const date = new Date(item?.slot_start_time);
+
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
     return (
       <>
-        {item?.slot === 'MORNING' && <TouchableOpacity onPress={()=>{formik.setFieldValue('slottimeid',item?.id)}} style={[localStyles.slotContainer,{backgroundColor:formik.values.slottimeid === item?.id ? colors.primary:colors.white} ]}>
-          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{moment(item?.slot_start_time).format('h:mm A')}</CText>
-        </TouchableOpacity> }
+        {item?.slot === 'MORNING' && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{formattedTime}</CText>
+        </TouchableOpacity>}
       </>
 
     );
   };
 
   const renderEveningSlotItem = ({ item, index }: any) => {
-     
-      
+    const date = new Date(item?.slot_start_time);
+
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+
     return (
       <>
-        {item?.slot === 'EVENING' && <TouchableOpacity onPress={()=>{formik.setFieldValue('slottimeid',item?.id)}} style={[localStyles.slotContainer,{backgroundColor:formik.values.slottimeid === item?.id ? colors.primary:colors.white} ]}>
-          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black} >{moment(item?.slot_start_time).format('h:mm A')}</CText>
-        </TouchableOpacity> }
+        {item?.slot === 'EVENING' && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black} >{formattedTime}</CText>
+        </TouchableOpacity>}
       </>
 
     );
@@ -256,326 +357,335 @@ const  startCheckout = () => {
       <CHeader title={strings.selectTimeSlot} />
       <Body contentContainerStyle={localStyles.mainRoot}>
 
-            <View>
+        <View>
 
 
 
-              <CText type="s12" style={localStyles.labelStyle}>
-                {'Booking For'}
-              </CText>
+          <CText type="s12" style={localStyles.labelStyle}>
+            {'Booking For'}
+          </CText>
+          <Dropdown
+            style={localStyles.dropdown}
+            placeholderStyle={localStyles.placeholderStyle}
+            selectedTextStyle={localStyles.selectedTextStyle}
+            data={bookingFor}
+            labelField="label"
+            valueField="value"
+            placeholder={'Relationship With user'}
+            value={formik.values.bookingfor}
+            onChange={(item) => { formik.setFieldValue('bookingfor', item?.value) }}
+            renderRightIcon={() => <BottomIcon />}
+            itemTextStyle={localStyles.selectedTextStyle}
+            itemContainerStyle={localStyles.itemContainerStyle}
+          />
+
+          <CText type="s12" style={localStyles.labelStyle}>
+            {strings.patientName}
+          </CText>
+
+          <TextInput
+            value={formik.values.patientname}
+            style={localStyles.inputTextField}
+            onChangeText={formik.handleChange('patientname')}
+            onBlur={formik.handleBlur('patientname')}
+            placeholderTextColor={colors.placeHolderColor}
+            placeholder={strings.enterPatientName}
+
+          />
+          {(formik.errors.patientname && formik.touched.patientname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientname}</Text> : null}
+
+          <CText type="s12" style={styles.mt5}>
+            {strings.patientMobileNo}
+          </CText>
+
+          <TextInput
+            value={formik.values.patientnumber}
+            style={localStyles.inputTextField}
+            onChangeText={formik.handleChange('patientnumber')}
+            onBlur={formik.handleBlur('patientnumber')}
+            placeholderTextColor={colors.placeHolderColor}
+            placeholder={strings.enterPatientNumber}
+            keyboardType='number-pad'
+
+          />
+          {(formik.errors.patientnumber && formik.touched.patientnumber) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientnumber}</Text> : null}
+          <View style={localStyles.ageGenderContainer}>
+            <View style={localStyles.widthStyle}>
+              <CText type="s12">{strings.patientAge}</CText>
+              <TextInput
+                value={formik.values.patientage}
+                style={localStyles.inputTextField}
+                onChangeText={formik.handleChange('patientage')}
+                onBlur={formik.handleBlur('patientage')}
+                placeholderTextColor={colors.placeHolderColor}
+                placeholder={strings.age}
+                keyboardType='number-pad'
+
+              />
+              {(formik.errors.patientage && formik.touched.patientage) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientage}</Text> : null}
+            </View>
+            <View style={localStyles.widthStyle}>
+              <CText type="s12">{strings.patientWeight}</CText>
+              <TextInput
+                value={formik.values.patientweight}
+                style={localStyles.inputTextField}
+                onChangeText={formik.handleChange('patientweight')}
+                onBlur={formik.handleBlur('patientweight')}
+                placeholderTextColor={colors.placeHolderColor}
+                placeholder={strings.weight}
+                keyboardType='number-pad'
+
+              />
+              {(formik.errors.patientweight && formik.touched.patientweight) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientweight}</Text> : null}
+            </View>
+            <View style={localStyles.widthStyle}>
+              <CText type="s12">{strings.PatientGender}</CText>
               <Dropdown
                 style={localStyles.dropdown}
                 placeholderStyle={localStyles.placeholderStyle}
                 selectedTextStyle={localStyles.selectedTextStyle}
-                data={bookingFor}
+                data={genderData}
                 labelField="label"
                 valueField="value"
-                placeholder={'Relationship With user'}
-                value={formik.values.bookingfor}
-                onChange={(item)=>{formik.setFieldValue('bookingfor',item?.value)}}
+                placeholder={strings.gender}
+                value={formik.values.patientgender}
+                onChange={(item) => { formik.setFieldValue('patientgender', item?.value) }}
                 renderRightIcon={() => <BottomIcon />}
                 itemTextStyle={localStyles.selectedTextStyle}
                 itemContainerStyle={localStyles.itemContainerStyle}
               />
+            </View>
+          </View>
 
-              <CText type="s12" style={localStyles.labelStyle}>
-                {strings.patientName}
-              </CText>
+          <View style={{ marginTop: responsiveHeight(2) }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+              <Text style={{
+                color: colors.black, ...typography.fontSizes.f12,
+                ...typography.fontWeights.SemiBold,
+              }} >{strings.SelectDateDay}</Text>
 
-              <TextInput
-                value={formik.values.patientname}
-                style={localStyles.inputTextField}
-                onChangeText={formik.handleChange('patientname')}
-                onBlur={formik.handleBlur('patientname')}
-                placeholderTextColor={colors.placeHolderColor}
-                placeholder={strings.enterPatientName}
+              <TouchableOpacity activeOpacity={0.6} onPress={() => { setDatePickerModel(!datePickerModel) }} >
 
-              />
-                {(formik.errors.patientname && formik.touched.patientname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientname}</Text> : null}
-
-              <CText type="s12" style={styles.mt5}>
-                {strings.patientMobileNo}
-              </CText>
-
-              <TextInput
-                value={formik.values.patientnumber}
-                style={localStyles.inputTextField}
-                onChangeText={formik.handleChange('patientnumber')}
-                onBlur={formik.handleBlur('patientnumber')}
-                placeholderTextColor={colors.placeHolderColor}
-                placeholder={strings.enterPatientNumber}
-                keyboardType='number-pad'
-
-              />
-                 {(formik.errors.patientnumber && formik.touched.patientnumber) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientnumber}</Text> : null}
-              <View style={localStyles.ageGenderContainer}>
-                <View style={localStyles.widthStyle}>
-                  <CText type="s12">{strings.patientAge}</CText>
-                  <TextInput
-                     value={formik.values.patientage}
-                     style={localStyles.inputTextField}
-                     onChangeText={formik.handleChange('patientage')}
-                     onBlur={formik.handleBlur('patientage')}
-                    placeholderTextColor={colors.placeHolderColor}
-                    placeholder={strings.age}
-                    keyboardType='number-pad'
-
-                  />
-                    {(formik.errors.patientage && formik.touched.patientage) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientage}</Text> : null}
-                </View>
-                <View style={localStyles.widthStyle}>
-                  <CText type="s12">{strings.patientWeight}</CText>
-                  <TextInput
-                    value={formik.values.patientweight}
-                    style={localStyles.inputTextField}
-                    onChangeText={formik.handleChange('patientweight')}
-                    onBlur={formik.handleBlur('patientweight')}
-                    placeholderTextColor={colors.placeHolderColor}
-                    placeholder={strings.weight}
-                    keyboardType='number-pad'
-
-                  />
-                    {(formik.errors.patientweight && formik.touched.patientweight) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.patientweight}</Text> : null}
-                </View>
-                <View style={localStyles.widthStyle}>
-                  <CText type="s12">{strings.PatientGender}</CText>
-                  <Dropdown
-                    style={localStyles.dropdown}
-                    placeholderStyle={localStyles.placeholderStyle}
-                    selectedTextStyle={localStyles.selectedTextStyle}
-                    data={genderData}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={strings.gender}
-                    value={formik.values.patientgender}
-                    onChange={(item)=>{formik.setFieldValue('patientgender',item?.value)}}
-                    renderRightIcon={() => <BottomIcon />}
-                    itemTextStyle={localStyles.selectedTextStyle}
-                    itemContainerStyle={localStyles.itemContainerStyle}
-                  />
-                </View>
-              </View>
-
-              <View style={{ marginTop: responsiveHeight(2) }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                <View style={{ backgroundColor: colors.primary, flexDirection: 'row', paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(2), gap: responsiveWidth(1) }} >
                   <Text style={{
-                    color: colors.black, ...typography.fontSizes.f12,
+                    color: colors.white, ...typography.fontSizes.f10,
                     ...typography.fontWeights.SemiBold,
-                  }} >{strings.SelectDateDay}</Text>
-
-                  <TouchableOpacity activeOpacity={0.6} onPress={() => { setDatePickerModel(!datePickerModel) }} >
-
-                    <View style={{ backgroundColor: colors.primary, flexDirection: 'row', paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(2), gap: responsiveWidth(1) }} >
-                      <Text style={{
-                        color: colors.white, ...typography.fontSizes.f10,
-                        ...typography.fontWeights.SemiBold,
-                      }} >{moment(currentDate).format('MMM')},{moment(currentDate).format('YYYY')}</Text>
-                      <BottomIconWhite />
-                    </View>
-
-                  </TouchableOpacity>
-
+                  }} >{moment(currentDate).format('MMM')},{moment(currentDate).format('YYYY')}</Text>
+                  <BottomIconWhite />
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: responsiveHeight(2.5) }} >
+              </TouchableOpacity>
 
-                  {
-                    nextFiveDates.map((item, index) => {
-                       
-                        
-                        
-                      return (
-                        <TouchableOpacity key={index.toString()} activeOpacity={0.6} onPress={() => { setSelectedDateOption(index)
-                          formik.setFieldValue('slotdateday',item)
-                         }} >
-                          <View style={{ backgroundColor: selectedDateOption === index ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-                            <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
-                            <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
-                          </View>
+            </View>
 
-                        </TouchableOpacity>
-                      )
-                    })
-                  }
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: responsiveHeight(2.5) }} >
 
-                </View>
-              </View>
-
-              <CText type="m14" style={styles.mt10}>
-                {strings.timeAvailable}
-              </CText>
-              <View style={localStyles.rowStyle}>
-                <MorningSlotIcon />
-                <CText type="r12" style={styles.ph5}>
-                  {strings.morningSlots}
-                </CText>
-              </View>
-              <View style={{  }}>
-              { !!slotListMorningArray ? <FlashList
-                  data={slotListMorningArray}
-                  renderItem={renderSlotItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  numColumns={5}
-                  ListEmptyComponent={()=>{return(
-                    <CText type="r14" numberOfLines={1} color={colors.success}>
-                    No Slots Available
-                 </CText>)}}
-                  estimatedItemSize={100}
-                // justifyContent="space-between"
-                /> : <Loader/> }
-              </View>
-
-              <View style={localStyles.rowStyle}>
-                <EveningSlotIcon />
-                <CText type="r12" style={styles.ph5}>
-                  {strings.eveningsSlots}
-                </CText>
-              </View>
-
-              <View style={{  }} >
-               { !!slotListEveningArray ? <FlashList
-                  data={slotListEveningArray}
-                  renderItem={renderEveningSlotItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  numColumns={5}
-                  ListEmptyComponent={()=>{return(
-                     <CText type="r14" numberOfLines={1} color={colors.success}>
-                     No Slots Available
-                  </CText>)}}
-                  estimatedItemSize={100}
-                // justifyContent="space-between"
-                /> : <Loader/> }
-              </View>
+              {
+                nextFiveDates.map((item, index) => {
 
 
 
+                  return (
+                    <TouchableOpacity key={index.toString()} activeOpacity={0.6} onPress={() => {
+                      setSelectedDateOption(index)
+                      formik.setFieldValue('slotdateday', item)
+                    }} >
+                      <View style={{ backgroundColor: selectedDateOption === index ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
+                        <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
+                        <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
+                      </View>
 
-              <View style={localStyles.couponStyle}>
-                <TouchableOpacity activeOpacity={0.6} onPress={()=>{onClickCheckCoupon()}} >
-                <CText
-                  type="r14"
-
-                  color={colors.primary}
-                  style={styles.center}>
-                  {strings.ApplyCoupon}
-                </CText>
-
-                </TouchableOpacity>
-              
-
-                <TextInput
-                  value={applyCoupons}
-                  style={localStyles.inputTextField}
-                  onChangeText={(t) => { formik.setFieldValue('couponcode',t) }}
-                  placeholderTextColor={colors.placeHolderColor}
-
-
-                />
-              </View>
-
-
-
-        <View style={localStyles.termStyle}>
-          <CheckBox
-            containerStyle={{}}
-            isChecked={coloredCheckBoxValue}
-            checkBoxColor={'#D0D0D0'}
-            onClick={() => { setColoredCheckBoxValue(!coloredCheckBoxValue) }}
-            checkedCheckBoxColor={colors.primary}
-          />
-          <CText type="r12" color={colors.gray} style={{ width: responsiveWidth(75), marginLeft: responsiveWidth(4) }} >
-            {strings.Iagreetothese}
-            <CText
-              suppressHighlighting={true}
-              type="r12"
-              style={[
-                localStyles.underLineStyle,
-                {
-                  textDecorationColor: colors.primary,
-                },
-              ]}
-              color={colors.primary}>
-              {strings.TermsandConditions}
-            </CText>
-            {' & '}
-            <CText
-              suppressHighlighting={true}
-              type="r12"
-              style={[
-                localStyles.underLineStyle,
-                {
-                  textDecorationColor: colors.primary,
-                },
-              ]}
-              color={colors.primary}>
-              {strings.cancelPolicy}
-            </CText>
-          </CText>
-        </View>
-        <View style={localStyles.btnSection}>
-          <TouchableOpacity onPress={formik.handleSubmit} style={localStyles.btn}>
-            <CText
-              type="r16"
-              numberOfLines={1}
-              color={'#5E5D5D'}
-              style={styles.ml10}>
-              {strings.close}
-            </CText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { startCheckout()  }}
-            style={[localStyles.btn, { backgroundColor: colors.success }]}>
-            <CText
-              type="r16"
-              numberOfLines={1}
-              color={colors.white}
-            >
-              {strings.pay}715
-            </CText>
-          </TouchableOpacity>
-        </View>
-    
-
-        <Modal
-          animationType='slide'
-          transparent={true}
-          visible={datePickerModel}
-        >
-
-          <View style={localStyles.modalCenterView} >
-
-            <View style={localStyles.modalView}>
-
-
-              <DatePicker
-                mode='calendar'
-                selected={formik.values.slotdateday}
-                onDateChange={(propDate) => { formik.setFieldValue('slotdateday', moment(propDate, 'YYYY/MM/DD').format('YYYY-MM-DD')) }}
-                minimumDate={startDate}
-              />
-
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                <TouchableOpacity activeOpacity={0.6} onPress={() => { setDatePickerModel(false) }} >
-
-                  <Text style={{ color: colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{strings.cancel}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => { setDatePickerModel(false) }} style={{ backgroundColor: colors.success, paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(2) }} >
-
-                  <Text style={{ color: colors.white, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Done</Text>
-                </TouchableOpacity>
-              </View>
-
+                    </TouchableOpacity>
+                  )
+                })
+              }
 
             </View>
           </View>
 
+          <CText type="m14" style={styles.mt10}>
+            {strings.timeAvailable}
+          </CText>
+          <View style={localStyles.rowStyle}>
+            <MorningSlotIcon />
+            <CText type="r12" style={styles.ph5}>
+              {strings.morningSlots}
+            </CText>
+          </View>
+          <View style={{}}>
+            {!!slotListMorningArray ? <FlashList
+              data={slotListMorningArray}
+              renderItem={renderSlotItem}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={5}
+              ListEmptyComponent={() => {
+                return (
+                  <CText type="r14" numberOfLines={1} color={colors.success}>
+                    No Slots Available
+                  </CText>)
+              }}
+              estimatedItemSize={100}
+            // justifyContent="space-between"
+            /> : <Spinner size={'small'} color={colors.primary} />}
+          </View>
 
-        </Modal>
+          <View style={localStyles.rowStyle}>
+            <EveningSlotIcon />
+            <CText type="r12" style={styles.ph5}>
+              {strings.eveningsSlots}
+            </CText>
+          </View>
+
+          <View style={{}} >
+            {!!slotListEveningArray ? <FlashList
+              data={slotListEveningArray}
+              renderItem={renderEveningSlotItem}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={5}
+              ListEmptyComponent={() => {
+                return (
+                  <CText type="r14" numberOfLines={1} color={colors.success}>
+                    No Slots Available
+                  </CText>)
+              }}
+              estimatedItemSize={100}
+            // justifyContent="space-between"
+            /> : <Spinner size={'small'} color={colors.primary} />}
+          </View>
+
+
+
+
+          <View style={localStyles.couponStyle}>
+
+
+
+            {applyCoupon ? <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: responsiveHeight(1), paddingHorizontal: responsiveWidth(2.5), borderWidth: 1, borderStyle: 'dashed', borderColor: colors.primary, borderRadius: responsiveWidth(1.5), flex: 1, justifyContent: 'space-between', marginLeft: responsiveWidth(1.4) }} >
+              <CText type='m12' color={colors.primary} >{formik.values.couponcode}</CText>
+              <Pressable onPress={() => {
+                setApplyCoupon(false)
+                setPayPrice('')
+                formik.setFieldValue('couponcode', '')
+              }} >
+                <CrossBottomTab />
+              </Pressable>
+
+            </View> :
+              <>
+                <TextInput
+                  style={[localStyles.inputTextField, { marginLeft: responsiveWidth(1.3) }]}
+                  value={formik.values.couponcode}
+                  onChangeText={formik.handleChange('couponcode')}
+                  placeholderTextColor={colors.placeHolderColor}
+                  placeholder='Enter Coupon code here'
+
+                />
+                <PrimaryButton disabled={useCheckCouponCodeMutation.isPending} onPress={() => { onClickCheckCoupon() }} loading={useCheckCouponCodeMutation.isPending} buttonText='Apply' height={responsiveHeight(5)} />
+              </>}
+
+
+
+
+
+          </View>
+
+
+
+          <View style={localStyles.termStyle}>
+            <CheckBox
+              containerStyle={{}}
+              isChecked={coloredCheckBoxValue}
+              checkBoxColor={'#D0D0D0'}
+              onClick={() => { setColoredCheckBoxValue(!coloredCheckBoxValue) }}
+              checkedCheckBoxColor={colors.primary}
+            />
+            <CText type="r12" color={colors.gray} style={{ width: responsiveWidth(75), marginLeft: responsiveWidth(4) }} >
+              {strings.Iagreetothese}
+              <CText
+                suppressHighlighting={true}
+                type="r12"
+                style={[
+                  localStyles.underLineStyle,
+                  {
+                    textDecorationColor: colors.primary,
+                  },
+                ]}
+                color={colors.primary}>
+                {strings.TermsandConditions}
+              </CText>
+              {' & '}
+              <CText
+                suppressHighlighting={true}
+                type="r12"
+                style={[
+                  localStyles.underLineStyle,
+                  {
+                    textDecorationColor: colors.primary,
+                  },
+                ]}
+                color={colors.primary}>
+                {strings.cancelPolicy}
+              </CText>
+            </CText>
+          </View>
+          <View style={localStyles.btnSection}>
+            <Button borderRadius={6} backgroundColor={colors.lightwhite} height={42} onPress={() => { }} >
+
+              <ButtonText fontSize={14} fontFamily='$InterRegular' color={colors.black} >{strings.cancel} </ButtonText>
+
+            </Button>
+
+
+            <Button borderRadius={6} disabled={useCreateConsultationMutation.isPending} backgroundColor={useCreateConsultationMutation.isPending ? 'gray' : colors.success} height={42} onPress={formik.handleSubmit} >
+
+              <ButtonText fontSize={14} fontFamily='$InterRegular' color={colors.white} >{strings.pay} </ButtonText>
+              <ButtonText fontSize={14} fontFamily='$InterSemiBold' color={colors.white}>{!!payPrice ? `${payPrice} ` : '715'}</ButtonText>
+              {!!payPrice && <ButtonText fontSize={12} fontFamily='$InterRegula' textDecorationLine='line-through' color={colors.white} >{'715'}</ButtonText>}
+              {useCreateConsultationMutation.isPending && <Spinner color="white" size={20} ml={7} />}
+            </Button>
+          </View>
+
+
+          <Modal
+            animationType='slide'
+            transparent={true}
+            visible={datePickerModel}
+          >
+
+            <View style={localStyles.modalCenterView} >
+
+              <View style={localStyles.modalView}>
+
+
+                <DatePicker
+                  mode='calendar'
+                  selected={formik.values.slotdateday}
+                  onDateChange={(propDate) => { formik.setFieldValue('slotdateday', moment(propDate, 'YYYY/MM/DD').format('YYYY-MM-DD')) }}
+                  minimumDate={startDate}
+                />
+
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <TouchableOpacity activeOpacity={0.6} onPress={() => { setDatePickerModel(false) }} >
+
+                    <Text style={{ color: colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{strings.cancel}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => { setDatePickerModel(false) }} style={{ backgroundColor: colors.success, paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(2) }} >
+
+                    <Text style={{ color: colors.white, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Done</Text>
+                  </TouchableOpacity>
+                </View>
+
+
+              </View>
+            </View>
+
+
+          </Modal>
 
         </View>
-   
+
       </Body>
     </Container>
   );
@@ -647,27 +757,34 @@ const localStyles = StyleSheet.create({
   },
   btnSection: {
     ...styles.rowSpaceBetween,
-    ...styles.mh10,
+    marginLeft: responsiveWidth(1.4),
     // alignItems:'center',
     marginBottom: responsiveHeight(2.5)
   },
   btn: {
     backgroundColor: colors.lightwhite,
-    ...styles.p10,
+    ...styles.ph10,
+    ...styles.pv10,
     borderRadius: 10,
-    width: moderateScale(100),
+    // width: moderateScale(100),
     ...styles.justifyCenter,
     ...styles.center,
+
   },
   couponStyle: {
-    width: '30%',
-    ...styles.selfEnd,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: responsiveWidth(3.5),
+    marginVertical: responsiveHeight(2.5)
+    //  paddingHorizontal:responsiveWidth(1.5)
+
   },
   termStyle: {
     ...styles.flexRow,
     ...styles.itemsCenter,
     alignItems: 'center',
-    marginBottom: responsiveHeight(3)
+    marginBottom: responsiveHeight(3),
+    marginLeft: responsiveWidth(1.4)
   },
   underLineStyle: {
     textDecorationStyle: 'solid',
@@ -705,7 +822,7 @@ const localStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.primary,
     ...styles.ph10,
-    height: responsiveHeight(5.3),
+    height: responsiveHeight(5),
     borderRadius: responsiveWidth(1.5)
     , ...styles.mv5
   }

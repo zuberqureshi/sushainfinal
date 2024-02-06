@@ -121,7 +121,9 @@ import StarUnFilledPrimaryColor from './starUnFilledPrimaryColor.svg'
 import StarFilledPrimaryColor from './starFilledPrimaryColor.svg'
 import DiscountGreenIcon from './discountGreenIcon.svg'
 import CrossIconBlack from './crossIconBlack.svg'
-
+import MedicineBottleLineGreen from './medicineBottleLineGreen.svg'
+import PlanNotebookIcon from './planNotebookIcon.svg'
+import UterusIcon from './uterusIcon.svg'
 
 export {
   Home,
@@ -244,6 +246,9 @@ export {
   StarUnFilledPrimaryColor,
   DiscountGreenIcon,
   CrossIconBlack,
+  MedicineBottleLineGreen,
+  PlanNotebookIcon,
+  UterusIcon,
 
 
 };

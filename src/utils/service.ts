@@ -1,7 +1,43 @@
 import GetLocation from 'react-native-get-location'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PermissionsAndroid } from 'react-native';
+import { useEffect } from 'react';
+import { Toast,useToast,ToastTitle } from '@gluestack-ui/themed';
 
 export const getLocation = async() => {
+
+    // useEffect(() => {
+    //   requestCameraPermission()
+    // }, [])
+    
+
+
+    const requestLocationPermission = async () => {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: 'Location Permission',
+              message:
+                'Cool Photo App needs access to your camera ' +
+                'so you can take awesome pictures.',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('You can use the Location');
+          } else {
+            console.log('Location permission denied');
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+      };
+
+      await requestLocationPermission()
+
     GetLocation.getCurrentPosition({
         enableHighAccuracy: true,
         timeout: 60000,
@@ -21,7 +57,11 @@ export const getLocation = async() => {
               console.error('Error:', error); });
             
     }).catch(error => {
+        
         const { code, message } = error;
-        console.warn(code, message);
+        // if(code === 'UNAVAILABLE'){
+            
+        // }
+        console.warn(code, message,);
     })
 }

@@ -170,12 +170,12 @@ const locationSet = async() => {
                 {strings.hi}  { userInfo?.userName }
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
-              <View style={localStyles.locationContainer}>
+              <Pressable onPress={()=>{getLocation()}} style={localStyles.locationContainer}>
                 <CText type={'s10'} color={colors.gray4}>
                   {userLocation}
                 </CText>
                 <ArrowDown />
-              </View>
+              </Pressable>
             </View>
           </TouchableOpacity>
           <View style={localStyles.iconContainer}>

@@ -12,6 +12,7 @@ import RatingComponent from '../HomeComponent/RatingComponent';
 import SubHeader from '../common/CommonComponent/SubHeader';
 import strings from '../../i18n/strings';
 import { Text } from '@gluestack-ui/themed';
+import Loader from '../../common/Loader';
 
 interface Top_Rate_Doctor_Data {
   name: string;
@@ -26,7 +27,7 @@ interface Top_Rate_Doctor_Data {
 
 
 
-export default function TopDoctor({data}:{data:any}) {
+export default function TopDoctor({data}:any) {
 
    const RenderItem = ({item,index}:{item:Top_Rate_Doctor_Data,index:number}) => {
     console.log(item?.name,index,'lllkkk');
@@ -62,7 +63,7 @@ export default function TopDoctor({data}:{data:any}) {
     <View>
    <SubHeader title={strings.topRatedDoctors} />
 
-      <FlashList
+   <FlashList
         data={data}
         renderItem={({item,index}:any) => <RenderItem item={item} index={index} />}
         keyExtractor={(item, index) => index.toString()}
@@ -70,7 +71,7 @@ export default function TopDoctor({data}:{data:any}) {
         horizontal
         showsHorizontalScrollIndicator={false}
         estimatedItemSize={200}
-      />
+      /> 
       
     </View>
   );

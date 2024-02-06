@@ -65,13 +65,13 @@ const tabRouteMedicines = () => {
         component={TabRoute.Medicines}
       />
       <Stack.Screen
-        name={StackNav.ProductByCategories}
+        name={StackNav.ProductByCategoriesTab}
         component={StackRoute.ProductByCategories}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.ProductDetail}
         component={StackRoute.ProductDetail}
-      />
+      /> */}
      
     </Stack.Navigator>
   );

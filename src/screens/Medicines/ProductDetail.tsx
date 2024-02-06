@@ -83,7 +83,7 @@ const ProductDetail = ({ route, navigation }) => {
   }
 
   return (
-    <Container>
+    <Container statusBarStyle='dark-content' >
 
  
 
@@ -405,21 +405,7 @@ const ProductDetail = ({ route, navigation }) => {
      </View>
 
     
-     <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',marginBottom:responsiveHeight(9),height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
-
-  <Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {'\u20B9'}526</Text>
-
-  <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.MedicineCart)}}  >
-    <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
-      <CartIconWhite/>
-      <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
-    </View>
-  </TouchableOpacity>
-  
-
-
-
- </View>
+    
 
 
 
@@ -427,6 +413,21 @@ const ProductDetail = ({ route, navigation }) => {
 
     
       </Body>
+      <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
+
+<Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {'\u20B9'}526</Text>
+
+<TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.MedicineCart)}}  >
+  <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
+    <CartIconWhite/>
+    <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
+  </View>
+</TouchableOpacity>
+
+
+
+
+</View>
 
     </Container>
   )
