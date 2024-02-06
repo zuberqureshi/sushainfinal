@@ -23,27 +23,63 @@ import { Container } from '../../components/Container'
 import useGetSpeclizationlist from '../../hooks/home/get-speclization-list'
 import useGetInstantspeclizationlist from '../../hooks/instantdoctor/get-instant-speclizationlist'
 import useGetInstantDoctorsBySpeclization from '../../hooks/instantdoctor/get-instant -doctorlist'
-import { Box } from '@gluestack-ui/themed'
+import { Box, Toast, ToastTitle, VStack, useToast } from '@gluestack-ui/themed'
 import SubHeader from '../../components/common/CommonComponent/SubHeader'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
+import { useFormik } from 'formik'
+import useCheckCouponCode from '../../hooks/booking/check-coupon-code'
 
 const ConsultDoctor = () => {
 
   const [healthIssue, setHealthIssue] = useState('')
-  const [language, setLanguage] = useState('')
+  // const [language, setLanguage] = useState('')
   const [healthIssueOptions, setHealthIssueOptions] = useState()
   const [applyCoupon, setApplyCoupon] = useState(false)
-
+  const [payPrice, setPayPrice] = useState('')
   const [isChecked, setIsChecked] = useState(false)
+ 
+   const toast = useToast()
+   
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: { healthissue: "", language: "", couponcode: ""},
+    // validationSchema: patientBookingValidationSchema,
+    onSubmit: values => {
+      // updateProfile(values.country,values.address,values.name,values.mobile)
+      // console.log('updatePatient', values);
+      // action.resetForm()
+      // loadUserInfo();
+      if (!(!!values.healthissue) || !(!!values.language)) {
+        toast.show({
+          placement: "bottom",
+          render: ({ id }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} action="error" variant="accent">
+                <VStack space="xs">
+                  <ToastTitle>Please select info</ToastTitle>
 
-  const onChangeHealthIssue = (item: any) => setHealthIssue(item.value);
+                </VStack>
+              </Toast>
+            )
+          },
+        })
 
-  const onChangeLanguage = (item: any) => setLanguage(item.value);
+      } else {
+        console.log(values,'sbmit jjj');
+        
+      }
+
+
+
+    },
+
+  });
 
   //api call
-  const { data, isLoading } = useGetFindADoctor()
   const { data: speclizationlistData, isLoading: isLoadingSpeclizationlist } = useGetInstantspeclizationlist()
-  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetInstantDoctorsBySpeclization({ specialization: !!healthIssue ? healthIssue : 'Diabetes' })
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetInstantDoctorsBySpeclization({ specialization: !!formik.values.healthissue ? formik.values.healthissue : 'Diabetes' })
+  const useCheckCouponCodeMutation = useCheckCouponCode()
   //  console.log(doctorBySpeclizationData?.data?.result[0].instantdocList[0],'INSTANAT')
 
   useEffect(() => {
@@ -59,9 +95,72 @@ const ConsultDoctor = () => {
   }, [speclizationlistData?.data, isLoadingSpeclizationlist,])
 
 
+  const onChangeHealthIssue = (item: any) => formik.setFieldValue('healthissue',item.value);
 
+  const onChangeLanguage = (item: any) => formik.setFieldValue('language',item.value);
 
-  if (isLoading) {
+  const onClickCheckCoupon = () => {
+    if(formik.values.couponcode.length<=0 || formik.values.couponcode === '' ){
+     toast.show({
+       placement: "bottom",
+       render: ({ id }: { id: string }) => {
+         const toastId = "toast-" + id
+         return (
+           <Toast nativeID={toastId} variant="accent" action="error">
+             <ToastTitle>Please enter a coupon code</ToastTitle>
+           </Toast>
+         );
+       },
+     })
+    }
+    else{
+       const payload = {
+         coupon_code: formik.values.couponcode,
+         type: "APPOINTMENT",
+         userid: '',
+         displayMode: "NATIVEAPP",
+         Totalmrp: '715'
+       }
+   
+       useCheckCouponCodeMutation.mutate(payload, {
+         onSuccess: (data) => {
+           console.log(data?.data?.result[0]?.finalPrice);
+   
+           toast.show({
+             placement: "bottom",
+             render: ({ id }: { id: string }) => {
+               const toastId = "toast-" + id
+               return (
+                 <Toast nativeID={toastId} variant="accent" action="success">
+                   <ToastTitle>Coupon Applied</ToastTitle>
+                 </Toast>
+               );
+             },
+           })
+           setPayPrice(data?.data?.result[0]?.finalPrice)
+           setApplyCoupon(true)
+   
+         },
+         onError: (error: any) => {
+   
+           toast.show({
+             placement: "bottom",
+             render: ({ id }: { id: string }) => {
+               const toastId = "toast-" + id
+               return (
+                 <Toast nativeID={toastId} variant="accent" action="error">
+                   <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                 </Toast>
+               );
+             },
+           })
+         }
+       })
+   
+       }
+     }
+
+  if (isLoadingSpeclizationlist) {
     return (
       <Container statusBarStyle='dark-content' >
         <CHeader title={strings.consultDoctor} />
@@ -70,41 +169,7 @@ const ConsultDoctor = () => {
     )
   }
 
-  // useEffect(() => {
-  //   // const fetchData = async () => {
-  //   //   // const data = await findDoctorHomeAPI();
-  //   //   // console.log('FindADoctor', data);
-  //   //   const apiUrl = `${API_BASE_URL}booking/videomainpage`; // Replace with your API endpoint
 
-  //   //   // Make a GET request using the fetch method
-  //   //   fetch(apiUrl, {
-  //   //     method: 'GET',
-  //   //     headers: {
-  //   //       // Add any headers if required (e.g., Authorization, Content-Type, etc.)
-  //   //       'Content-Type': 'application/json',
-  //   //     },
-  //   //   })
-  //   //     .then(response => {
-  //   //       if (!response.ok) {
-  //   //         throw new Error(`HTTP error! Status: ${response.status}`);
-  //   //       }
-  //   //       return response.json(); // Assuming the response is in JSON format
-  //   //     })
-  //   //     .then(data => {
-  //   //       // Handle the data from the successful API response
-  //   //       console.log('API response:', data?.data[0]?.bannerList);
-  //   //       // setBannerData(data?.data[0]?.bannerList)
-  //   //       // setSpecializationList(data?.data[0]?.specializationList)
-  //   //       setApiData(data?.data[0])
-  //   //       setLoader(false)
-  //   //     })
-  //   //     .catch(error => {
-  //   //       // Handle errors
-  //   //       console.error('API error:', error);
-  //   //     });
-  //   // };
-  //   // fetchData();
-  // }, []);
 
 
 
@@ -145,7 +210,7 @@ const ConsultDoctor = () => {
               labelField="label"
               valueField="value"
               placeholder={strings.healthIssues}
-              value={healthIssue}
+              value={formik.values.healthissue}
               onChange={onChangeHealthIssue}
               renderRightIcon={() => <DownArrowWhite width={responsiveWidth(4)} />}
               // itemTextStyle={styles.selectedTextStyle}
@@ -165,7 +230,7 @@ const ConsultDoctor = () => {
               labelField="label"
               valueField="value"
               placeholder={strings.language}
-              value={language}
+              value={formik.values.language}
               onChange={onChangeLanguage}
               renderRightIcon={() => <DownArrowWhite width={responsiveWidth(4)} />}
               // itemTextStyle={styles.selectedTextStyle}
@@ -233,8 +298,8 @@ const ConsultDoctor = () => {
               <CText type='m12' color={colors.primary} >{'RL50'}</CText>
               <Pressable onPress={() => {
                 setApplyCoupon(false)
-                // setPayPrice('')
-                // formik.setFieldValue('couponcode', '')
+                setPayPrice('')
+                formik.setFieldValue('couponcode', '')
               }} >
                 <CrossBottomTab />
               </Pressable>
@@ -243,13 +308,13 @@ const ConsultDoctor = () => {
               <>
                 <TextInput
                   style={[styles.inputTextField, { marginLeft: responsiveWidth(1.3) }]}
-                  // value={formik.values.couponcode}
-                  // onChangeText={formik.handleChange('couponcode')}
+                  value={formik.values.couponcode}
+                  onChangeText={formik.handleChange('couponcode')}
                   placeholderTextColor={colors.placeHolderColor}
                   placeholder='Enter Coupon code here'
 
                 />
-                <PrimaryButton  onPress={() => { setApplyCoupon(true) }}  buttonText='Apply' height={responsiveHeight(5)} />
+                <PrimaryButton disabled={useCheckCouponCodeMutation.isPending} loading={useCheckCouponCodeMutation.isPending}   onPress={() => { onClickCheckCoupon() }}  buttonText='Apply' height={responsiveHeight(5)} />
               </>}
 
 
@@ -262,14 +327,19 @@ const ConsultDoctor = () => {
 
           <View style={{ marginTop: responsiveHeight(2), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: responsiveWidth(4), }} >
             <Text style={styles.cousultationFeeText}>{strings.consultationFee}</Text>
-            <Text style={styles.cousultationFeeRateText}>750</Text>
+            <Text style={styles.cousultationFeeRateText}>715</Text>
           </View>
 
           <View style={styles.dividerLine} ></View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: responsiveWidth(4), }} >
             <Text style={styles.amountPayText} >{strings.amounttoPay}</Text>
-            <Text style={styles.amountPayRateText} >{'\u20B9'}750</Text>
+
+            <View style={{flexDirection:'row',alignItems:'center'}} >
+            <Text style={styles.amountPayRateText} >{'\u20B9'}{!!payPrice ? `${payPrice} ` : '715'}</Text>
+            { !!payPrice && <Text style={{color: colors.black,...typography.fontWeights.Regular,fontSize: responsiveFontSize(1.6),textDecorationLine:'line-through'}} >{ '715'}</Text>}
+            </View>
+          
           </View>
 
 
@@ -298,7 +368,7 @@ const ConsultDoctor = () => {
 
             </View>
 
-            <TouchableOpacity style={styles.totalFeesButtonWrapper} >
+            <TouchableOpacity onPress={formik.handleSubmit} style={styles.totalFeesButtonWrapper} >
 
               <Text style={styles.totalFeesButtonText} >{strings.payConsult}</Text>
 

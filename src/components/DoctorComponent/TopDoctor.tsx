@@ -61,7 +61,7 @@ export default function TopDoctor({data}:any) {
    
   return (
     <View>
-   <SubHeader title={strings.topRatedDoctors} />
+   <SubHeader title={strings.topRatedDoctors} isViewHide={false}  />
 
    <FlashList
         data={data}

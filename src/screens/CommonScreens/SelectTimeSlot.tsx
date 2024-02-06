@@ -168,7 +168,20 @@ export default function SelectTimeSlot({ route, }: Props) {
   });
 
   const onClickCheckCoupon = () => {
-
+ if(formik.values.couponcode.length<=0 || formik.values.couponcode === '' ){
+  toast.show({
+    placement: "bottom",
+    render: ({ id }: { id: string }) => {
+      const toastId = "toast-" + id
+      return (
+        <Toast nativeID={toastId} variant="accent" action="error">
+          <ToastTitle>Please enter a coupon code</ToastTitle>
+        </Toast>
+      );
+    },
+  })
+ }
+ else{
     const payload = {
       coupon_code: formik.values.couponcode,
       type: "APPOINTMENT",
@@ -211,6 +224,8 @@ export default function SelectTimeSlot({ route, }: Props) {
         })
       }
     })
+
+    }
   }
 
 
