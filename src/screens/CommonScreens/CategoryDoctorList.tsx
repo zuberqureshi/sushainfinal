@@ -14,7 +14,7 @@ import CHeader from '../../components/common/CHeader';
 import images from '../../assets/images';
 import {getHeight, moderateScale} from '../../common/constants';
 import {colors, styles} from '../../themes';
-import {Cart, DigitalPrecereption,FilterIcon,FreeFollowUp,Menu,SortIcon,} from '../../assets/svgs';
+import {Cart, DigitalPrecereption,FilterIcon,FreeFollowUp,LikeIcon,Menu,SortIcon,} from '../../assets/svgs';
 import CText from '../../components/common/CText';
 import CButton from '../../components/common/CButton';
 import strings from '../../i18n/strings';
@@ -35,6 +35,7 @@ interface Props {
 export default function CategoryDoctorList(props: Props) {
   const {route,navigation} = props;
   const {itm} = route.params;
+  const iconSize = moderateScale(21);
   // console.log('itm', itm);
 
   const { data: speclizationListData, isLoading: speclizationListIsLoading } = useGetSpeclizationlist()
@@ -79,9 +80,14 @@ export default function CategoryDoctorList(props: Props) {
            onChangeText={(t)=>setSearchText(t)}
            style={localStyles.inputContainerStyle}
           />
-          <TouchableOpacity style={localStyles.cartBtnStyle}>
-            <Cart height={moderateScale(21)} width={moderateScale(21)} />
-          </TouchableOpacity>
+         <TouchableOpacity
+        onPress={()=>{}}
+        style={localStyles.cartBtnStyle}>
+        <LikeIcon height={iconSize} width={iconSize} />
+      </TouchableOpacity>
+      <TouchableOpacity style={localStyles.cartBtnStyle}>
+        <Cart height={iconSize} width={iconSize} />
+      </TouchableOpacity>
           {!!searchData.length && (
             <View style={localStyles.searchSuggestionContainer}>
               <FlatList
@@ -163,12 +169,8 @@ const localStyles = StyleSheet.create({
     ...styles.shadowStyle,
   },
   cartBtnStyle: {
-    borderWidth: moderateScale(1),
-    ...styles.ph10,
-    ...styles.center,
-    height: moderateScale(40),
-    borderRadius: moderateScale(6),
-    borderColor: colors.gray4,
+    ...styles.pl5,
+    ...styles.pv10,
   },
   inputContainerStyle: {
     ...typography.fontSizes.f12,
