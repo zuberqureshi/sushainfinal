@@ -22,6 +22,7 @@ export const StackNav = {
   PrivacyPolicy: 'PrivacyPolicy',
   CategoryDoctorListTab: 'CategoryDoctorListTab',
   CategoryDoctorList: 'CategoryDoctorList',
+  CategoryDoctorListDrawer: 'CategoryDoctorListDrawer',
   DoctorProfile: 'DoctorProfile',
   PatientsReview: 'PatientsReview',
   PaymentScreen: 'PaymentScreen',

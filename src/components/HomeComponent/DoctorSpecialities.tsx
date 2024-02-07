@@ -85,7 +85,7 @@ const RenderFooterComponent = memo(({ resultValue, isLoading ,selectedSpecDoctor
 
   return (
     <View style={localStyles.doctorListContaienr}>
-      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.CategoryDoctorList, {itm:selectedSpecDoctor})}} style={localStyles.viewAllContaiener}>
+      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.CategoryDoctorListDrawer, {itm:selectedSpecDoctor})}} style={localStyles.viewAllContaiener}>
         <CText type="s12" color={colors.success}>
           {strings.viewAll}
         </CText>

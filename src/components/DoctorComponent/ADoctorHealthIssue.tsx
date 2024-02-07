@@ -66,7 +66,7 @@ export default function ADoctorHealthIssue({data}:any) {
   };
 
   const onPressDoctorSpeciality = (itm: any) => {
-    navigation.navigate(StackNav.CategoryDoctorList, {itm});
+    navigation.navigate(StackNav.CategoryDoctorListDrawer, {itm});
   };
 
   return (
