@@ -5,13 +5,14 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 // local imports
 import {colors, styles} from '../../themes';
 import {
+  API_IMAGE_BASE_URL,
   deviceWidth,
   getSortedArray,
   moderateScale,
 } from '../../common/constants';
 import {Banner} from '../../types/Types';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
-import {  API_IMAGE_BASE_URL } from '@env'
+// import {  API_IMAGE_BASE_URL } from '@env'
 import Loader from '../../common/Loader';
 import { Spinner } from '@gluestack-ui/themed';
 
@@ -103,6 +104,7 @@ const localStyles = StyleSheet.create({
   root: {
     ...styles.mt10,
     ...styles.center,
+    
   },
   imgStyle: {
     width: '100%',

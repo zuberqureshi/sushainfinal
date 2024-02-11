@@ -4,7 +4,10 @@ import { fetcher } from '../../utils/fetcher';
 class AuthService {
 
   queryKeys = {
-    loginByPassword: 'loginByPassword'
+    loginByPassword: 'loginByPassword',
+    userRegister: 'userRegister',
+    loginOtpVerify: 'loginOtpVerify',
+    resendOtp: 'resendOtp',
   };
 
   loginByPassword = async (data:any) => {
@@ -15,11 +18,37 @@ class AuthService {
       data
     });
  
-  
-    
   }
 
+  userRegister = async (data:any) => {
 
+    return fetcher({
+      url: 'auth/loginotp',
+      method: 'POST',
+      data
+    });
+ 
+  }
+
+ loginOtpVerify = async (data:any) => {
+
+    return fetcher({
+      url: 'auth/loginotpverify',
+      method: 'POST',
+      data
+    });
+ 
+  }
+
+  resendOtp = async (data:any) => {
+
+    return fetcher({
+      url: 'auth/resendmobileotp',
+      method: 'POST',
+      data
+    });
+ 
+  }
    
 
 }

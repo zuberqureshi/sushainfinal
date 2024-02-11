@@ -3,7 +3,7 @@ import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
 // import CountDown from 'react-native-countdown-component';
 import {ParamListBase} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { Text } from '@gluestack-ui/themed';
+import { Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
 import OTPTextView from 'react-native-otp-textinput';
 import Clipboard from '@react-native-clipboard/clipboard';
 // local imports
@@ -31,6 +31,10 @@ import {
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
 import CountDown from 'react-native-countdown-component';
+import PrimaryButton from '../../components/common/Button/PrimaryButton';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
+import useLoginOtpVerify from '../../hooks/auth/login-otp-verify';
+import useResendOtp from '../../hooks/auth/resend-otp';
 
 type Props = {
   route: any;
@@ -39,10 +43,18 @@ type Props = {
 
 const VerifyLoginOtp = ({route, navigation}:Props) => {
   const {mobile} = route.params;
+  const input = useRef(null)
+  const toast = useToast()
+
   const [otpInput, setOtpInput] = useState<string>('');
   const onPinChange = (code: React.SetStateAction<string>) => setPin(code);
   const [isTimeOver, setIsTimeOver] = useState(false);
-  const input = useRef(null)
+
+    //api call
+  const useLoginOtpVerifyMutation = useLoginOtpVerify()
+  const useResendOtpMutation = useResendOtp()
+
+  
 
 
   const handleCellTextChange = async (text: string, i: number) => {
@@ -53,30 +65,49 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
       }
     }
   };
-  const otpVerify = async () => {
-    // let payLoad = {
-    //   mobile: mobile,
-    //   otp: pin,
-    // };
 
-    // let otpVerifyResponse = (await postRequestApi(
-    //   LOGIN_OTP_VERIFY,
-    //   payLoad,
-    // )) as OtpVerifyResponse;
-    // if (otpVerifyResponse?.code === 200) {
-    //   if (otpVerifyResponse?.success) {
-    //     await setToken(otpVerifyResponse?.data[0]?.token);
-    //     await setUserDetail(otpVerifyResponse?.data[0]?.user);
-    //     await setRefreshToken(otpVerifyResponse?.data[0]?.refreshToken);
-    //     global.userDetail = otpVerifyResponse?.data[0]?.user;
-    //     navigation.reset({
-    //       index: 0,
-    //       routes: [{name: StackNav.DrawerNavigation}],
-    //     });
-    //   }
-    // } else {
-    //   showPopupWithOk('', otpVerifyResponse?.message);
-    // }
+
+  
+  const otpVerify = async () => {
+    let payload = {
+      mobile: mobile,
+      otp: otpInput,
+    };
+
+    console.log('oTPPP',payload);
+
+     useLoginOtpVerifyMutation.mutate(payload, {
+        onSuccess: (data) => {
+         
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>OTP Verified</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+           
+          // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+        
+        },
+        onError: (error) => {
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="error">
+                  <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                </Toast>
+              )
+            }
+          })
+        }
+      })
   };
   useEffect(() => {
     // if (pin.length === 4) {
@@ -89,26 +120,50 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
   const onFinishTimer = () => setIsTimeOver(true);
 
   const onPressResend = async () => {
-    // setPin('');
-    // let payLoad = {
-    //   mobile: mobile,
-    // };
 
-    // let otpResentResponse = (await postRequestApi(
-    //   RESEND_MOBILE_OTP,
-    //   payLoad,
-    // )) as LoginWithOtpResponse;
-    // if (otpResentResponse?.code === 200) {
-    //   if (otpResentResponse?.success) {
-    //     setIsTimeOver(false);
-    //   }
-    // } else {
-    //   showPopupWithOk('', otpResentResponse?.message);
-    // }
+    input.current.clear()
+    setIsTimeOver(false);
+ 
+    let payload = {
+      mobile: mobile,
+    };
+
+    useResendOtpMutation.mutate(payload, {
+      onSuccess: (data) => {
+        console.log('OTP RESEND DATA',data?.data);
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>OTP Resend </ToastTitle>
+              </Toast>
+            );
+          },
+        })
+         
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+      
+      },
+      onError: (error) => {
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
   };
 
   return (
-    <Container >
+    <Container statusBarStyle='dark-content' >
       <Body style={localStyles.root} contentContainerStyle={{alignItems:'center'}} >
 
   
@@ -132,23 +187,20 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
       <OTPTextView
           ref={input}
           // containerStyle={localStyles.pinInputStyle}
+          defaultValue={otpInput}
           handleTextChange={setOtpInput}
           handleCellTextChange={handleCellTextChange}
           inputCount={4}
           keyboardType="numeric"
           tintColor={colors.primary}
         />
+       
+    { !isTimeOver &&  <PrimaryButton buttonText='Verify OTP' onPress={otpVerify} disabled={useLoginOtpVerifyMutation.isPending} loading={useLoginOtpVerifyMutation.isPending} marginTop={responsiveHeight(2.5)} height={35} borderRadius={10}  /> }
 
-      <View style={styles.rowCenter}>
+      <View style={styles.rowCenter}> 
         {isTimeOver ? (
-          <TouchableOpacity
-            onPress={onPressResend}
-            disabled={isTimeOver ? false : true}
-            style={localStyles.btnStyle}>
-            <Text     fontFamily='$InterRegular' fontSize={12} alignSelf='center' color={colors.white}>
-              {strings.resendOtp}
-            </Text>
-          </TouchableOpacity>
+        
+           <PrimaryButton buttonText={strings.resendOtp}  disabled={useResendOtpMutation.isPending} loading={useResendOtpMutation.isPending}   onPress={onPressResend} marginTop={responsiveHeight(2.5)} height={35} borderRadius={10}  /> 
         ) : (
           <View style={styles.rowCenter}>
             <Text fontFamily='$InterMedium' fontSize={14} color={colors.gray2} alignSelf='center'>

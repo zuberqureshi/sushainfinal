@@ -27,7 +27,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
 
   //api call
   const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title })
-  console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
+  // console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
 
   //Loader
   if (doctorBySpeclizationIsLoading) {

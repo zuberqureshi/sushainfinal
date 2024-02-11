@@ -15,12 +15,30 @@ import CText from '../../components/common/CText'
 import BannerList from '../../components/HomeComponent/BannerList'
 import CustomerSpeak from '../../components/common/CustomerSpeak'
 import ScreenBottomAchievement from '../../components/common/ScreenBottomAchievement/ScreenBottomAchievement'
+import useGetUpcomingAppointments from '../../hooks/appointment/get-upcoming-appointments'
+import moment from 'moment'
+import useGetCompletedAppointments from '../../hooks/appointment/get-completed-appointments'
+import Loader from '../../components/Loader/Loader'
 
 const Appointments = () => {
+
+  //api call
+  const { data: upcomingAppointmentData, isLoading: isLoadingUpcomingAppointment } = useGetUpcomingAppointments({ userid: 257 })
+  const { data: completedAppointmentData, isLoading: isLoadingCompletedAppointment } = useGetCompletedAppointments({ userid: 257 })
 
   const [status, setStatus] = useState(false)
   const [selectedAppointmentView, setselectedAppointmentView] = useState('upcoming')
   const [selectedReviewStar, setSelectedReviewStar] = useState<number>(0)
+
+  if(isLoadingCompletedAppointment || isLoadingUpcomingAppointment){
+    return(
+      <Container>
+        <CHeader title='Appointments' />
+        <Loader/>
+      </Container>
+
+    )
+  }
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -32,7 +50,7 @@ const Appointments = () => {
           <ShakeHand />
         </Box>
 
-        <Box backgroundColor={colors.white4}  py={10} px={15} borderRadius={10} mt={10} style={{ marginHorizontal: responsiveWidth(3),...styles.shadowStyle }} >
+        <Box backgroundColor={colors.white4} py={10} px={15} borderRadius={10} mt={10} style={{ marginHorizontal: responsiveWidth(3), ...styles.shadowStyle }} >
           <Text fontFamily='$InikaBold' fontSize={16} color={colors.success}>Today <Text fontFamily='$InikaBold' fontSize={16} color={colors.primary}>Appointment</Text></Text>
           <Text fontFamily='$InterRegular' fontSize={8} color={colors.black}>Appointment Id: 345567872782889</Text>
 
@@ -123,21 +141,36 @@ const Appointments = () => {
             <Box backgroundColor='#ffffff' mb={10} >
 
               <Box px={16} >
-                {['Dr. Preeti Chhabra', 'Dr. Anshu Sharma'].map((item, index) => {
+                {upcomingAppointmentData?.data?.result[0]?.upcomingAppointmentList?.slice(0,2)?.map((item, index) => {
+
+                  const date = new Date(item?.start_time);
+
+
+                  // Specify Indian Standard Time zone offset
+                  const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+                  // Adjust the date to IST by subtracting the offset
+                  date.setTime(date.getTime() - ISTOffset);
+
+                  // Format options for time
+                  const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+                  // Get formatted time in Indian Standard Time
+                  const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
 
                   return (
-                    <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{...styles.shadowStyle}} >
+                    <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{ ...styles.shadowStyle }} >
                       <Box flexDirection='row' alignItems='center' gap={14} py={10}>
                         <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
                         <Box flexDirection='column' gap={9} >
                           <Box flexDirection='row' alignItems='center' >
                             <Box gap={3} >
-                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>Dr. Preeti Chhabra</Text>
-                              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} >Appointment Id: 465316277829919</Text>
+                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
+                              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} >Appointment Id: {item?.orderId}</Text>
                             </Box>
                             <Box flexDirection='row' alignItems='center' alignSelf='flex-start' gap={2} >
                               <ClockSmallColorIcon />
-                              <Text fontFamily='$InterBold' fontSize={11} color={colors.primary}  >1:30PM</Text>
+                              <Text fontFamily='$InterBold' fontSize={11} color={colors.primary}  >{formattedTime}</Text>
                             </Box>
 
                           </Box>
@@ -180,26 +213,26 @@ const Appointments = () => {
 
                         </Box>
                       </Box>
-                      <Box w={36} h={'100%'} backgroundColor='#EAE5E566' pt={40} >
-                        <Text fontFamily='$InikaRegular' w={23} lineHeight={13} fontSize={12} color={colors.black} textAlign='center' alignSelf='center' mt={32} >15 Aug</Text>
+                      <Box w={36} h={'100%'} backgroundColor='#EAE5E566' pt={40} gap={4} >
+                        <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={12} color={colors.black} textAlign='center' alignSelf='center' mt={32} >{moment(item?.date).format('DD')}</Text>
+                        <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={12} numberOfLines={1} color={colors.black} textAlign='center' alignSelf='center' >{moment(item?.date).format('MMM')}</Text>
                       </Box>
 
                     </Box>
                   )
                 })}
+              </Box>
 
-              </Box>
-               
               <TouchableOpacity activeOpacity={0.6} >
-              <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
-                <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
-              </Box>
-              </TouchableOpacity> 
-             
+                <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
+                  <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
+                </Box>
+              </TouchableOpacity>
+
 
               <Box backgroundColor='#D9D9D933' py={30} px={16} >
 
-                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
+                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{ ...styles.shadowStyle }} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentMedicinesIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
@@ -207,7 +240,7 @@ const Appointments = () => {
                   <GreaterThanBlack />
                 </Box>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{ ...styles.shadowStyle }} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentBeautyIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
@@ -215,7 +248,7 @@ const Appointments = () => {
                   <GreaterThanBlack />
                 </Box>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{...styles.shadowStyle}} >
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{ ...styles.shadowStyle }} >
                   <Box flexDirection='row' alignItems='center' gap={5}>
                     <AppointmentOrderIcon />
                     <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
@@ -234,13 +267,18 @@ const Appointments = () => {
             <Box backgroundColor='#F7F7F7' pb={25} mb={10} mt={10} >
               <Text fontFamily='$InikaRegular' fontSize={13} color={'#696767'} my={8} mx={16} >Don’t forget to take Follow up</Text>
 
-              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{...styles.shadowStyle}} >
+              {completedAppointmentData?.data?.result[0]?.completedAppointmentList?.slice(0,2)?.map((item, index) => {
+
+
+                return (
+                  <Box key={index.toString()} >
+                   <Box  backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{ ...styles.shadowStyle }} >
                 <Box flexDirection='row' alignItems='center' gap={18} py={10}>
                   <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
                   <Box flexDirection='column' gap={9} >
                     <Box flexDirection='row' alignItems='center' >
                       <Box gap={3} >
-                        <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>Dr. Preeti Chhabra</Text>
+                        <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
                         <Text fontFamily='$InterRegular' w={254} lineHeight={13} fontSize={10} numberOfLines={3} color={colors.black} >Gynae and Fertility, Neuro, Hormonal Imbalances, PCOD and UT Fibroid, Pre Conception Care, Pre and Post Natal Care, Hypertension</Text>
                       </Box>
 
@@ -285,18 +323,18 @@ const Appointments = () => {
 
 
               </Box>
-
-              <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{...styles.shadowStyle}} >
+              
+              { !!item?.rating && <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{ ...styles.shadowStyle }} >
                 <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : Dr. Anshu Sharma</Text>
 
                 <Box flexDirection='row' gap={5} >
 
-                  {['1', '2', '3', '4', '5'].map((item, index):any => {
+                  {['1', '2', '3', '4', '5'].map((item, index): any => {
                     return (
-                      <TouchableOpacity key={index.toString()}  onPress={()=>{setSelectedReviewStar(index+1)}} activeOpacity={0.6} >
-                           {item < (selectedReviewStar + 1 )? <StarFilledPrimaryColor/> : <StarUnFilledPrimaryColor/>}
+                      <TouchableOpacity key={index.toString()} onPress={() => { setSelectedReviewStar(index + 1) }} activeOpacity={0.6} >
+                        {item < (selectedReviewStar + 1) ? <StarFilledPrimaryColor /> : <StarUnFilledPrimaryColor />}
                       </TouchableOpacity>
-                   
+
                     )
                   })}
                 </Box>
@@ -316,77 +354,85 @@ const Appointments = () => {
                 </Box>
 
 
-              </Box>
+              </Box>}
+
+                  
+                  </Box>
+                ) }) }
+
+                 
+
+             
 
               <TouchableOpacity activeOpacity={0.6} >
-              <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
-                <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
-              </Box>
-              </TouchableOpacity> 
-             
-        
-
-              <Box pb={30} pt={8} px={16} >
-
-              <Box flexDirection='row' alignItems='center' gap={5} mb={15}>
-                  <DiscountGreenIcon style={{alignSelf:'flex-start',marginTop:responsiveHeight(0.9)}} />
-                  <Text fontFamily='$InterMedium' fontSize={10} color={'#696767'} numberOfLines={2} >Your medicines are added to cart. Get 20%off on medicine orders. Apply Coupon PURE20 at checkout  </Text>
-                </Box>
-
-                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
-                  <Box flexDirection='row' alignItems='center' gap={5}>
-                    <AppointmentMedicinesIcon />
-                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
+                  <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
+                    <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
                   </Box>
-                  <GreaterThanBlack />
-                </Box>
+                </TouchableOpacity>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
-                  <Box flexDirection='row' alignItems='center' gap={5}>
-                    <AppointmentBeautyIcon />
-                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
+
+
+                <Box pb={30} pt={8} px={16} >
+
+                  <Box flexDirection='row' alignItems='center' gap={5} mb={15}>
+                    <DiscountGreenIcon style={{ alignSelf: 'flex-start', marginTop: responsiveHeight(0.9) }} />
+                    <Text fontFamily='$InterMedium' fontSize={10} color={'#696767'} numberOfLines={2} >Your medicines are added to cart. Get 20%off on medicine orders. Apply Coupon PURE20 at checkout  </Text>
                   </Box>
-                  <GreaterThanBlack />
-                </Box>
 
-                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                }} >
-                  <Box flexDirection='row' alignItems='center' gap={5}>
-                    <AppointmentOrderIcon />
-                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
+                  <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                  }} >
+                    <Box flexDirection='row' alignItems='center' gap={5}>
+                      <AppointmentMedicinesIcon />
+                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
+                    </Box>
+                    <GreaterThanBlack />
                   </Box>
-                  <GreaterThanBlack />
+
+                  <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                  }} >
+                    <Box flexDirection='row' alignItems='center' gap={5}>
+                      <AppointmentBeautyIcon />
+                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
+                    </Box>
+                    <GreaterThanBlack />
+                  </Box>
+
+                  <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                  }} >
+                    <Box flexDirection='row' alignItems='center' gap={5}>
+                      <AppointmentOrderIcon />
+                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
+                    </Box>
+                    <GreaterThanBlack />
+                  </Box>
+
+
+
                 </Box>
-
-
-
-              </Box>
 
 
 

@@ -216,6 +216,8 @@ export default {
   colitis:'Colitis',
   gasAcidity:'Gas & Acidity',
   pepticulcers:'Peptic Ulcers',
+  BeautyPersonalCare:'Beauty & Personal Care',
+
   
   };
   

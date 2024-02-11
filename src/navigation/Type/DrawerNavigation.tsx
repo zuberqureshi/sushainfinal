@@ -291,7 +291,7 @@ const DrawerView = () => {
             {strings.support}
           </CText>
           <TouchableOpacity onPress={()=>{
-            // navigation.navigate(StackNav.ClinicDoctorDetailCard)
+            navigation.navigate(StackNav.LifeStyleDrawer)
             }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}
@@ -329,6 +329,7 @@ export default function DrawerNavigation() {
       drawerContent={(props: any) => <DrawerView {...props} />}>
       <Drawer.Screen name={StackNav.TabBar} component={StackRoute.TabBarNavigation} />
       <Drawer.Screen name={StackNav.CategoryDoctorListDrawer} component={StackRoute.CategoryDoctorList} />
+      <Drawer.Screen name={StackNav.LifeStyleDrawer} component={StackRoute.LifeStyle} />
     </Drawer.Navigator>
   );
 }

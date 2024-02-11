@@ -56,6 +56,27 @@ export const patientBookingValidationSchema = yup.object().shape({
 
 })
 
+export const signUpSchema = yup.object().shape({
+  firstname:yup.string().required("First name is required").typeError('Input must be a string'),
+  lastname:yup.string().required("Last name is required").typeError('Input must be a string'),
+  number:yup.string().required("Patient number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter 10 digit number'),
+  password:yup.string()
+    .required('password is must')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,'Enter Strong Password'),
+    cpassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),   
+})
+
+export const signUpWithEmailSchema = yup.object().shape({
+  firstname:yup.string().required("First name is required").typeError('Input must be a string'),
+  lastname:yup.string().required("Last name is required").typeError('Input must be a string'),
+  number:yup.string().required("Patient number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter 10 digit number'),
+  email:yup.string().email('Invalid email').required('Email is required'),
+  password:yup.string()
+    .required('password is must')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,'Enter Strong Password'),
+    cpassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),   
+})
+
 const emailRegex =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
