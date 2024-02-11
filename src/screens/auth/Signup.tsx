@@ -182,7 +182,7 @@ const Signup = ({ route, navigation }) => {
 
 
   return (
-    <Container>
+    <Container statusBarStyle='dark-content' >
       <Body style={localStyles.root} >
         <View style={styles.rowSpaceBetween}>
           <View style={[styles.flexRow]}>
@@ -307,7 +307,7 @@ const Signup = ({ route, navigation }) => {
             </CText>
             <ArrowDown />
           </View>
-          <Box borderWidth={1} borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' w={'75%'}  >
+          <Box borderWidth={1} justifyContent='center' borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' w={'75%'}  >
 
             <TextInput
               onChangeText={formik.handleChange('number')}
@@ -389,7 +389,7 @@ const Signup = ({ route, navigation }) => {
         </View>
         {(formik.errors.cpassword && formik.touched.cpassword) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.cpassword}</Text> : null}
        
-        <Box borderWidth={1} borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' mt={10}  >
+        <Box borderWidth={1} justifyContent='center' borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' mt={10}  >
 
           <TextInput
             onChangeText={formik.handleChange('referralcode')}

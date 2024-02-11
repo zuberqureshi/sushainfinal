@@ -163,7 +163,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
   };
 
   return (
-    <Container >
+    <Container statusBarStyle='dark-content' >
       <Body style={localStyles.root} contentContainerStyle={{alignItems:'center'}} >
 
   
