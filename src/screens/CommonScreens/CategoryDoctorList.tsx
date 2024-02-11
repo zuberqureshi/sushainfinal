@@ -173,8 +173,8 @@ const localStyles = StyleSheet.create({
     ...styles.pv10,
   },
   inputContainerStyle: {
-    ...typography.fontSizes.f12,
-    ...typography.fontWeights.Medium,
+    ...typography.fontSizes.f10,
+    ...typography.fontWeights.SemiBold,
     flex:1,
     marginHorizontal:responsiveWidth(2.5),
     height:responsiveHeight(5),

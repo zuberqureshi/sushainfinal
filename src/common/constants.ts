@@ -1,5 +1,5 @@
 import {Dimensions, Platform} from 'react-native';
-// import DeviceInfo from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
 
 //Device dimensions
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
@@ -44,29 +44,31 @@ export const REFRESH_TOKEN = 'REFRESH_TOKEN';
 export const TIME_FORMATE = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 export const TIME_YMD = 'YYYYMMDD';
 
-// // get device IP
-// export const getDeviceIp = async () => {
-//   const ipAddress = await DeviceInfo.getIpAddress();
-//   return ipAddress;
-// };
+// get device IP
+export const getDeviceIp = async () => {
+  const ipAddress = await DeviceInfo.getIpAddress();
+  return ipAddress;
+};
 
-// // get Device Name
-// export const getDeviceName = async () => {
-//   const deviceName = await DeviceInfo.getDeviceName();
-//   return deviceName;
-// };
+// get Device Name
+export const getDeviceName = async () => {
+  const deviceName = await DeviceInfo.getDeviceName();
+  return deviceName;
+};
 
-// // get Device OS
-// export const getDeviceOS = async () => {
-//   const deviceOS = await DeviceInfo.getSystemName();
-//   return deviceOS;
-// };
+// get Device OS
+export const getDeviceOS = async () => {
+  const deviceOS = await DeviceInfo.getSystemName();
+  return deviceOS;
+};
 
-// // get Device unique ID
-// export const getDeviceUniqueId = async () => {
-//   const deviceUniqueId = await DeviceInfo.getUniqueId();
-//   return deviceUniqueId;
-// };
+// get Device unique ID
+export const getDeviceUniqueId = async () => {
+  const deviceUniqueId = await DeviceInfo.getUniqueId();
+  return deviceUniqueId;
+};
+
+
 
 export const getSortedArray = (array: any, key: string) => {
   if (array?.length > 1) {

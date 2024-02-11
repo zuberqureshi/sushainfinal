@@ -78,6 +78,54 @@ export default function SelectTimeSlot({ route, }: Props) {
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
 
+  useEffect(() => {
+    CFPaymentGatewayService.setCallback({
+      onVerify(orderID: string): void {
+        console.log('success ', orderID);
+        //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
+        // navigation.navigate(NAVIGATION.PaymentSuccess);
+      },
+      onError(error: CFErrorResponse, orderID: string): void {
+        console.log('failed ', orderID);
+        // navigation.navigate(NAVIGATION.PaymentFailed);
+      },
+    });
+    return () => CFPaymentGatewayService.removeCallback();
+  }, []);
+
+  const startCheckout = (sessionId,orderId) => {
+    try {
+      const session = new CFSession(
+        sessionId,
+        orderId,
+        CFEnvironment.SANDBOX
+      );
+      const paymentModes = new CFPaymentComponentBuilder()
+        .add(CFPaymentModes.CARD)
+        .add(CFPaymentModes.UPI)
+        .add(CFPaymentModes.NB)
+        .add(CFPaymentModes.WALLET)
+        .add(CFPaymentModes.PAY_LATER)
+        .build();
+      const theme = new CFThemeBuilder()
+        .setNavigationBarBackgroundColor('#49b0c5')
+        .setNavigationBarTextColor('#FFFFFF')
+        .setButtonBackgroundColor('#80b841')
+        .setButtonTextColor('#FFFFFF')
+        .setPrimaryTextColor('#212121')
+        .setSecondaryTextColor('#757575')
+        .build();
+      const dropPayment = new CFDropCheckoutPayment(
+        session,
+        paymentModes,
+        theme
+      );
+      CFPaymentGatewayService.doPayment(dropPayment);
+    } catch (e: any) {
+      console.log('startcheckout eeror ', e.message);
+    }
+  }
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" },
@@ -125,40 +173,41 @@ export default function SelectTimeSlot({ route, }: Props) {
         console.log({payload});
         
 
-        // useCreateConsultationMutation.mutate(payload, {
-        //   onSuccess: (data) => {
-        //     console.log(data?.data);
+        useCreateConsultationMutation.mutate(payload, {
+          onSuccess: (data) => {
+            console.log(data?.data?.result[0].paymentCreatedData);
 
-        //     toast.show({
-        //       placement: "bottom",
-        //       render: ({ id }: { id: string }) => {
-        //         const toastId = "toast-" + id
-        //         return (
-        //           <Toast nativeID={toastId} variant="accent" action="success">
-        //             <ToastTitle>Submit Succesfully</ToastTitle>
-        //           </Toast>
-        //         );
-        //       },
-        //     })
-        //     setPayPrice(data?.data?.result[0]?.finalPrice)
-        //     setApplyCoupon(true)
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>Submit Succesfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+           startCheckout(data?.data?.result[0].paymentCreatedData?.payment_session_id,data?.data?.result[0].paymentCreatedData?.order_id)
+            // setPayPrice(data?.data?.result[0]?.finalPrice)
+            // setApplyCoupon(true)
 
-        //   },
-        //   onError: (error: any) => {
+          },
+          onError: (error: any) => {
 
-        //     toast.show({
-        //       placement: "bottom",
-        //       render: ({ id }: { id: string }) => {
-        //         const toastId = "toast-" + id
-        //         return (
-        //           <Toast nativeID={toastId} variant="accent" action="error">
-        //             <ToastTitle>Something went wrong, please try again later</ToastTitle>
-        //           </Toast>
-        //         );
-        //       },
-        //     })
-        //   }
-        // })
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="error">
+                    <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+          }
+        })
       }
 
 
@@ -248,53 +297,7 @@ export default function SelectTimeSlot({ route, }: Props) {
   }
 
 
-  useEffect(() => {
-    CFPaymentGatewayService.setCallback({
-      onVerify(orderID: string): void {
-        console.log('success ', orderID);
-        //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-        // navigation.navigate(NAVIGATION.PaymentSuccess);
-      },
-      onError(error: CFErrorResponse, orderID: string): void {
-        console.log('failed ', orderID);
-        // navigation.navigate(NAVIGATION.PaymentFailed);
-      },
-    });
-    return () => CFPaymentGatewayService.removeCallback();
-  }, []);
-
-  const startCheckout = () => {
-    try {
-      const session = new CFSession(
-        'session_nfELAxM5ckTG_uOPoXK8EP37UpGFbWP_Tkieyj0SNb5EV5TrR0kNjoT5zPn09JCfNm_zURcfkxs2e2bbI9y7JYthZHNXCog1n6HkxqajTp_F',
-        'order_838112btyhbcL5PcsEy4eDmR8Dge22hm',
-        CFEnvironment.SANDBOX
-      );
-      const paymentModes = new CFPaymentComponentBuilder()
-        .add(CFPaymentModes.CARD)
-        .add(CFPaymentModes.UPI)
-        .add(CFPaymentModes.NB)
-        .add(CFPaymentModes.WALLET)
-        .add(CFPaymentModes.PAY_LATER)
-        .build();
-      const theme = new CFThemeBuilder()
-        .setNavigationBarBackgroundColor('#49b0c5')
-        .setNavigationBarTextColor('#FFFFFF')
-        .setButtonBackgroundColor('#80b841')
-        .setButtonTextColor('#FFFFFF')
-        .setPrimaryTextColor('#212121')
-        .setSecondaryTextColor('#757575')
-        .build();
-      const dropPayment = new CFDropCheckoutPayment(
-        session,
-        paymentModes,
-        theme
-      );
-      CFPaymentGatewayService.doPayment(dropPayment);
-    } catch (e: any) {
-      console.log('startcheckout eeror ', e.message);
-    }
-  }
+ 
 
   if(!(!!slotListMorningArray) || !(!!slotListEveningArray)){
     return(

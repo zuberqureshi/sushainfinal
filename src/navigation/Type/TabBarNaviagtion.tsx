@@ -173,6 +173,7 @@ export default function TabBarNavigation({}) {
           tabBarShowLabel: false,
           tabBarHideOnKeyboard: isAndroid ? true : false,
          
+         
        
         }}
         
@@ -204,7 +205,7 @@ export default function TabBarNavigation({}) {
           position="LEFT"
           name={TabNav.FindADoctorHome}
           component={tabRouteDoctor}
-          
+             
         />
         <Tab.Screen
           position="CIRCLE"

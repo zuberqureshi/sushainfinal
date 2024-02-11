@@ -50,6 +50,8 @@ import InstantConsultation from "../screens/InstantConsultation/ConsultDoctor";
 import ClinicConsultation from "../screens/ClinicConsultation/DoctorDetailCard";
 import Appointments from "../screens/Appointments/Appointments";
 import PatientsReview from "../screens/CommonScreens/PatientsReview";
+import LifeStyle from "../screens/LifeStyle/LifeStyle";
+import Signup from "../screens/auth/Signup";
 
 
 
@@ -76,7 +78,7 @@ export const StackRoute = {
   AuthStack,
   LoginScreen,
   VerifyLoginOtp,
-  // Signup,
+  Signup,
   // VerifyRegisterOtp,
   TabBarNavigation,
   // TabBarNew,
@@ -100,6 +102,7 @@ export const StackRoute = {
   MedicineAddress,
   OrderSummery,
   Appointments,
+  LifeStyle,
 
 
 };

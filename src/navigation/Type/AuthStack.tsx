@@ -22,8 +22,8 @@ export default function AuthStack() {
       {/* <Stack.Screen
         name={StackNav.VerifyRegisterOtp}
         component={StackRoute.VerifyRegisterOtp}
-      />
-      <Stack.Screen name={StackNav.Signup} component={StackRoute.Signup} /> */}
+      /> */}
+      <Stack.Screen name={StackNav.Signup} component={StackRoute.Signup} />
     </Stack.Navigator>
   );
 }

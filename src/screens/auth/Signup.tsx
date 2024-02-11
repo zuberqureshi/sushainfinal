@@ -5,43 +5,54 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ViewStyle,
+  ViewStyle, Text
 } from 'react-native';
-import React, {FunctionComponent, useState} from 'react';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {ParamListBase} from '@react-navigation/native';
+import React, { FunctionComponent, useState } from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ParamListBase } from '@react-navigation/native';
 
 // local imports
 import typography from '../../themes/typography';
-import {colors, styles} from '../../themes';
+import { colors, styles } from '../../themes';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import CText from '../../components/common/CText';
 import strings from '../../i18n/strings';
 import images from '../../assets/images';
 import {
-  getDeviceIp,
-  getDeviceName,
-  getDeviceOS,
-  getDeviceUniqueId,
+  // getDeviceIp,
+  // getDeviceName,
+  // getDeviceOS,
+  // getDeviceUniqueId,
   getHeight,
   moderateScale,
 } from '../../common/constants';
 import CInput from '../../components/common/CInput';
 import CButton from '../../components/common/CButton';
-import {ArrowDown, BackArrow, Eye, EyeDashed} from '../../assets/svgs';
-import {StackNav} from '../../navigation/NavigationKeys';
+import { ArrowDown, BackArrow, Eye, EyeDashed } from '../../assets/svgs';
+import { StackNav } from '../../navigation/NavigationKeys';
 import {
+  signUpSchema,
+  signUpWithEmailSchema,
   validateConfirmPassword,
   validateEmail,
   validateMobile,
   validateName,
   validatePassword,
 } from '../../utils/validators';
-import {postRequestApi} from '../../api/axios';
-import {USER_REGISTER_LOG_IN_API} from '../../api/url';
-import {LoginWithOtpResponse, SignupProp} from '../../types/Types';
-import {showPopupWithOk} from '../../utils/helpers';
+// import {postRequestApi} from '../../api/axios';
+// import {USER_REGISTER_LOG_IN_API} from '../../api/url';
+import { LoginWithOtpResponse, SignupProp } from '../../types/Types';
+import { showPopupWithOk } from '../../utils/helpers';
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { Container } from '../../components/Container';
+import Body from '../../components/Body/Body';
+import { Box, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
+import PrimaryButton from '../../components/common/Button/PrimaryButton';
+import { useFormik } from 'formik';
+import * as RNLocalize from "react-native-localize";
+import useUserRegister from '../../hooks/auth/user-register';
+
 
 const BlurredStyle: StyleProp<ViewStyle> = {
   backgroundColor: colors.white,
@@ -57,150 +68,98 @@ type Props = {
   navigation: NativeStackNavigationProp<ParamListBase>;
 };
 
-const Signup: FunctionComponent<Props> = ({route, navigation}) => {
+const Signup = ({ route, navigation }) => {
   const user = route?.params?.user;
+  const toast = useToast()
 
-  // value states
-  const [firstName, setFirstName] = useState(user?.name ? user?.name : '');
-  const [lastName, setLastName] = useState(
-    user?.lastName ? user?.lastName : '',
-  );
-  const [email, setEmail] = useState(user?.email ? user?.email : '');
-  const [mobile, setMobile] = useState('');
+
   const [countryCode, setCountryCode] = useState('+91');
   const [isByEmail, setIsByEmail] = useState(false);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [referralCode, setReferralCode] = useState('');
+ 
+  //api call
+  const useUserRegisterMutation = useUserRegister()
 
-  // style states
-  const [firstNameInputStyle, setFirstNameInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [lastNameInputStyle, setLastNameInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [emailInputStyle, setEmailInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [mobileInputStyle, setMobileInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [passwordInputStyle, setPasswordInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [confirmPasswordInputStyle, setConfirmPasswordInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
-  const [referralCodeInputStyle, setReferralCodeInputStyle] =
-    useState<StyleProp<ViewStyle>>(BlurredStyle);
 
   // show Password states
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
-  // error states
-  const [firstNameError, setFirstNameError] = useState('');
-  const [lastNameError, setLastNameError] = useState('');
-  const [mobileError, setMobileError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: { firstname: "", lastname: "", number: "", email: "", password: "", cpassword: "", referralcode: "" },
+    validationSchema: isByEmail ? signUpWithEmailSchema : signUpSchema,
+    onSubmit: values => {
+      // updateProfile(values.country,values.address,values.name,values.mobile)
+      // console.warn('formsubmit', values);
 
-  const onChangeFirstName = (text: string): void => {
-    const {msg} = validateName(text.trim());
-    setFirstName(text);
-    setFirstNameError(msg);
-  };
-  const onChangeLastName = (text: string): void => {
-    const {msg} = validateName(text.trim());
-    setLastName(text);
-    setLastNameError(msg);
-  };
-  const onChangeEmail = (text: string): void => {
-    const {msg} = validateEmail(text.trim());
-    setEmail(text.trim());
-    setEmailError(msg);
-  };
-  const onChangeMobile = (text: string): void => {
-    const {msg} = validateMobile(text.trim());
-    setMobile(text.trim());
-    setMobileError(msg);
-  };
-  const onChangePassword = (val: string): void => {
-    const {msg} = validatePassword(val.trim());
-    setPassword(val.trim());
-    setPasswordError(msg);
-    if (confirmPassword !== '') {
-      const {msg} = validateConfirmPassword(confirmPassword, val.trim());
-      setConfirmPasswordError(msg);
+       const payload = {
+        mobile: values.number,  // mandatory 
+        device_name:"duii",
+        name :`${values.firstname} ${values.lastname}`,
+        password:values.password,
+        email: values.email,
+        device_type:"MOBILEAPP",     //  MOBILEAPP
+        device_data:"duii",         
+        login_ip:"duii",
+        country_code:"IN", // country code ISO
+        app_fcm_token:"ffjjj"
+        }
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+      useUserRegisterMutation.mutate(payload, {
+        onSuccess: (data) => {
+          
+          console.log('SUGNUPP DATA',data?.data);
+          
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>OTP Sent</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+           
+          navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+        
+        },
+        onError: (error) => {
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="error">
+                  <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                </Toast>
+              )
+            }
+          })
+        }
+      })
+
+
+
+
+      // action.resetForm()
+      // loadUserInfo();
+
     }
-  };
-  const onChangeConfirmPassword = (val: string): void => {
-    const {msg} = validateConfirmPassword(val.trim(), password);
-    setConfirmPassword(val.trim());
-    setConfirmPasswordError(msg);
-  };
-  const onChangeReferralCode = (text: string): void => {
-    setReferralCode(text);
-  };
 
-  const onFocusInput = (
-    onHighlight: React.Dispatch<React.SetStateAction<StyleProp<ViewStyle>>>,
-  ) => onHighlight(FocusedStyle);
-  const onBlurInput = (
-    onUnHighlight: React.Dispatch<React.SetStateAction<StyleProp<ViewStyle>>>,
-  ) => onUnHighlight(BlurredStyle);
+  });
+//   const countryData = RNLocalize.findBestAvailableLanguage(['en', 'fr', 'es']); // Pass supported language codes
+// console.log('Country Name:', countryData?.country);
 
-  const onFocusFirstName = () => {
-    onFocusInput(setFirstNameInputStyle);
-  };
-  const onBlurFirstName = () => {
-    onBlurInput(setFirstNameInputStyle);
-  };
 
-  const onFocusLastName = () => {
-    onFocusInput(setLastNameInputStyle);
-  };
-  const onBlurLastName = () => {
-    onBlurInput(setLastNameInputStyle);
-  };
-
-  const onFocusEmail = () => {
-    onFocusInput(setEmailInputStyle);
-  };
-  const onBlurEmail = () => {
-    onBlurInput(setEmailInputStyle);
-  };
-
-  const onFocusMobile = () => {
-    onFocusInput(setMobileInputStyle);
-  };
-  const onBlurMobile = () => {
-    onBlurInput(setMobileInputStyle);
-  };
-
-  const onFocusPassword = () => {
-    onFocusInput(setPasswordInputStyle);
-  };
-  const onBlurPassword = () => {
-    onBlurInput(setPasswordInputStyle);
-  };
-
-  const onFocusConfirmPassword = () => {
-    onFocusInput(setConfirmPasswordInputStyle);
-  };
-  const onBlurConfirmPassword = () => {
-    onBlurInput(setConfirmPasswordInputStyle);
-  };
-
-  const onFocusReferralCode = () => {
-    onFocusInput(setReferralCodeInputStyle);
-  };
-  const onBlurReferralCode = () => {
-    onBlurInput(setReferralCodeInputStyle);
-  };
 
   const navigateBack = () => navigation.goBack();
 
   const onPressSkip = (): void => {
     navigation.reset({
       index: 0,
-      routes: [{name: StackNav.DrawerNavigation}],
+      routes: [{ name: StackNav.DrawerNavigation }],
     });
   };
 
@@ -214,117 +173,17 @@ const Signup: FunctionComponent<Props> = ({route, navigation}) => {
     navigation.navigate(StackNav.LoginScreen);
   };
 
-  const onPressShowPassword = (): void => setShowPassword(!showPassword);
 
-  const onPressShowConfirmPassword = (): void =>
-    setShowConfirmPassword(!showConfirmPassword);
 
-  const signUpApiCall = async () => {
-    let payload = {
-      mobile: mobile, // mandatory
-      first_name: firstName, // mandatory
-      last_name: lastName, // mandatory
-      email: email ? email : undefined,
-      device_type: await getDeviceOS(), //  MOBILEAPP
-      device_data: await getDeviceUniqueId(),
-      device_name: await getDeviceName(),
-      login_ip: await getDeviceIp(),
-      password: password,
-      country_code: 'IN', // country code ISO
-      app_fcm_token: 'fcmtoken',
-    };
-    let registerResponse = (await postRequestApi(
-      USER_REGISTER_LOG_IN_API,
-      payload,
-    )) as LoginWithOtpResponse;
-    if (registerResponse?.code === 200) {
-      if (registerResponse.success) {
-        console.log('=========', JSON.stringify(registerResponse));
-        navigation.navigate(StackNav.VerifyRegisterOtp, {
-          mobile: mobile,
-        });
-      }
-    } else {
-      showPopupWithOk('', registerResponse?.message);
-    }
-  };
 
-  const onPressSignUp = async (): Promise<void> => {
-    if (!firstName) {
-      setFirstNameError(strings.thisFieldIsMandatory);
-    }
-    if (!lastName) {
-      setLastNameError(strings.thisFieldIsMandatory);
-    }
-    if (isByEmail) {
-      if (!email) {
-        setEmailError(strings.thisFieldIsMandatory);
-      }
-    } else {
-      if (!mobile) {
-        setMobileError(strings.thisFieldIsMandatory);
-      }
-    }
-    if (!password) {
-      setPasswordError(strings.thisFieldIsMandatory);
-    }
-    if (!confirmPassword) {
-      setConfirmPasswordError(strings.thisFieldIsMandatory);
-    }
-    if (isByEmail) {
-      if (
-        firstNameError === '' &&
-        firstName &&
-        lastNameError === '' &&
-        lastName &&
-        emailError === '' &&
-        email &&
-        mobileError === '' &&
-        mobile &&
-        passwordError === '' &&
-        password &&
-        confirmPasswordError === '' &&
-        confirmPassword
-      ) {
-        await signUpApiCall();
-      }
-    } else {
-      if (
-        firstNameError === '' &&
-        firstName &&
-        lastNameError === '' &&
-        lastName &&
-        mobileError === '' &&
-        mobile &&
-        passwordError === '' &&
-        password &&
-        confirmPasswordError === '' &&
-        confirmPassword
-      ) {
-        await signUpApiCall();
-      }
-    }
-  };
 
-  const rightAccessoryPassword = () => {
-    return (
-      <TouchableOpacity onPress={onPressShowPassword}>
-        {showPassword ? <EyeDashed /> : <Eye />}
-      </TouchableOpacity>
-    );
-  };
 
-  const rightAccessoryConfirmPassword = () => {
-    return (
-      <TouchableOpacity onPress={onPressShowConfirmPassword}>
-        {showConfirmPassword ? <EyeDashed /> : <Eye />}
-      </TouchableOpacity>
-    );
-  };
+
+
 
   return (
-    <CSafeAreaView style={localStyles.root}>
-      <KeyBoardAvoidWrapper>
+    <Container>
+      <Body style={localStyles.root} >
         <View style={styles.rowSpaceBetween}>
           <View style={[styles.flexRow]}>
             <TouchableOpacity
@@ -345,34 +204,56 @@ const Signup: FunctionComponent<Props> = ({route, navigation}) => {
         <View style={styles.center}>
           <Image style={localStyles.imageStyle} source={images.signupImage} />
         </View>
-        <CInput
-          toGetTextFieldValue={onChangeFirstName}
-          _errorText={firstNameError}
-          placeholder={strings.firstName}
-          _value={firstName}
-          inputContainerStyle={[
-            localStyles.inputContainerStyle,
-            firstNameInputStyle,
-          ]}
-          inputBoxStyle={localStyles.inputBoxStyle}
-          _onFocus={onFocusFirstName}
-          _onBlur={onBlurFirstName}
-          placeholderTextColor={colors.placeHolderColor}
-        />
-        <CInput
-          toGetTextFieldValue={onChangeLastName}
-          _errorText={lastNameError}
-          placeholder={strings.lastName}
-          _value={lastName}
-          inputContainerStyle={[
-            localStyles.inputContainerStyle,
-            lastNameInputStyle,
-          ]}
-          inputBoxStyle={localStyles.inputBoxStyle}
-          _onFocus={onFocusLastName}
-          _onBlur={onBlurLastName}
-          placeholderTextColor={colors.placeHolderColor}
-        />
+
+        <View style={{ gap: responsiveHeight(2.5) }} >
+
+          <View style={{
+            borderWidth: moderateScale(1),
+            borderRadius: moderateScale(6),
+            height: moderateScale(40),
+            borderColor: colors.borderColor,
+            width: '100%', justifyContent: 'center', paddingHorizontal: responsiveWidth(0.7),
+          }}>
+            <TextInput
+              onChangeText={formik.handleChange('firstname')}
+              onBlur={formik.handleBlur('firstname')}
+              value={formik.values.firstname}
+              placeholder={strings.firstName}
+              placeholderTextColor={colors.placeHolderColor}
+
+              autoCorrect={false}
+              style={[
+                localStyles.inputContainerStyles
+
+              ]}
+
+            />
+          </View>
+          {(formik.errors.firstname && formik.touched.firstname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.firstname}</Text> : null}
+          <View style={{
+            borderWidth: moderateScale(1),
+            borderRadius: moderateScale(6),
+            height: moderateScale(40),
+            borderColor: colors.borderColor,
+            width: '100%', justifyContent: 'center', paddingHorizontal: responsiveWidth(0.7),
+          }}>
+            <TextInput
+              onChangeText={formik.handleChange('lastname')}
+              onBlur={formik.handleBlur('lastname')}
+              value={formik.values.lastname}
+              placeholder={strings.lastName}
+              placeholderTextColor={colors.placeHolderColor}
+
+              autoCorrect={false}
+              style={[
+                localStyles.inputContainerStyles
+
+              ]}
+
+            />
+          </View>
+          {(formik.errors.lastname && formik.touched.lastname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.lastname}</Text> : null}
+        </View>
 
         <View style={localStyles.btnContainer}>
           <CButton
@@ -393,21 +274,29 @@ const Signup: FunctionComponent<Props> = ({route, navigation}) => {
           />
         </View>
         {isByEmail && (
-          <CInput
-            toGetTextFieldValue={onChangeEmail}
-            _errorText={emailError}
-            placeholder={strings.enterEmail}
-            _value={email}
-            inputContainerStyle={[
-              localStyles.inputContainerStyle,
-              emailInputStyle,
-              styles.mt10,
-            ]}
-            inputBoxStyle={localStyles.inputBoxStyle}
-            _onFocus={onFocusEmail}
-            _onBlur={onBlurEmail}
-            placeholderTextColor={colors.placeHolderColor}
-          />
+          <>
+            <Box borderWidth={1} borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' mt={15} >
+
+              <TextInput
+                onChangeText={formik.handleChange('email')}
+                onBlur={formik.handleBlur('email')}
+                value={formik.values.email}
+                placeholder={strings.enterEmail}
+                placeholderTextColor={colors.placeHolderColor}
+                keyboardType='email-address'
+                autoCorrect={false}
+                style={[
+                  localStyles.inputContainerStyles
+
+                ]}
+
+              />
+            </Box>
+            {(formik.errors.email && formik.touched.email) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.email}</Text> : null}
+
+          </>
+
+
         )}
 
         <View
@@ -418,86 +307,107 @@ const Signup: FunctionComponent<Props> = ({route, navigation}) => {
             </CText>
             <ArrowDown />
           </View>
-          <TextInput
-            onChangeText={onChangeMobile}
-            placeholder={strings.enterMobileNumber}
-            value={mobile}
-            style={[
-              localStyles.mobileNumberStyle,
-              mobileInputStyle,
-              {
-                width: '78%',
-              },
-            ]}
-            maxLength={10}
-            keyboardType="number-pad"
-            onFocus={onFocusMobile}
-            onBlur={onBlurMobile}
-            placeholderTextColor={colors.placeHolderColor}
-          />
+          <Box borderWidth={1} borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' w={'75%'}  >
+
+            <TextInput
+              onChangeText={formik.handleChange('number')}
+              onBlur={formik.handleBlur('number')}
+              value={formik.values.number}
+              placeholder={strings.enterMobileNumber}
+              placeholderTextColor={colors.placeHolderColor}
+              keyboardType='number-pad'
+              autoCorrect={false}
+              style={[
+                localStyles.inputContainerStyles
+
+              ]}
+
+            />
+          </Box>
+       
+
         </View>
-        {mobileError && mobileError !== '' ? (
-          <CText
-            style={{
-              ...localStyles.errorText,
-              color: colors.alertColor,
-            }}>
-            {mobileError}
-          </CText>
-        ) : null}
-        <CInput
-          toGetTextFieldValue={onChangePassword}
-          _errorText={passwordError}
-          placeholder={strings.chooseNewPassword}
-          _value={password}
-          inputContainerStyle={[
-            localStyles.inputContainerStyle,
-            passwordInputStyle,
-          ]}
-          inputBoxStyle={localStyles.inputBoxStyle}
-          _onFocus={onFocusPassword}
-          _onBlur={onBlurPassword}
-          keyBoardType={'default'}
-          placeholderTextColor={colors.placeHolderColor}
-          secureTextEntry={showPassword}
-          rightAccessory={rightAccessoryPassword}
-        />
-        <CInput
-          toGetTextFieldValue={onChangeConfirmPassword}
-          _errorText={confirmPasswordError}
-          placeholder={strings.confirmPassword}
-          _value={confirmPassword}
-          inputContainerStyle={[
-            localStyles.inputContainerStyle,
-            confirmPasswordInputStyle,
-          ]}
-          inputBoxStyle={localStyles.inputBoxStyle}
-          _onFocus={onFocusConfirmPassword}
-          _onBlur={onBlurConfirmPassword}
-          keyBoardType={'default'}
-          placeholderTextColor={colors.placeHolderColor}
-          secureTextEntry={showConfirmPassword}
-          rightAccessory={rightAccessoryConfirmPassword}
-        />
-        <CInput
-          toGetTextFieldValue={onChangeReferralCode}
-          placeholder={strings.referralCode}
-          _value={referralCode}
-          inputContainerStyle={[
-            localStyles.inputContainerStyle,
-            referralCodeInputStyle,
-          ]}
-          inputBoxStyle={localStyles.inputBoxStyle}
-          _onFocus={onFocusReferralCode}
-          _onBlur={onBlurReferralCode}
-          placeholderTextColor={colors.placeHolderColor}
-        />
-        <CButton
-          title={strings.signUp}
-          type={'s16'}
-          onPress={onPressSignUp}
-          containerStyle={localStyles.saveBtnStyle}
-        />
+        {(formik.errors.number && formik.touched.number) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.number}</Text> : null}
+
+        <View style={{
+          borderWidth: moderateScale(1),
+          borderRadius: moderateScale(6),
+          height: moderateScale(40),
+          borderColor: colors.borderColor,
+          width: '100%', paddingHorizontal: responsiveWidth(0.7), flexDirection: 'row', alignItems: 'center',
+        }}>
+          {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
+          <TextInput
+            onChangeText={formik.handleChange('password')}
+            onBlur={formik.handleBlur('password')}
+            value={formik.values.password}
+            placeholder={strings.chooseNewPassword}
+            placeholderTextColor={colors.placeHolderColor}
+            secureTextEntry={showPassword}
+
+            style={[
+              localStyles.inputContainerStyles, { width: '90%' }
+
+            ]}
+
+          />
+
+          <TouchableOpacity style={{}} onPress={() => { setShowPassword(!showPassword) }}>
+            {showPassword ? <EyeDashed /> : <Eye />}
+          </TouchableOpacity>
+
+        </View>
+        {(formik.errors.password && formik.touched.password) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.password}</Text> : null}
+
+        <View style={{
+          borderWidth: moderateScale(1),
+          borderRadius: moderateScale(6),
+          height: moderateScale(40),
+          borderColor: colors.borderColor,
+          width: '100%', paddingHorizontal: responsiveWidth(0.7), flexDirection: 'row', alignItems: 'center', marginTop: responsiveHeight(1.4)
+        }}>
+          {/* <FontAwesome name="user-o" size={responsiveWidth(5)} /> */}
+          <TextInput
+            onChangeText={formik.handleChange('cpassword')}
+            onBlur={formik.handleBlur('cpassword')}
+            value={formik.values.cpassword}
+            placeholder={strings.confirmNewPassword}
+            placeholderTextColor={colors.placeHolderColor}
+            secureTextEntry={showPassword}
+
+            style={[
+              localStyles.inputContainerStyles, { width: '90%' }
+
+            ]}
+
+          />
+
+          <TouchableOpacity style={{}} onPress={() => { setShowPassword(!showPassword) }}>
+            {showPassword ? <EyeDashed /> : <Eye />}
+          </TouchableOpacity>
+
+        </View>
+        {(formik.errors.cpassword && formik.touched.cpassword) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.cpassword}</Text> : null}
+       
+        <Box borderWidth={1} borderColor={colors.borderColor} borderRadius={4} height={40} overflow='hidden' mt={10}  >
+
+          <TextInput
+            onChangeText={formik.handleChange('referralcode')}
+            onBlur={formik.handleBlur('referralcode')}
+            value={formik.values.referralcode}
+            placeholder={strings.referralCode}
+            placeholderTextColor={colors.placeHolderColor}
+            autoCorrect={false}
+            style={[
+              localStyles.inputContainerStyles
+
+            ]}
+
+          />
+        </Box>
+        {(formik.errors.referralcode && formik.touched.referralcode) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.referralcode}</Text> : null}
+
+        <PrimaryButton onPress={formik.handleSubmit} disabled={useUserRegisterMutation?.isPending } loading={ useUserRegisterMutation?.isPending } buttonText='Sign Up' width={'30%'} height={responsiveHeight(5)} alignSelf='center' marginTop={responsiveHeight(1.4)} />
         <View style={localStyles.signInContainer}>
           <CText type="r12" color={colors.black2} style={styles.selfEnd}>
             {strings.alreadyHaveAccount}
@@ -541,8 +451,8 @@ const Signup: FunctionComponent<Props> = ({route, navigation}) => {
             {strings.privacyPolicy}
           </CText>
         </CText>
-      </KeyBoardAvoidWrapper>
-    </CSafeAreaView>
+      </Body>
+    </Container>
   );
 };
 
@@ -550,8 +460,8 @@ export default Signup;
 
 const localStyles = StyleSheet.create({
   root: {
-    ...styles.ph20,
-    ...styles.pv20,
+    ...styles.ph10,
+    ...styles.pv10,
   },
   backArrowStyle: {
     ...styles.selfCenter,
@@ -586,7 +496,7 @@ const localStyles = StyleSheet.create({
     ...styles.ph10,
     gap: moderateScale(5),
     width: '20%',
-    height: moderateScale(36),
+    height: moderateScale(40),
   },
   mobileNumberStyle: {
     ...styles.ph20,
@@ -623,5 +533,16 @@ const localStyles = StyleSheet.create({
     textAlign: 'left',
     ...typography.fontSizes.f12,
     ...styles.ml10,
+  },
+  inputContainerStyles: {
+    backgroundColor: colors.white,
+    marginLeft: responsiveWidth(1.5),
+    ...typography.fontSizes.f14,
+    ...typography.fontWeights.Regular,
+    ...styles.ph10,
+
+
+
+
   },
 });

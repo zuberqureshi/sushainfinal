@@ -25,6 +25,8 @@ import ForgotePassword from '../../components/common/modal/ForgotePassword'
 import { AuthContext } from '../../context/AuthContext'
 import useLoginByPassword from '../../hooks/auth/loginbypassword'
 import { setAccessToken, getAccessToken } from '../../utils/network'
+import SignInMOdal from '../../components/common/modal/SignInModal'
+import SignInModal from '../../components/common/modal/SignInModal'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -118,6 +120,9 @@ const LoginScreen = () => {
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();
 
+  // const signInModalRef = useRef<ActionSheetRef>(null);
+
+  // const onPressSignInModal = () => signInModalRef.current?.show();
 
 
 
@@ -129,26 +134,8 @@ const LoginScreen = () => {
   };
 
   const onPressSignInWithOtp = async () => {
-    // if (emailOrMobile.length === 0) {
-    //   setEmailMobileError(strings.thisFieldIsMandatory);
-    // }
-    // if (emailMobileError === '' && emailOrMobile) {
-    //   let otpSentResponse = (await postRequestApi(USER_REGISTER_LOG_IN_API, {
-    //     mobile: emailOrMobile,
-    //   })) as LoginWithOtpResponse;
-    //   if (otpSentResponse?.code === 200) {
-    //     if (otpSentResponse.success) {
-    //       console.log('=========', JSON.stringify(otpSentResponse));
-    //       navigation.navigate(StackNav.VerifyLoginOtp, {
-    //         mobile: emailOrMobile,
-    //         otp: otpSentResponse?.data[0]?.otpValue,
-    //       });
-    //     }
-    //   } else {
-    //     showPopupWithOk('', otpSentResponse?.message);
-    //   }
-    // }
-    navigation.navigate(StackNav.VerifyLoginOtp, { mobile: formik.values.userid });
+   
+
   };
 
   return (
@@ -166,7 +153,7 @@ const LoginScreen = () => {
           <Text fontFamily='$InterSemiBold' fontSize={16}>{strings.userSignIn}</Text>
           <View style={localStyles.newMenberContainer}>
             <Text fontFamily='$InterRegular' fontSize={14}>{strings.newMember}</Text>
-            <TouchableOpacity onPress={() => { }}>
+            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.Signup) }}>
               <Text fontFamily='$InterSemiBold' fontSize={14} color={colors.success}>
                 {strings.signUp}
               </Text>
@@ -329,6 +316,8 @@ const LoginScreen = () => {
       </Body>
 
       <ForgotePassword SheetRef={forgotePasswordRef} />
+
+    {/* <SignInModal  SheetRef={signInModalRef}  /> */}
     </Container>
 
   )
