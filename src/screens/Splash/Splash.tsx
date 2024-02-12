@@ -28,7 +28,7 @@ export default function Splash() {
     let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
 
     if(  v?.accessToken){
- 
+      loginstatus =true
       let  currentTime = Math.floor(new Date().getTime());
       console.log('tokeninfo from memoery',currentTime,v)
 
