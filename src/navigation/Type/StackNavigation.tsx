@@ -131,8 +131,8 @@ export default function StackNavigation() {
       />
 
       <Stack.Screen
-        name={StackNav.MedicineCart}
-        component={StackRoute.MedicineCart}
+        name={StackNav.Cart}
+        component={StackRoute.Cart}
       /> 
 
       <Stack.Screen

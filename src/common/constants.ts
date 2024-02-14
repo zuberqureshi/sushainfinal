@@ -7,7 +7,7 @@ export const deviceWidth = viewportWidth;
 export const deviceHeight = viewportHeight;
 
 export const  Api_Image_Base_Url = 'https://sushainclinic.s3.ap-south-1.amazonaws.com/uploads/'
-export const  API_IMAGE_BASE_URL = 'https://sushainclinic.s3.ap-south-1.amazonaws.com/uploads/'
+export const  API_IMAGE_BASE_URL = 'https://sushainclinics.s3.ap-south-1.amazonaws.com/uploads/'
 
 let sampleHeight = 800;
 let sampleWidth = 360;

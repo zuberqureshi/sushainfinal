@@ -124,6 +124,8 @@ import CrossIconBlack from './crossIconBlack.svg'
 import MedicineBottleLineGreen from './medicineBottleLineGreen.svg'
 import PlanNotebookIcon from './planNotebookIcon.svg'
 import UterusIcon from './uterusIcon.svg'
+import DropdownFilledIcon from './dropdownFilledIcon.svg'
+
 
 export {
   Home,
@@ -249,6 +251,6 @@ export {
   MedicineBottleLineGreen,
   PlanNotebookIcon,
   UterusIcon,
-
+  DropdownFilledIcon,
 
 };

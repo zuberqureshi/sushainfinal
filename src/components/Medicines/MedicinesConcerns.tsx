@@ -8,31 +8,43 @@ import {medicinesConcernsData, shopByategoryData} from '../../api/constant';
 import {colors, styles} from '../../themes';
 import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
-import {moderateScale} from '../../common/constants';
+import {API_IMAGE_BASE_URL, moderateScale} from '../../common/constants';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
 import { useNavigation } from '@react-navigation/native';
 import {OptimizedFlatList} from 'react-native-optimized-flatlist'
 import { StackNav } from '../../navigation/NavigationKeys';
+import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-concerns';
+import Loader from '../Loader/Loader';
 // import { StackNav } from '../../navigation/NavigationKeys';
 
 
 
 const MedicinesConcerns = ({title}: {title: string}) => {
-
+ 
   const navigation = useNavigation()
+  
+  const {data,isLoading} = useGetMedicinesHealthConcerns()
+  // console.log('medicen    ===',data?.data?.result[0].categroyList);
+  if(isLoading){
+    return(
+      <Loader/>
+    )
+  }
 
   const RenderDSpecialities = ({item}: {item: DoctorSpecialityListData}) => {
     // console.log({item});
 
+   
+
     
   return (
-    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.title})}}  style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.name,bannerImg:item?.listing_banner_mbl})}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
-        <Image source={item?.image} style={localStyles.imgStyle} />
+        <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.app_icon}`}} style={localStyles.imgStyle} />
       </View>
       <View style={localStyles.titleContainer}>
         <CText type="m12" align="center" style={styles.ph5} numberOfLines={2}>
-          {item?.title}
+          {item?.name}
         </CText>
       </View>
     </TouchableOpacity>
@@ -45,19 +57,20 @@ const MedicinesConcerns = ({title}: {title: string}) => {
     return <RenderDSpecialities item={item} />;
   };
 
+
   return (
     <View style={{marginBottom:responsiveHeight(1),alignSelf:'center'}}>
       <SubHeader title={title} isViewHide={false} />
       
       <FlatList
-        data={medicinesConcernsData}
+        data={data?.data?.result[0].categroyList}
         renderItem={renderItem}
         // horizontal
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph10}
         // showsHorizontalScrollIndicator={false}
         numColumns={4}
-        estimatedItemSize={200}
+      
       />
        
     </View>

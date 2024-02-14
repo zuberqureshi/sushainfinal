@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ScrollView, Pressable } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions, ScrollView, Pressable } from 'react-native'
 import React, { useState, useRef } from 'react'
 import { colors, styles } from '../../themes'
 import typography from '../../themes/typography'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import CText from '../../components/common/CText'
 import { ArrowDown, BackArrow, BagBlue, Cart, CartBlack, CartIconWhite, CashIcon, ColitisIcon, CrossBottomTab, DownArrowBlack, DownArrowWhite, FilterIcon, GascidityIcon, Genuine, GreenSmaalTick, GreenTruck, IBSIcon, LikeIcon, Location, PepticUlcersIcon, RecurringPayment, ReloadBottomTab, ShareIcon, ShareIconBlack, SortIcon, StarFilled, StarUnFilled, TickFilterSelected, TickFilterUnselected, TruckIcon, WorkspaceTrusted } from '../../assets/svgs'
-import { deviceHeight, deviceWidth, getHeight, moderateScale } from '../../common/constants'
+import { API_IMAGE_BASE_URL, deviceHeight, deviceWidth, getHeight, moderateScale } from '../../common/constants'
 import CSafeAreaView from '../../components/common/CSafeAreaView'
 import CHeader from '../../components/common/CHeader'
 import CButton from '../../components/common/CButton'
@@ -19,17 +19,54 @@ import SimilarProduct from '../../components/Medicines/SimilarProduct'
 import { StackNav } from '../../navigation/NavigationKeys'
 import { Container } from '../../components/Container'
 import Body from '../../components/Body/Body'
+import { Box, Text } from '@gluestack-ui/themed'
+import RenderHtml from 'react-native-render-html';
+import { useDispatch, useSelector } from 'react-redux'
+import { addProductsToCart } from '../../redux/cartSlice'
+import { increaseQty } from '../../redux/productSlice'
 // import { ScrollView } from 'react-native-virtualized-view'
 
 const wWidht = Dimensions.get('screen').width;
 const wHeight = Dimensions.get('screen').height;
 const ProductDetail = ({ route, navigation }) => {
-
+  
+  const {productDetail} = route.params
   const [sliderImgActive, setSliderImgActive] = useState(0)
   const [productTypeActive, setProductTypeActive] = useState(0)
 
+  const dispatch = useDispatch()
+  const cartData = useSelector(state => state.cart);
+  
   const [productAvailability, setProductAvailability] = useState('')
   const onProductAvailability = (item: any) => setProductAvailability(item.value)
+  
+  const getSliderImg = () => {
+    let string = `` ;
+    if(!!productDetail?.other_img){
+       string = `${productDetail?.images},${productDetail?.other_img}`
+    }else{
+      string = `${productDetail?.images}`
+    }
+    return string.split(',')
+  }
+
+  const imgSliderString = `${productDetail?.images},${productDetail?.other_img}`
+  let imgSlider = getSliderImg()
+  
+  
+
+  const getItemPriceCart = () => {
+    let total = 0 ;
+    cartData.map(item => {
+   
+      if(item?.id === productDetail?.id){
+     
+      total = total+item.final_price}
+    })
+
+    return total ;
+  }
+  const getPriceItemAdd = getItemPriceCart()
 
   const onChangeSliderImg = (nativeEvent) => {
 
@@ -47,10 +84,13 @@ const ProductDetail = ({ route, navigation }) => {
       <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(2.5) }} >
         <ShareIconBlack />
         <LikeIcon />
-
-        <CartBlack />
-        <CText type='b8' style={{ backgroundColor: colors.white, position: 'absolute', right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.2), borderRadius: responsiveWidth(2), top: responsiveHeight(-0.5), }} >1</CText>
-
+         
+         <Pressable  onPress={()=>{navigation.navigate(StackNav.Cart)}} >
+         <CartBlack />
+        
+      
+        <CText type='b8' style={{ backgroundColor: colors.white, position: 'absolute', right: -4, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.2), borderRadius: responsiveWidth(2), top: responsiveHeight(-0.5), }} >{cartData?.length}</CText>
+        </Pressable>
 
       </View>
     )
@@ -110,9 +150,15 @@ const ProductDetail = ({ route, navigation }) => {
           style={{ width: wWidht * 0.9, height: wHeight * 0.22 }}
         >
 
-          {
-            imgData.map((e, index) =>
-              <Image key={index} source={e.image} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />
+          { productDetail?.image_third_party === 'NO' ?
+            imgSlider?.map((e, index) =>{     
+              return(<Image key={index} source={{uri: `${API_IMAGE_BASE_URL}${e}`}} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
+            
+            }
+            ) : imgSlider?.map((e, index) =>{     
+              return(<Image key={index} source={{uri: `${e}`}} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
+            
+            }
             )
           }
 
@@ -121,7 +167,7 @@ const ProductDetail = ({ route, navigation }) => {
 
       <View style={localStyles.wrapDot} >
         {
-          imgData.map((e, index) =>
+          imgSlider?.map((e, index) =>
             <Text
               key={index}
               style={sliderImgActive === index ? localStyles.dotActive : localStyles.dot}
@@ -132,9 +178,9 @@ const ProductDetail = ({ route, navigation }) => {
         }
       </View>
 
-      <View style={{ paddingHorizontal: responsiveWidth(3), paddingBottom: responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
-        <CText type='s16' >Aloe Cucumber Face Wash</CText>
-        <CText type='r8' >BY PURE BY PRIYANKA</CText>
+      <View style={{ paddingHorizontal: responsiveWidth(3), paddingBottom: responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' ,gap:responsiveHeight(0.4)}} >
+        <Text  fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black}   >{productDetail?.name}</Text>
+        <Text fontFamily='$InterRegular' fontSize={8} lineHeight={10} color={colors.black} textTransform='uppercase' >BY {productDetail?.brand}</Text>
 
         <View style={{ marginVertical: responsiveHeight(0.5) }} >
           <FlashList
@@ -151,13 +197,13 @@ const ProductDetail = ({ route, navigation }) => {
 
         </View>
 
-        <CText type='r12' >1 Pack of 100 ML in Bottle</CText>
+        <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} color={colors.black}  >{productDetail?.oum_unit} Pack of {productDetail?.quantity_per_packaging} {productDetail?.oum_name} in {productDetail?.packaging}</Text>
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }} >
           <FlashList
             // style={{ flex: 1, }}
             data={[1, 2, 3, 4, 5]}
-            renderItem={({ item, index }) => (item != 5 ? <StarFilled /> : <StarUnFilled />)}
+            renderItem={({ item, index }) => (item <= productDetail?.rating ? <StarFilled /> : <StarUnFilled />)}
             keyExtractor={(item, index) => index.toString()}
 
             horizontal
@@ -167,14 +213,14 @@ const ProductDetail = ({ route, navigation }) => {
           />
             
           <Pressable onPress={()=>{navigation.navigate(StackNav.ProductsReview)}} >
-          <CText type='m10' color='#93989A' >4 Reviews</CText>
+          <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={'#93989A'} >4 Reviews</Text>
           </Pressable>  
           
         </View>
 
-        <View style={{ ...styles.flexRow, marginTop: responsiveHeight(0.5) }} >
+        <View style={{ ...styles.flexRow,alignItems:'center' }} >
           <BagBlue />
-          <CText type='r10' color='#30B0C5' >110 people bought this</CText>
+          <Text fontFamily='$InterRegular' fontSize={10} lineHeight={12} color={colors.primary} alignSelf='flex-end' ml={3} >{productDetail?.buyers} people bought this</Text>
         </View>
 
       </View>
@@ -183,7 +229,12 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={{ ...styles.flexRow, marginTop: responsiveHeight(1.5), gap: responsiveWidth(3),paddingHorizontal: responsiveWidth(3)  }} >
           <CText type='s12' >Availability In</CText>
-          <Dropdown
+          <Box backgroundColor={'#EBFBD9'} px={12} py={4} borderRadius={10} flexDirection='row' alignItems='center' gap={4}>
+          <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={colors.black} alignSelf='center'  >{productDetail?.availability}</Text>
+          <DownArrowBlack />
+          </Box>
+         
+          {/* <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdown}
             placeholderStyle={localStyles.placeholderStyle}
@@ -197,14 +248,17 @@ const ProductDetail = ({ route, navigation }) => {
             renderRightIcon={() => <DownArrowBlack />}
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyle}
-          />
+          /> */}
         </View>
 
 
-        <CText style={{ marginTop: responsiveHeight(1),paddingHorizontal: responsiveWidth(3)  }} type='r12'  >MRP  <CText type='s16' >{'\u20B9'} 690</CText></CText>
+        <CText style={{ marginTop: responsiveHeight(1),paddingHorizontal: responsiveWidth(3)  }} type='r12'  >MRP  <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black} >{productDetail?.symbol} {productDetail?.final_price}</Text></CText>
 
         <View style={{ ...styles.flexRow, marginTop: responsiveHeight(2), gap: responsiveWidth(3),paddingHorizontal: responsiveWidth(3)  }}  >
-          <TouchableOpacity activeOpacity={0.6} style={{ borderColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3),borderWidth:1 }} >
+          <TouchableOpacity onPress={()=>{
+            dispatch(addProductsToCart(productDetail))
+            dispatch(increaseQty(productDetail?.id))
+            }} activeOpacity={0.6} style={{ borderColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3),borderWidth:1 }} >
 
             <CText
               type='m14'
@@ -252,23 +306,31 @@ const ProductDetail = ({ route, navigation }) => {
 
       <View style={{paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1'}} >
         
-        <View style={{gap:responsiveHeight(1.2)}} >
+        <View style={{gap:responsiveHeight(0.8)}} >
         <CText type='s14' >Product details</CText>
 
         <View>
         <CText type='s12' color='#5E5B58' >Description:</CText>
-
-        <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >
+        <RenderHtml
+      contentWidth={responsiveWidth(20)}
+      baseStyle={{ color: '#525454',fontFamily:'InterMedium',fontSize:11,lineHeight:12}}
+      source={ {html: productDetail?.single_description} }
+    />
+        {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >
         This enriched formula with Aloe Vera Leaf Extract, Basil Extract, Neem Extract, Tea Tree Oil, White Tea and Cucumber Extract known for their natural healing properties which helps in deeply cleanses and decongests the pores of your skin.
-        </CText>
+        </CText> */}
         </View>
 
         <View>
         <CText type='s12' color='#5E5B58' >Highlights:</CText>
-
-        <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >• It helps in fading any marks or blemishes left by acne or pimples.</CText>
+        <RenderHtml
+      contentWidth={responsiveWidth(20)}
+      baseStyle={{ color: '#525454',fontFamily:'InterMedium',fontSize:11,lineHeight:16,}}
+      source={ {html: productDetail?.pro_highlight} }
+    />
+        {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >• It helps in fading any marks or blemishes left by acne or pimples.</CText>
         <CText type='m10' color='#525454' style={{width:responsiveWidth(89),}} >• Contains Salicylic Acid that helps treat acne prevent acne.</CText>
-        <CText type='m10' color='#525454' style={{width:responsiveWidth(89),}} >• Unclogs pores and allows the skin to breathe and shine.</CText>
+        <CText type='m10' color='#525454' style={{width:responsiveWidth(89),}} >• Unclogs pores and allows the skin to breathe and shine.</CText> */}
         </View>
 
         <View>
@@ -413,11 +475,11 @@ const ProductDetail = ({ route, navigation }) => {
 
     
       </Body>
-      <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
+  { !!getPriceItemAdd && <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
 
-<Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {'\u20B9'}526</Text>
+<Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {productDetail?.symbol} {getItemPriceCart()}</Text>
 
-<TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.MedicineCart)}}  >
+<TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}}  >
   <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
     <CartIconWhite/>
     <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
@@ -427,7 +489,7 @@ const ProductDetail = ({ route, navigation }) => {
 
 
 
-</View>
+</View>}
 
     </Container>
   )
@@ -461,7 +523,7 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(2),
     borderRadius: responsiveWidth(2.5),
     paddingLeft: responsiveWidth(3),
-    color: 'red',
+    // color: 'red',
     height: responsiveHeight(3)
 
 
