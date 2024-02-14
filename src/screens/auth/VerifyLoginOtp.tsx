@@ -35,7 +35,7 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
 import useLoginOtpVerify from '../../hooks/auth/login-otp-verify';
 import useResendOtp from '../../hooks/auth/resend-otp';
-
+import { setAccessToken, getAccessToken }  from '../../utils/network'
 type Props = {
   route: any;
   navigation: NativeStackNavigationProp<ParamListBase>;
@@ -77,8 +77,24 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
     console.log('oTPPP',payload);
 
      useLoginOtpVerifyMutation.mutate(payload, {
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
          
+
+          await setAccessToken('AccessTokenInfo',
+            JSON.stringify({
+              accessToken: data?.data?.result[0]?.token,
+              refreshToken: data?.data?.result[0]?.refreshToken,
+              expirationTime: data?.data?.result[0]?.ExpirationTime,
+            }))
+
+
+          await setAccessToken('userInfo',
+            JSON.stringify({
+              userId: data?.data?.result[0]?.user.id,
+              userName: data?.data?.result[0]?.user.first_name,
+              userMobile: data?.data?.result[0]?.user.mobile,
+            }))
+
           toast.show({
             placement: "bottom",
             render: ({ id }: { id: string }) => {
