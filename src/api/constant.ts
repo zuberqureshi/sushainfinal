@@ -166,6 +166,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 100 Tablet in Bottle',
     price:'132',
     image: images.productByCategory1,
+    qty:0,
   },
   {
     id: 2,
@@ -173,6 +174,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 60 Tablet in Bottle',
     price:'165',
     image: images.productByCategory2,
+    qty:0,
   },
   {
     id: 3,
@@ -180,6 +182,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 80 Tablet in Bottle',
     price:'194',
     image: images.productByCategory3,
+    qty:0,
   },
   {
     id: 4,
@@ -187,6 +190,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 100 Tablet in Bottle',
     price:'75',
     image: images.productByCategory4,
+    qty:0,
   },
   {
     id: 5,
@@ -194,6 +198,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 100 Tablet in Bottle',
     price:'740',
     image: images.productByCategory5,
+    qty:0,
   },
   {
     id: 6,
@@ -201,6 +206,7 @@ export const productItemCategoryData = [
     decp:'1 Pack of 100 Tablet in Bottle',
     price:'171',
     image: images.productByCategory6,
+    qty:0,
   },
 ]
 export const medicinesConcernsData = [
@@ -274,7 +280,7 @@ export const genderData = [
 ];
 
 export const productAvailabilityData = [
-  {label: 'Face Wash', value: '1'},
+  {label: 'Digestive', value: '1'},
   {label: 'Item 2', value: '2'},
   {label: 'Item 3', value: '3'},
   {label: 'Item 4', value: '4'},

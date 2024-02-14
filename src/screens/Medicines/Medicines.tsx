@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, TextInput, } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 import React from 'react';
 import { colors, styles } from '../../themes';
@@ -8,7 +8,7 @@ import images from '../../assets/images';
 import typography from '../../themes/typography';
 import { responsiveFontSize, responsiveHeight, responsiveWidth, } from 'react-native-responsive-dimensions';
 import { moderateScale } from '../../common/constants';
-import { DigitalPrecereption, FreeFollowUp, MedicineBottle, CovidVirusResearch, UserIcon, DoctorIcon, BrandIcon, ReviewsIcon, GreaterThanIcon, } from '../../assets/svgs';
+import { DigitalPrecereption, FreeFollowUp, MedicineBottle, CovidVirusResearch, UserIcon, DoctorIcon, BrandIcon, ReviewsIcon, GreaterThanIcon, Menu, LikeIcon, Cart, } from '../../assets/svgs';
 import CText from '../../components/common/CText';
 //   import DoctorCategoryComponent from '../../components/DoctorComponent/DoctorCategoryComponent';
 import MedicinesConcerns from '../../components/Medicines/MedicinesConcerns';
@@ -20,6 +20,8 @@ import strings from '../../i18n/strings';
 import SimilarProduct from '../../components/Medicines/SimilarProduct';
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent';
 import { Container } from '../../components/Container';
+import { Box } from '@gluestack-ui/themed';
+import { StackNav } from '../../navigation/NavigationKeys';
 
 
 
@@ -39,7 +41,12 @@ const BottomContainer = ({ icon, title }: any) => {
   );
 };
 
-const Medicines = () => {
+
+
+const Medicines = ({route,navigation}:any) => {
+
+  const iconSize = moderateScale(21);
+
   return (
     <Container  statusBarStyle='dark-content' >
       <CHeader
@@ -51,7 +58,41 @@ const Medicines = () => {
         style={{ marginBottom: responsiveHeight(10) }}
         showsVerticalScrollIndicator={false}>
 
-        <SearchWithLikeComponent />
+      <View style={localStyles.searchContainer}>
+          <TouchableOpacity onPress={()=>{navigation.openDrawer()}}>
+            <Menu />
+          </TouchableOpacity>
+         
+          <TextInput
+           placeholder={strings.searchPlaceHolder}
+          //  value={searchText}
+          //  onChangeText={(t)=>setSearchText(t)}
+           style={localStyles.inputContainerStyle}
+          />
+      <Box flexDirection='row' alignItems='center' gap={4} >
+      <TouchableOpacity
+        onPress={()=>{}}
+        style={localStyles.cartBtnStyle}>
+        <LikeIcon height={iconSize} width={iconSize} />
+      </TouchableOpacity>
+      <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} style={localStyles.cartBtnStyle}>
+        <Cart height={iconSize} width={iconSize} />
+      </TouchableOpacity>
+      </Box>    
+      
+          {/* {!!searchData.length && (
+            <View style={localStyles.searchSuggestionContainer}>
+              <FlatList
+                data={searchData}
+                renderItem={renderSearchResult}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                ItemSeparatorComponent={() => <RenderSeparator />}
+                // estimatedItemSize={100}
+              />
+            </View>
+          )} */}
+        </View>
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -319,5 +360,44 @@ const localStyles = StyleSheet.create({
     ...styles.center,
     ...styles.ph10,
     width: '50%',
+  },
+  searchContainer: {
+    ...styles.rowSpaceBetween,
+    ...styles.flexRow,
+    ...styles.ph20,
+    ...styles.itemsCenter,
+    position: 'relative',
+    zIndex: 100,
+    ...styles.mt10
+  },
+  searchSuggestionContainer: {
+    position: 'absolute',
+    top: moderateScale(40),
+    width: '70%',
+    // height: getHeight(150),
+    backgroundColor: colors.white,
+    ...styles.selfCenter,
+    left: '19%',
+    borderWidth: moderateScale(1),
+    borderRadius: moderateScale(5),
+    borderColor: colors.gray6,
+    zIndex: 10,
+    ...styles.shadowStyle,
+  },
+  cartBtnStyle: {
+    ...styles.pl5,
+    ...styles.pv10,
+  },
+  inputContainerStyle: {
+    ...typography.fontSizes.f10,
+    ...typography.fontWeights.SemiBold,
+    flex:1,
+    marginHorizontal:responsiveWidth(2.5),
+    height:responsiveHeight(5),
+    borderWidth:1,
+    borderRadius:responsiveWidth(1.5),
+    borderColor: colors.gray4,
+    ...styles.pl10
+
   },
 });

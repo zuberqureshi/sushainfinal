@@ -215,9 +215,7 @@ const ConsultDoctor = () => {
               renderRightIcon={() => <DownArrowWhite width={responsiveWidth(4)} />}
               // itemTextStyle={styles.selectedTextStyle}
               itemContainerStyle={styles.itemContainerStyle}
-              renderSelectedItem={(item, unSelect) => (
-                      <CText>jklkjl</CText>
-              )}
+              selectedTextProps={{ numberOfLines: 1 }}
               
             />
 

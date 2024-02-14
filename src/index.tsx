@@ -8,6 +8,13 @@ import { AuthProvider } from './context/AuthContext'
 import { queryClient } from './react-query/client'
 import AppNavigator from './navigation'
 import { notificationListener, requestUserPermission } from './utils/notificationService'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from 'redux-persist';
+
+const persistor = persistStore(store);
+
 const App = () => {
 
   useEffect(() => {
@@ -22,9 +29,16 @@ const App = () => {
 
     <QueryClientProvider client={queryClient}>
       <GluestackUIProvider config={config}>
-        <AuthProvider >
-          <AppNavigator />
-        </AuthProvider>
+        <Provider store={store} >
+          <PersistGate persistor={persistor}>
+            <AuthProvider >
+
+              <AppNavigator />
+
+            </AuthProvider>
+          </PersistGate>
+        </Provider>
+
       </GluestackUIProvider>
     </QueryClientProvider>
 

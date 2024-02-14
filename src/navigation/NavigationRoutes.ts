@@ -37,7 +37,7 @@ import DrawerNavigation from "./Type/DrawerNavigation";
 import ProductByCategories from "../screens/Medicines/ProductByCategories";
 import ProductDetail from "../screens/Medicines/ProductDetail";
 import ProductsReview from "../screens/Medicines/ProductsReview";
-import MedicineCart from "../screens/Medicines/MedicineCart";
+
 import MedicineAddress from "../screens/Medicines/MedicineAddress";
 import OrderSummery from "../screens/OrderSummery/OrderSummery";
 import AppointmentBooked from "../screens/CommonScreens/AppointmentBooked";
@@ -52,6 +52,7 @@ import Appointments from "../screens/Appointments/Appointments";
 import PatientsReview from "../screens/CommonScreens/PatientsReview";
 import LifeStyle from "../screens/LifeStyle/LifeStyle";
 import Signup from "../screens/auth/Signup";
+import Cart from "../screens/CommonScreens/Cart";
 
 
 
@@ -98,7 +99,7 @@ export const StackRoute = {
   AppointmentCancellation,
   ProductDetail,
   ProductsReview,
-  MedicineCart,
+  Cart,
   MedicineAddress,
   OrderSummery,
   Appointments,

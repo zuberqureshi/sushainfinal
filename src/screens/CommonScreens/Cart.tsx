@@ -1,12 +1,13 @@
 import {
     StyleSheet,
-    Text,
+    
     View,
     SafeAreaView,
     TouchableOpacity,
     Image,
     ScrollView,
-    FlatList
+    FlatList,
+    Pressable
   } from 'react-native';
   import React,{useState} from 'react';
   import {colors, styles} from '../../themes';
@@ -21,7 +22,7 @@ import {
     responsiveWidth,
   } from 'react-native-responsive-dimensions';
   import StepIndicator from 'react-native-step-indicator';
-  import {deviceWidth, moderateScale} from '../../common/constants';
+  import {API_IMAGE_BASE_URL, deviceWidth, moderateScale} from '../../common/constants';
 import CSafeAreaView from '../../components/common/CSafeAreaView'
 import CText from '../../components/common/CText';
 import { CouponPercent, GreenCouponPercent, ReportDeleteIcon, RightArrowBlack, ShippingTrack } from '../../assets/svgs';
@@ -30,12 +31,20 @@ import { FlashList } from '@shopify/flash-list';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import SimilarProduct from '../../components/Medicines/SimilarProduct';
 import { StackNav } from '../../navigation/NavigationKeys';
+import { useDispatch, useSelector } from 'react-redux';
+import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice';
+import { decreaseQty, deleteProductItem, increaseQty } from '../../redux/productSlice';
+import { Text } from '@gluestack-ui/themed';
 
-const MedicineCart = ({navigation}) => {
+const Cart = ({navigation}) => {
 
   const [stepCurrentPosition,setStepCurrentPosition] = useState(0)
 
   const [selectedShippingOption, setSelectedShippingOption] = useState(1)
+
+  const cartData = useSelector(state => state.cart);
+
+  const dispatch = useDispatch()
 
     const labels = ["Cart","Address","Payment","Summary"];
 const customStyles = {
@@ -72,18 +81,24 @@ const renderMedicineCartItem = ({item,index}) => {
 
     return(
         <View style={{...styles.flexRow,borderWidth:1,borderColor:'#E9E3E3',paddingHorizontal:responsiveWidth(2),paddingVertical:responsiveHeight(1.5),width:deviceWidth*0.92,borderRadius:responsiveWidth(4),marginBottom:responsiveHeight(2),height:responsiveHeight(19)}} >
-            <Image source={item.img} style={{borderColor:colors.primary,borderRadius:responsiveWidth(4),borderWidth:1,width:responsiveWidth(25),height:responsiveHeight(16),resizeMode:'contain'}} />
-            <View style={{width:'70%',paddingLeft:responsiveWidth(2),gap:responsiveHeight(0.5),alignSelf:'center'}} >
-                <View style={{...styles.flexRow,justifyContent:'space-between'}} >
-                    <CText type='s12' >{item.title}</CText>
+            <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}} style={{borderColor:colors.primary,borderRadius:responsiveWidth(4),borderWidth:1,width:responsiveWidth(25),height:responsiveHeight(16),resizeMode:'contain'}} />
+            <View style={{width:'70%',paddingLeft:responsiveWidth(2),gap:responsiveHeight(0.8),alignSelf:'center'}} >
+                <View style={{...styles.flexRow,justifyContent:'space-between',alignItems:'center'}} >
+                    {/* <CText type='s12' >{item.name}</CText> */}
+                    <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={12} numberOfLines={1} w={'85%'} lineHeight={13} >{item?.name}</Text>
+                    <TouchableOpacity activeOpacity={0.6} onPress={()=>{
+                      dispatch(deleteCartItem(item?.id))
+                      dispatch(deleteProductItem(item?.id))
+                      }} >
                     <ReportDeleteIcon style={{alignSelf:'flex-start'}} width={responsiveWidth(5)} height={responsiveHeight(2.5)} />
+                    </TouchableOpacity>
+
                 </View>
-                <CText numberOfLines={3} style={{width:'90%'}} type='r10' >
-                    {item.des}
-                </CText>
+               
+                <Text fontFamily='$InterRegular' color={colors.black} fontSize={10} numberOfLines={3} w={'85%'} lineHeight={11} >{item?.single_description}</Text>
                 
                 <View style={{...styles.flexRow,alignItems:'baseline'}} >
-                <CText type='b14' >{'\u20B9'}{item.Price}  </CText>
+                <Text fontFamily='$InterBold' color={colors.black} fontSize={14} lineHeight={16} >{item?.symbol}{item?.final_price} </Text>
                 <CText type='m12' color='#454444' style={{textDecorationLine:'line-through'}} >{item.aprice}</CText>
                 <CText type='m10' style={{marginTop:responsiveHeight(0.3)}} >  20%off</CText>
                 </View>
@@ -92,17 +107,28 @@ const renderMedicineCartItem = ({item,index}) => {
 
              
 
-                <CText  type='s10' >Qty:1</CText>
+                <CText  type='s10' >Qty:{item?.qty+1}</CText>
                 
                 <View style={{backgroundColor:colors.lightSuccess,borderColor:colors.success,borderWidth:responsiveWidth(0.2),borderRadius:responsiveWidth(1.5),}} >
                     <View style={{flexDirection:'row',alignItems:'center'}} >
-                        <TouchableOpacity activeOpacity={0.6} onPress={()=>{}} >
+                        <TouchableOpacity onPress={()=>{
+                          if(item.qty > 0){
+                            dispatch(removeCartItem(item))
+                            dispatch(decreaseQty(item?.id))
+                          }else{
+                            dispatch(deleteCartItem(item?.id))
+                            dispatch(decreaseQty(item?.id))
+                          }
+                        }} activeOpacity={0.6} >
                         <Text style={{color:colors.success,   ...typography.fontSizes.f20,...typography.fontWeights.Medium,paddingLeft:responsiveWidth(2),lineHeight:responsiveHeight(3)}}  >-</Text>
                         </TouchableOpacity>
 
 
-                    <Text style={{color:colors.black,   ...typography.fontSizes.f12,...typography.fontWeights.SemiBold,paddingHorizontal:responsiveWidth(3),}}  >1</Text>
-                       <TouchableOpacity activeOpacity={0.6} >
+                    <Text style={{color:colors.black,   ...typography.fontSizes.f12,...typography.fontWeights.SemiBold,paddingHorizontal:responsiveWidth(3),}}  >{item?.qty+1}</Text>
+                       <TouchableOpacity onPress={()=>{
+                        dispatch(addProductsToCart(item))
+                        dispatch(increaseQty(item?.id))
+                        }}  activeOpacity={0.6} >
                         <Text style={{color:colors.success,   ...typography.fontSizes.f20,...typography.fontWeights.Medium,paddingRight:responsiveWidth(2),lineHeight:responsiveHeight(3)}}  >+</Text>
                         </TouchableOpacity>
                     </View>
@@ -132,7 +158,7 @@ const renderMedicineCartItem = ({item,index}) => {
      />
      </View>
 
-     <CText style={{backgroundColor:colors.creem,paddingVertical:responsiveHeight(1.5),paddingHorizontal:responsiveWidth(3)}} type='b12' color='#197A50' >3 Items added</CText>
+     <CText style={{backgroundColor:colors.creem,paddingVertical:responsiveHeight(1.5),paddingHorizontal:responsiveWidth(3)}} type='b12' color='#197A50' >{ !!cartData ? cartData?.length : 0} Items added</CText>
       
 
      <View style={{flex:1,borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1',paddingTop:responsiveHeight(1.5),alignItems:'center'}}>
@@ -140,7 +166,7 @@ const renderMedicineCartItem = ({item,index}) => {
 
      <FlatList
         style={{flex:1,}}
-          data={medicineCartDate}
+          data={cartData}
           renderItem={renderMedicineCartItem}
           keyExtractor={(item, index) => index.toString()}
          
@@ -279,7 +305,7 @@ const renderMedicineCartItem = ({item,index}) => {
   )
 }
 
-export default MedicineCart
+export default Cart
 
 const localStyles = StyleSheet.create({
 

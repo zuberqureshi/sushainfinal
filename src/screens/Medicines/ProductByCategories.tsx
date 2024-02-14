@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View,TouchableOpacity,Image } from 'react-native'
-import React,{useState,useRef} from 'react'
+import { StyleSheet, View,TouchableOpacity,Image, TextInput, Pressable,FlatList } from 'react-native'
+import React,{useState,useRef, useEffect, useCallback} from 'react'
 import { colors,styles } from '../../themes'
 import typography from '../../themes/typography'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import CText from '../../components/common/CText'
-import { BackArrow, Cart, CartIconWhite, ColitisIcon, CrossBottomTab, FilterIcon, GascidityIcon, IBSIcon, PepticUlcersIcon, ReloadBottomTab, SortIcon, TickFilterSelected, TickFilterUnselected } from '../../assets/svgs'
-import { deviceHeight, getHeight, moderateScale } from '../../common/constants'
+import { BackArrow, Cart, CartIconWhite, ColitisIcon, CrossBottomTab, DownArrowBlack, DropdownFilledIcon, FilterIcon, GascidityIcon, HeartLightBlue, IBSIcon, LikeIcon, Menu, PepticUlcersIcon, ReloadBottomTab, SortIcon, TickFilterSelected, TickFilterUnselected } from '../../assets/svgs'
+import { API_IMAGE_BASE_URL, deviceHeight, getHeight, moderateScale } from '../../common/constants'
 
 import CHeader from '../../components/common/CHeader'
 import CButton from '../../components/common/CButton'
@@ -14,31 +14,228 @@ import strings from '../../i18n/strings'
 
 import images from '../../assets/images'
 import ProductItemsByCategory from '../../components/Medicines/ProductItemsByCategory'
-import { productItemCategoryData } from '../../api/constant'
+import { productAvailabilityData, productItemCategoryData } from '../../api/constant'
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper'
 import RBSheet from "react-native-raw-bottom-sheet";
 import { StackNav } from '../../navigation/NavigationKeys'
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent'
 import MedicinesByCategory from '../../components/Medicines/MedicinesByCategory'
 import { Container } from '../../components/Container'
-import { FlatList } from 'react-native-gesture-handler'
 
-
+import { useDispatch, useSelector } from 'react-redux'
+import { addProducts, clearProducts, decreaseQty, increaseQty } from '../../redux/productSlice'
+import { Box, Text } from '@gluestack-ui/themed'
+import Loader from '../../components/Loader/Loader'
+import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice'
+import { FlashList } from 'react-native-actions-sheet'
+import { Dropdown } from 'react-native-element-dropdown'
 
 const ProductByCategories = ({ route, navigation }:any) => {
 
   //  console.log(route.params);
-   const {categoryName} = route.params
-
+   const {categoryName,bannerImg} = route.params
+  
    const refRBSheet = useRef();
    
+   const iconSize = moderateScale(21);
+  
+   const limit = 10 ;
+   const loadMore = true ;
+   const [apiData, setApiData] = useState<any[]>([])
    const [multipleAddButton, setMultipleAddButton] = useState(false)
    const [filterBy, setFilterBy] = useState('brand')
-
+   const [showLoad, setShowLoad] = useState(false)
+   const [productCategory, setProductCategory] = useState(categoryName)
+  const onProductCategoryChange = (item: any) => setProductCategory(item.value)
+  const [pageNum, setPageNum] = useState(1)
   const [filterData1, setFilterData1] = useState([{title:'By Rating',isSelected:false},{title:'Price - Low High',isSelected:false},{title:'Price - High To Low',isSelected:false}])
   const [filterData2, setFilterData2] = useState([{title:'Dabur',isSelected:false},{title:'Sushain',isSelected:false},{title:'Boheco',isSelected:false},{title:'Nagarjuna',isSelected:false},{title:'Himalaya',isSelected:false},{title:'Boheco',isSelected:false},{title:'Nagarjuna',isSelected:false},{title:'Himalaya',isSelected:false}])
+  
+  const dispatch = useDispatch()
+
+  const cartData = useSelector(state => state.cart);
+
+  const getTotalPriceCart = () => {
+    let total = 0 ;
+    cartData.map(item => {
+      console.log('getTOTAL',item?.qty);
+      
+     
+      total = total+(item?.qty + 1)*item.final_price
+    })
+
+    return total ;
+  }
+
+  // const addInRedux = async() => {
+  //   await dispatch(clearProducts())
+  //   productItemCategoryData.map(item => {
+  //     dispatch(addProducts(item));
+  //   })
+  // }
+  // useEffect(() => {
+  //   addInRedux()
+  // }, [])
+  const products = useSelector(state => state.product);
+  // console.log(products,products.length,'PREDUXBBB');
+
+  const fetchData = () => {
+    console.log(products.length,pageNum,'DATA LEE');
+    
+   setShowLoad(true)
+    fetch(`http://3.110.107.128:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${categoryName}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
+    .then(async(res) =>{ 
+      console.log(res?.result[0]?.productList?.length,pageNum,'APIII DATAAA')
+      // await dispatch(clearProducts())
+     
+    
+    
+  //  dataApi =   await [...dataApi,...res?.result[0]?.productList]
+  
+     
+   
+    // await setApiData([...apiData,...res?.result[0]?.productList])
+
+     await  res?.result[0]?.productList?.map(item => {
+        // Assuming each item is an object
+        // return {
+        //   ...item,
+        //   qty: 0, // Add your new value here
+        // };
+        dispatch(addProducts({ ...item, qty: 0}))
+      });
+      // console.log(products[0].qty,'productt map ADD QTY');
+     
+  //     modifiedData.map(item => {
+  //   dispatch(addProducts(item));
+  // })
+      // setApiData(res?.result[0]?.productList);
+      // dispatch(addProducts(res?.result[0]?.productList))
+      setShowLoad(false)
+      await setPageNum(pageNum + 1)
+   
+     }).catch((error => {
+      console.log('erooor API PRODCC',error);
+      
+     }))
+    
+  }
+
+
+  useEffect(() => {
+    dispatch(clearProducts())
+   fetchData()
+  }, [])
+  
+  const renderCardItem = useCallback( ({item, index}: any) => {
+
+      //  console.log('qty',item?.id);
+       const bestSeller = true
+    return(
+      <Pressable onPress={()=>{navigation.navigate(StackNav.ProductDetail,{productDetail:item})}} >
+        <View style={[localStyles.cardMainContainer,{marginLeft:index % 2 && responsiveWidth(2.4) }]} >
+           
+           <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}}>
+            {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
+          <HeartLightBlue style={{alignSelf:'flex-end'}} width={responsiveWidth(6)} height={responsiveHeight(4)} />
+  
+          
+  
+          </View>
+  
+          <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}} style={localStyles.itemImg}  />
+  
+          <View style={{paddingLeft:responsiveWidth(1.5),marginTop:responsiveHeight(0.5),gap:moderateScale(2),height:responsiveHeight(4)}} >
+            <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} w='89%' numberOfLines={2} lineHeight={10} >{item?.name}</Text>
+            <Text fontFamily='$InterRegular' color={colors.black} fontSize={8} w='90%' numberOfLines={1} lineHeight={10}  >Use In {item?.category?.split(',')[0]}</Text>
+          </View>
+  
+          <View style={{paddingHorizontal:responsiveWidth(1.5),flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:responsiveHeight(1.3)}}  >
+  
+            <View style={{gap:moderateScale(2),marginTop:responsiveHeight(1)}} >
+                <Text fontFamily='$InterBold' color={colors.black} fontSize={12} lineHeight={12} >{'\u20B9'} {!!item?.final_price ? item?.final_price : 'N/A'}</Text>
+                <View style={{flexDirection:'row',alignItems:'center',gap:responsiveWidth(0.5)}} >
+                    <Image source={images.startFilled} style={{resizeMode:'contain',width:responsiveWidth(2.5),height:responsiveHeight(1.25)}} />
+                    <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} lineHeight={10} >{!!item?.rating ? item?.rating : 5}|5 reviews</Text>
+                </View>
+  
+  
+            </View>
+  
+        {   item?.qty == 0 ? (
+              <TouchableOpacity activeOpacity={0.6} onPress={()=>{
+                dispatch(addProductsToCart(item))
+                dispatch(increaseQty(item?.id))
+  
+                }} style={{backgroundColor:colors.lightSuccess,borderColor:colors.success,borderWidth:responsiveWidth(0.2),borderRadius:responsiveWidth(1.5)}} >
+              <Text fontFamily='$InterMedium' color={colors.success} fontSize={12} px={16} py={1} >ADD</Text>
+          </TouchableOpacity>
+        ) : null }
+  
+        { item?.qty !==0 &&
+          
+         
+              <View style={{flexDirection:'row',alignItems:'center',backgroundColor:colors.lightSuccess,borderColor:colors.success,borderWidth:responsiveWidth(0.2),borderRadius:responsiveWidth(1.5)}} >
+                
+               { item?.qty !==0 &&   <TouchableOpacity  onPress={()=>{
+                      if(item.qty > 1){
+                        dispatch(removeCartItem(item))
+                        dispatch(decreaseQty(item?.id))
+                      }else{
+                        dispatch(deleteCartItem(item?.id))
+                        dispatch(decreaseQty(item?.id))
+                      }
+                    }}
+                activeOpacity={0.6}  >
+                  <Text fontFamily='$InterMedium' color={colors.black} fontSize={20} pl={10}  >-</Text>
+                  </TouchableOpacity>}
+  
+  
+            { item?.qty !==0 &&   <Text  fontFamily='$InterSemiBold' color={colors.black} fontSize={14} px={9} py={1}  >{!!item?.qty ? item?.qty  : 0}</Text>}
+                
+                { item?.qty !==0 &&  <TouchableOpacity onPress={()=>{
+                    dispatch(addProductsToCart(item))
+                    dispatch(increaseQty(item?.id))
+                }} activeOpacity={0.6} >
+                  <Text  fontFamily='$InterMedium' color={colors.black} fontSize={20} pr={10} >+</Text>
+                  </TouchableOpacity>}
+             
+              </View>
+             
+        
+         
+        }
+          </View>
+  
+  
+      
+        </View>
+        </Pressable>
+    )
+  
+   
+    },[products])
+  
+    const onEndReached = async() => {
+    // await  setPageNum(pageNum + 1)
+      if(loadMore && pageNum <=10 ){
+    
+      // await products?.map(item => {
+      //           // Assuming each item is an object
+      //           // return {
+      //           //   ...item,
+      //           //   qty: 0, // Add your new value here
+      //           // };
+      //           dispatch(addProducts(item))
+      //         });
+            
+        await fetchData()
+      }
+
+    }
 
   //  const filterData = [{title:'By Rating',isSelected:false},{title:'Price - Low High',isSelected:false},{title:'Price - High To Low',isSelected:false}];
+
 
    const renderFliterOption = ({item,index}:any) => {
 
@@ -102,25 +299,78 @@ const ProductByCategories = ({ route, navigation }:any) => {
    <Container statusBarStyle='dark-content' >
     
 
-            <View style={[localStyles.headerWrapper,]}>
+  <View style={[localStyles.headerWrapper,]}>
       <View style={[styles.rowStart, styles.flex]}>
        
           <TouchableOpacity style={styles.mr15} onPress={()=>{navigation.goBack()}}>
             <BackArrow height={moderateScale(20)} width={moderateScale(20)} />
           </TouchableOpacity>
-      
+{/*       
         <CText
           numberOfLines={1}
           style={localStyles.headerText}
           type={'s16'}>
           {categoryName}
           
-        </CText>
+        </CText> */}
+
+        <Dropdown
+            data={productAvailabilityData}
+            style={localStyles.dropdown}
+            placeholderStyle={localStyles.placeholderStyle}
+            selectedTextStyle={localStyles.selectedTextStyle}
+            renderItem={(item)=>{return(<Text fontFamily='$InterSemiBold' fontSize={14} lineHeight={16} numberOfLines={1}  style={{paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1)}} >{item?.label}</Text>)}}
+            labelField="label"
+            valueField="value"
+            placeholder={`${productCategory}`}
+            value={productCategory}
+            onChange={onProductCategoryChange}
+            renderRightIcon={() => <DropdownFilledIcon />}
+            // itemTextStyle={styles.selectedTextStyle}
+            itemContainerStyle={localStyles.itemContainerStyle}
+            selectedTextProps={{ numberOfLines: 1 }}
+          />
+
       </View>
       
     </View>
 
-      <SearchWithLikeComponent/>
+    <View style={localStyles.searchContainer}>
+          <TouchableOpacity onPress={()=>{navigation.openDrawer()}}>
+            <Menu />
+          </TouchableOpacity>
+         
+          <TextInput
+           placeholder={strings.searchPlaceHolder}
+           
+           style={localStyles.inputContainerStyle}
+          />
+      <Box gap={5} flexDirection='row' alignItems='center' >
+      <TouchableOpacity
+        
+        style={localStyles.cartBtnStyle}>
+        <LikeIcon height={iconSize} width={iconSize} />
+      </TouchableOpacity>
+      <TouchableOpacity 
+      onPress={()=>{navigation.navigate(StackNav.Cart)}} 
+      style={localStyles.cartBtnStyle}>
+        <Cart height={iconSize} width={iconSize} />
+      </TouchableOpacity>
+      </Box>    
+       
+          {/* {!!searchData.length && (
+            <View style={localStyles.searchSuggestionContainer}>
+              <FlatList
+                data={searchData}
+                renderItem={renderSearchResult}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                ItemSeparatorComponent={() => <RenderSeparator />}
+                // estimatedItemSize={100}
+              />
+            </View>
+          )} */}
+        </View>
 
       <KeyBoardAvoidWrapper>
 
@@ -150,9 +400,10 @@ const ProductByCategories = ({ route, navigation }:any) => {
       </View>
 
       <MedicinesByCategory/>
+
       <TouchableOpacity activeOpacity={0.6} style={localStyles.bannerContaienr}>
           <Image
-            source={images.productByCategoryBanner}
+            source={{uri:`${API_IMAGE_BASE_URL}${bannerImg}`}}
             style={localStyles.bannerImageStyle}
             resizeMode="cover"
           />
@@ -160,34 +411,56 @@ const ProductByCategories = ({ route, navigation }:any) => {
 
 
 
-  
+    <FlatList
+        style={{flex:1,alignSelf:'center'}}
+          data={products}
+          renderItem={renderCardItem}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={2}
+          // justifyContent="space-between"
+         contentContainerStyle={{}}
+        
+        //  ListEmptyComponent={()=>{
+        //   return(
+        //     <Loader/>
+        //   )
+        //  }}
+         onEndReached={onEndReached}
+        //  ListFooterComponent={() => {
+        //    if (useGetMedicinesByCategoryQuery?.isFetching) {
+        //      return (
+        //        <Box h={100} pt={20}>
+        //          <Spinner color={colors.primary} size={'small'} />
+        //        </Box>
+        //      )
+        //    }
+        //  }}
+        />
 
-
-
-    
-
-      <ProductItemsByCategory multipleAddButton={multipleAddButton} setMultipleAddButton={setMultipleAddButton} data={productItemCategoryData} bestSeller={true} />
-
+         {showLoad && <Box mt={!!products ? 20 : 50} mb={20}>
+          <Loader/>
+         </Box> }
   
       </KeyBoardAvoidWrapper>
 
 
 
- <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
+  {
+    cartData.length >0 && (
+      <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
 
-  <Text style={{color:colors.black,   ...typography.fontSizes.f14,...typography.fontWeights.Bold,}}>3 Items | {'\u20B9'}526</Text>
-
-  <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.MedicineAddress)}}  >
-    <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
-      <CartIconWhite/>
-      <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
-    </View>
-  </TouchableOpacity>
-  
-
-
-
- </View>
+      <Text style={{color:colors.black,   ...typography.fontSizes.f14,...typography.fontWeights.Bold,}}>{cartData?.length} Items | {'\u20B9'} {getTotalPriceCart()}</Text>
+    
+      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.Cart)}}  >
+        <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
+          <CartIconWhite/>
+          <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
+        </View>
+      </TouchableOpacity>
+      
+     </View>
+    )
+  }
 
 
  <RBSheet
@@ -345,6 +618,102 @@ const localStyles = StyleSheet.create({
         height: moderateScale(140),
         ...styles.mv10,
         borderRadius: moderateScale(10),
+      },
+      searchContainer: {
+        ...styles.rowSpaceBetween,
+        ...styles.flexRow,
+        ...styles.ph20,
+        ...styles.itemsCenter,
+        position: 'relative',
+        zIndex: 100,
+        ...styles.mt10
+      },
+      searchSuggestionContainer: {
+        position: 'absolute',
+        top: moderateScale(40),
+        width: '70%',
+        // height: getHeight(150),
+        backgroundColor: colors.white,
+        ...styles.selfCenter,
+        left: '19%',
+        borderWidth: moderateScale(1),
+        borderRadius: moderateScale(5),
+        borderColor: colors.gray6,
+        zIndex: 10,
+        ...styles.shadowStyle,
+      },
+      cartBtnStyle: {
+        ...styles.pl5,
+        ...styles.pv10,
+      },
+      inputContainerStyle: {
+        ...typography.fontSizes.f10,
+        ...typography.fontWeights.SemiBold,
+        flex:1,
+        marginHorizontal:responsiveWidth(2.5),
+        height:responsiveHeight(5),
+        borderWidth:1,
+        borderRadius:responsiveWidth(1.5),
+        borderColor: colors.gray4,
+        ...styles.pl10
+    
+      },
+      dividerStyle: {
+        height: getHeight(1),
+        backgroundColor: colors.gray6,
+      },
+      cardMainContainer:{
+        borderWidth:1,
+        borderColor:'#D9D9D9',
+        width:responsiveWidth(45),
+        height:moderateScale(220),
+        borderRadius:responsiveWidth(3),
+        marginBottom:responsiveHeight(1),
+        
+       },
+       bestsellerText:{
+           color:colors.primary,
+           ...typography.fontWeights.Medium,
+           ...typography.fontSizes.f10,
+        
+         },
+         itemImg:{
+           resizeMode:'contain',
+           width:responsiveWidth(35),
+           height:responsiveHeight(14),
+           alignSelf:'center',
+           // marginTop:responsiveHeight(0)
+   
+         
+       },
+       dropdown: {
+        backgroundColor: colors.primary3,
+        width: responsiveWidth(30),
+        paddingHorizontal: responsiveWidth(2),
+        
+        // paddingLeft: responsiveWidth(3),
+        // color: 'red',
+        height: responsiveHeight(3),
+        
+    
+    
+      },
+      selectedTextStyle: {
+        color: colors.black,
+        ...typography.fontWeights.SemiBold,
+        ...typography.fontSizes.f14,
+        
+        
+      },
+      itemContainerStyle: {
+    
+      },
+      placeholderStyle: {
+        color: colors.black,
+        ...typography.fontWeights.SemiBold,
+        ...typography.fontSizes.f14,
+    
+    
       },
 
 })
