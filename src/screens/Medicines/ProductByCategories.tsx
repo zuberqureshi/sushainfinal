@@ -29,6 +29,7 @@ import Loader from '../../components/Loader/Loader'
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice'
 import { FlashList } from 'react-native-actions-sheet'
 import { Dropdown } from 'react-native-element-dropdown'
+import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-concerns'
 
 const ProductByCategories = ({ route, navigation }:any) => {
 
@@ -45,8 +46,9 @@ const ProductByCategories = ({ route, navigation }:any) => {
    const [multipleAddButton, setMultipleAddButton] = useState(false)
    const [filterBy, setFilterBy] = useState('brand')
    const [showLoad, setShowLoad] = useState(false)
-   const [productCategory, setProductCategory] = useState(categoryName)
-  const onProductCategoryChange = (item: any) => setProductCategory(item.value)
+   const [productCategory, setProductCategory] = useState([])
+   const [selectedProductCategory, setSelectedProductCtegory] = useState(categoryName)
+ 
   const [pageNum, setPageNum] = useState(1)
   const [filterData1, setFilterData1] = useState([{title:'By Rating',isSelected:false},{title:'Price - Low High',isSelected:false},{title:'Price - High To Low',isSelected:false}])
   const [filterData2, setFilterData2] = useState([{title:'Dabur',isSelected:false},{title:'Sushain',isSelected:false},{title:'Boheco',isSelected:false},{title:'Nagarjuna',isSelected:false},{title:'Himalaya',isSelected:false},{title:'Boheco',isSelected:false},{title:'Nagarjuna',isSelected:false},{title:'Himalaya',isSelected:false}])
@@ -54,6 +56,13 @@ const ProductByCategories = ({ route, navigation }:any) => {
   const dispatch = useDispatch()
 
   const cartData = useSelector(state => state.cart);
+
+  const {data:medicinesHealthConcernsData,isLoading:medicinesHealthConcernsIsLoading} = useGetMedicinesHealthConcerns()
+
+ const onProductCategoryChange = (item: any) => {
+    setPageNum(1)
+    setSelectedProductCtegory(item.value)
+  }
 
   const getTotalPriceCart = () => {
     let total = 0 ;
@@ -83,7 +92,7 @@ const ProductByCategories = ({ route, navigation }:any) => {
     console.log(products.length,pageNum,'DATA LEE');
     
    setShowLoad(true)
-    fetch(`http://3.110.107.128:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${categoryName}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
+    fetch(`http://3.110.107.128:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
     .then(async(res) =>{ 
       console.log(res?.result[0]?.productList?.length,pageNum,'APIII DATAAA')
       // await dispatch(clearProducts())
@@ -123,9 +132,23 @@ const ProductByCategories = ({ route, navigation }:any) => {
 
 
   useEffect(() => {
-    dispatch(clearProducts())
+   dispatch(clearProducts())
    fetchData()
-  }, [])
+
+  }, [selectedProductCategory])
+
+  useEffect(() => {
+    if (medicinesHealthConcernsData?.data && !medicinesHealthConcernsIsLoading) {
+      const updatedData = medicinesHealthConcernsData?.data?.result[0].categroyList?.map((item: any) => {
+        return {label: item?.name, value: item?.name }
+      })
+
+      setProductCategory(updatedData)
+    }
+  }, [medicinesHealthConcernsIsLoading])
+  
+  // console.log('prodect LIST',productCategory);
+  
   
   const renderCardItem = useCallback( ({item, index}: any) => {
 
@@ -135,7 +158,7 @@ const ProductByCategories = ({ route, navigation }:any) => {
       <Pressable onPress={()=>{navigation.navigate(StackNav.ProductDetail,{productDetail:item})}} >
         <View style={[localStyles.cardMainContainer,{marginLeft:index % 2 && responsiveWidth(2.4) }]} >
            
-           <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}}>
+           <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'auto':'flex-end'}}>
             {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
           <HeartLightBlue style={{alignSelf:'flex-end'}} width={responsiveWidth(6)} height={responsiveHeight(4)} />
   
@@ -314,22 +337,22 @@ const ProductByCategories = ({ route, navigation }:any) => {
           
         </CText> */}
 
-        <Dropdown
-            data={productAvailabilityData}
+      { !!productCategory && <Dropdown
+            data={productCategory}
             style={localStyles.dropdown}
             placeholderStyle={localStyles.placeholderStyle}
             selectedTextStyle={localStyles.selectedTextStyle}
             renderItem={(item)=>{return(<Text fontFamily='$InterSemiBold' fontSize={14} lineHeight={16} numberOfLines={1}  style={{paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1)}} >{item?.label}</Text>)}}
             labelField="label"
             valueField="value"
-            placeholder={`${productCategory}`}
-            value={productCategory}
+            placeholder={`${selectedProductCategory}`}
+            value={selectedProductCategory}
             onChange={onProductCategoryChange}
             renderRightIcon={() => <DropdownFilledIcon />}
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyle}
             selectedTextProps={{ numberOfLines: 1 }}
-          />
+          />}
 
       </View>
       
@@ -666,7 +689,7 @@ const localStyles = StyleSheet.create({
         borderWidth:1,
         borderColor:'#D9D9D9',
         width:responsiveWidth(45),
-        height:moderateScale(220),
+        height:responsiveHeight(29),
         borderRadius:responsiveWidth(3),
         marginBottom:responsiveHeight(1),
         

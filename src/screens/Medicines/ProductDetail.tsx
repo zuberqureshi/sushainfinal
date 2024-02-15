@@ -19,7 +19,7 @@ import SimilarProduct from '../../components/Medicines/SimilarProduct'
 import { StackNav } from '../../navigation/NavigationKeys'
 import { Container } from '../../components/Container'
 import Body from '../../components/Body/Body'
-import { Box, Text } from '@gluestack-ui/themed'
+import { Box, Text,Toast,ToastTitle,useToast } from '@gluestack-ui/themed'
 import RenderHtml from 'react-native-render-html';
 import { useDispatch, useSelector } from 'react-redux'
 import { addProductsToCart } from '../../redux/cartSlice'
@@ -36,7 +36,8 @@ const ProductDetail = ({ route, navigation }) => {
 
   const dispatch = useDispatch()
   const cartData = useSelector(state => state.cart);
-  
+  const toast = useToast()
+
   const [productAvailability, setProductAvailability] = useState('')
   const onProductAvailability = (item: any) => setProductAvailability(item.value)
   
@@ -121,6 +122,25 @@ const ProductDetail = ({ route, navigation }) => {
 
     )
   }
+const onClickAddToCart = () => {
+
+  
+  dispatch(addProductsToCart(productDetail))
+  dispatch(increaseQty(productDetail?.id))
+
+  toast.show({
+    placement: 'bottom',
+    render: ({ id }: { id: string }) => {
+      const toastId = "toast-" + id
+      return (
+        <Toast nativeID={toastId} variant='accent' action='success'>
+          <ToastTitle>Add To Cart</ToastTitle>
+        </Toast>
+      )
+    }
+  })
+}
+
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -256,8 +276,7 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={{ ...styles.flexRow, marginTop: responsiveHeight(2), gap: responsiveWidth(3),paddingHorizontal: responsiveWidth(3)  }}  >
           <TouchableOpacity onPress={()=>{
-            dispatch(addProductsToCart(productDetail))
-            dispatch(increaseQty(productDetail?.id))
+             onClickAddToCart()
             }} activeOpacity={0.6} style={{ borderColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3),borderWidth:1 }} >
 
             <CText
