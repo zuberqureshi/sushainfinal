@@ -34,7 +34,7 @@ import { StackNav } from '../../navigation/NavigationKeys';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice';
 import { decreaseQty, deleteProductItem, increaseQty } from '../../redux/productSlice';
-import { Text } from '@gluestack-ui/themed';
+import { Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
 
 const Cart = ({navigation}) => {
 
@@ -45,7 +45,7 @@ const Cart = ({navigation}) => {
   const cartData = useSelector(state => state.cart);
 
   const dispatch = useDispatch()
-
+  const toast = useToast()
     const labels = ["Cart","Address","Payment","Summary"];
 const customStyles = {
   stepIndicatorSize: 25,
@@ -77,6 +77,25 @@ const onPageChange =(position) =>{
     setStepCurrentPosition(position);
 }
 
+const deleteItemFromCart = (item:any) => {
+
+  dispatch(deleteCartItem(item?.id))
+  dispatch(deleteProductItem(item?.id))
+
+  toast.show({
+    placement: "bottom",
+    render: ({ id }: { id: string }) => {
+      const toastId = "toast-" + id
+      return (
+        <Toast nativeID={toastId} variant="accent" action='success'>
+          <ToastTitle>Remove From Cart</ToastTitle>
+        </Toast>
+      )
+    }
+  })
+}
+
+
 const renderMedicineCartItem = ({item,index}) => {
 
     return(
@@ -87,8 +106,7 @@ const renderMedicineCartItem = ({item,index}) => {
                     {/* <CText type='s12' >{item.name}</CText> */}
                     <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={12} numberOfLines={1} w={'85%'} lineHeight={13} >{item?.name}</Text>
                     <TouchableOpacity activeOpacity={0.6} onPress={()=>{
-                      dispatch(deleteCartItem(item?.id))
-                      dispatch(deleteProductItem(item?.id))
+                        deleteItemFromCart(item)
                       }} >
                     <ReportDeleteIcon style={{alignSelf:'flex-start'}} width={responsiveWidth(5)} height={responsiveHeight(2.5)} />
                     </TouchableOpacity>
