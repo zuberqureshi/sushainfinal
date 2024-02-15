@@ -42,7 +42,7 @@ type Props = {
 };
 
 const VerifyLoginOtp = ({route, navigation}:Props) => {
-  const {mobile} = route.params;
+  const {mobile,screenType} = route.params;
   const input = useRef(null)
   const toast = useToast()
 
@@ -80,34 +80,37 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
         onSuccess: async (data) => {
          
 
-          await setAccessToken('AccessTokenInfo',
-            JSON.stringify({
-              accessToken: data?.data?.result[0]?.token,
-              refreshToken: data?.data?.result[0]?.refreshToken,
-              expirationTime: data?.data?.result[0]?.ExpirationTime,
-            }))
+          // await setAccessToken('AccessTokenInfo',
+          //   JSON.stringify({
+          //     accessToken: data?.data?.result[0]?.token,
+          //     refreshToken: data?.data?.result[0]?.refreshToken,
+          //     expirationTime: data?.data?.result[0]?.ExpirationTime,
+          //   }))
 
 
-          await setAccessToken('userInfo',
-            JSON.stringify({
-              userId: data?.data?.result[0]?.user.id,
-              userName: data?.data?.result[0]?.user.first_name,
-              userMobile: data?.data?.result[0]?.user.mobile,
-            }))
+          // await setAccessToken('userInfo',
+          //   JSON.stringify({
+          //     userId: data?.data?.result[0]?.user.id,
+          //     userName: data?.data?.result[0]?.user.first_name,
+          //     userMobile: data?.data?.result[0]?.user.mobile,
+          //   }))
 
+         
+           
+          if(screenType === 'signup'){
+          navigation.navigate(StackNav.LoginScreen)
           toast.show({
             placement: "bottom",
             render: ({ id }: { id: string }) => {
               const toastId = "toast-" + id
               return (
                 <Toast nativeID={toastId} variant="accent" action="success">
-                  <ToastTitle>OTP Verified</ToastTitle>
+                  <ToastTitle>SignUp Successfully</ToastTitle>
                 </Toast>
               );
             },
           })
-           
-          // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+        }
         
         },
         onError: (error) => {

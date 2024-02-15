@@ -122,7 +122,7 @@ const Signup = ({ route, navigation }) => {
             },
           })
            
-          navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+          navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
         
         },
         onError: (error) => {
