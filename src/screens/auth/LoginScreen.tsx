@@ -31,6 +31,7 @@ import SignInModal from '../../components/common/modal/SignInModal'
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
+  const [loading, setLoading] = useState(false)
   const authContext = useContext(AuthContext);
 
   async function load() {
@@ -54,14 +55,17 @@ const LoginScreen = () => {
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
       console.warn('formsubmit', values);
-
+      setLoading(true)
       var body = {
         mobile: values.userid,
         password: values.password
 
       }
-
+      
       createloginByPassword.mutate(body, {
+
+      
+
         onSuccess: async (data) => {
           console.warn('afterlogindata', data?.data?.result[0]);
 
@@ -86,7 +90,7 @@ const LoginScreen = () => {
 
               return (
                 <Toast nativeID={toastId} variant="accent" action="success">
-                  <ToastTitle>Logged In   successfully</ToastTitle>
+                  <ToastTitle>Logged In successfully</ToastTitle>
                 </Toast>
               );
             },
@@ -97,7 +101,7 @@ const LoginScreen = () => {
             routes: [{ name: StackNav.DrawerNavigation }],
           });
 
-
+          setLoading(false)
         },
         onError: (error) => {
           console.log('errorafterlogin', error)
@@ -134,8 +138,8 @@ const LoginScreen = () => {
   };
 
   const onPressSignInWithOtp = async () => {
+    navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp'})
    
-
   };
 
   return (
@@ -247,7 +251,7 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          <PrimaryButton onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
+          <PrimaryButton disabled={loading} loading={loading} onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
         </View>
 
         <View style={localStyles.dividerContainer}>
