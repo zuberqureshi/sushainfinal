@@ -40,6 +40,7 @@ import strings from '../../i18n/strings';
 //   removeUserDetail,
 // } from '../../utils/asyncstorage';
 import { setLng } from '../../i18n/changeLng';
+import { removeAccessToken } from '../../utils/network';
 
 
 
@@ -152,25 +153,25 @@ const DrawerView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const onPressLogOut = () => {
-    // Alert.alert('Logout', 'Are you sure you want to logout?', [
-    //   {
-    //     text: 'Cancel',
-    //     onPress: () => {},
-    //     style: 'cancel',
-    //   },
-    //   {
-    //     text: 'OK',
-    //     onPress: async () => {
-    //       await removeToken();
-    //       await removeRefreshToken();
-    //       await removeUserDetail();
-    //       navigation.reset({
-    //         index: 0,
-    //         routes: [{name: StackNav.AuthStack}],
-    //       });
-    //     },
-    //   },
-    // ]);
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          await removeAccessToken('userInfo');
+          await removeAccessToken('AccessTokenInfo');
+ 
+          navigation.reset({
+            index: 0,
+            routes: [{name: StackNav.AuthStack}],
+          });
+        },
+      },
+    ]);
   };
 
   const changeLng = (lng:string) => {
