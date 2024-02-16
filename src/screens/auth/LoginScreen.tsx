@@ -79,8 +79,12 @@ const LoginScreen = () => {
 
           await setAccessToken('userInfo',
             JSON.stringify({
+
+              userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+              userId: data?.data?.result[0]?.user.id,
               userName: data?.data?.result[0]?.user.first_name,
               userMobile: data?.data?.result[0]?.user.mobile,
+              
             }))
 
           toast.show({
