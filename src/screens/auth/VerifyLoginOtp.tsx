@@ -80,37 +80,43 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
         onSuccess: async (data) => {
          
 
-          // await setAccessToken('AccessTokenInfo',
-          //   JSON.stringify({
-          //     accessToken: data?.data?.result[0]?.token,
-          //     refreshToken: data?.data?.result[0]?.refreshToken,
-          //     expirationTime: data?.data?.result[0]?.ExpirationTime,
-          //   }))
+          if(screenType === 'signup'){
+            navigation.navigate(StackNav.LoginScreen)
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>SignUp Successfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+            return;
+          }
+         
+          await setAccessToken('AccessTokenInfo',
+            JSON.stringify({
+              accessToken: data?.data?.result[0]?.token,
+              refreshToken: data?.data?.result[0]?.refreshToken,
+              expirationTime: data?.data?.result[0]?.ExpirationTime,
+            }))
 
 
-          // await setAccessToken('userInfo',
-          //   JSON.stringify({
-          //     userId: data?.data?.result[0]?.user.id,
-          //     userName: data?.data?.result[0]?.user.first_name,
-          //     userMobile: data?.data?.result[0]?.user.mobile,
-          //   }))
+          await setAccessToken('userInfo',
+            JSON.stringify({
+
+              userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+              userId: data?.data?.result[0]?.user.id,
+              userName: data?.data?.result[0]?.user.first_name,
+              userMobile: data?.data?.result[0]?.user.mobile,
+              
+            }))
+
 
          
            
-          if(screenType === 'signup'){
-          navigation.navigate(StackNav.LoginScreen)
-          toast.show({
-            placement: "bottom",
-            render: ({ id }: { id: string }) => {
-              const toastId = "toast-" + id
-              return (
-                <Toast nativeID={toastId} variant="accent" action="success">
-                  <ToastTitle>SignUp Successfully</ToastTitle>
-                </Toast>
-              );
-            },
-          })
-        }
         
         },
         onError: (error) => {
