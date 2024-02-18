@@ -128,9 +128,9 @@ const LoginScreen = () => {
 
   const onPressResetPassword = () => forgotePasswordRef.current?.show();
 
-  // const signInModalRef = useRef<ActionSheetRef>(null);
+  const signInModalRef = useRef<ActionSheetRef>(null);
 
-  // const onPressSignInModal = () => signInModalRef.current?.show();
+  const onPressSignInModal = () => signInModalRef.current?.show();
 
 
 
@@ -288,7 +288,7 @@ const LoginScreen = () => {
             ]}
           />
         </View>
-        <PrimaryButton buttonText={strings.doctorLogin} height={getHeight(34)} marginVertical={responsiveHeight(3)} />
+        <PrimaryButton onPress={onPressSignInModal} buttonText={strings.doctorLogin} height={getHeight(34)} marginVertical={responsiveHeight(3)} />
         <Text fontFamily='$InterRegular' fontSize={10} color={colors.gray} alignSelf='center'>
           {strings.byProceedingYou}
           <Text
@@ -325,7 +325,7 @@ const LoginScreen = () => {
 
       <ForgotePassword SheetRef={forgotePasswordRef} />
 
-    {/* <SignInModal  SheetRef={signInModalRef}  /> */}
+      <SignInModal  SheetRef={signInModalRef}  />
     </Container>
 
   )

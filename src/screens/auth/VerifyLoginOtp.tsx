@@ -94,9 +94,9 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
               },
             })
             return;
-          }
-         
-          await setAccessToken('AccessTokenInfo',
+          }else if (screenType === 'signinwithotp'){
+                 
+            await setAccessToken('AccessTokenInfo',
             JSON.stringify({
               accessToken: data?.data?.result[0]?.token,
               refreshToken: data?.data?.result[0]?.refreshToken,
@@ -114,6 +114,9 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
               
             }))
 
+          }
+         
+        
 
          
            

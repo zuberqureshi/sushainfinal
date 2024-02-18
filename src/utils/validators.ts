@@ -86,6 +86,11 @@ export const addressAddSchema = yup.object().shape({
   address:yup.string().required("Address is required").typeError('Input must be a string'),
   locality:yup.string().required("Locality is required").typeError('Input must be a string'),
 
+})
+
+export const signInWithOtpSchema = yup.object().shape({
+  mobile:yup.string().required("Mobile number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter exactly 10 digits'),
+  // otp:yup.string().required("otp is required"),
 
 
 })
