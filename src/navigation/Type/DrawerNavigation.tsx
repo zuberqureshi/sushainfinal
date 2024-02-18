@@ -292,7 +292,7 @@ const DrawerView = () => {
             {strings.support}
           </CText>
           <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.LifeStyleDrawer)
+            navigation.navigate(StackNav.Address)
             }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}

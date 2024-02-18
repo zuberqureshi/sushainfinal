@@ -71,12 +71,23 @@ export const signUpSchema = yup.object().shape({
 export const signUpWithEmailSchema = yup.object().shape({
   firstname:yup.string().required("First name is required").typeError('Input must be a string'),
   lastname:yup.string().required("Last name is required").typeError('Input must be a string'),
-  number:yup.string().required("Patient number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter 10 digit number'),
+  number:yup.string().required("Patient number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter exactly 10 digits'),
   email:yup.string().email('Invalid email').required('Email is required'),
   password:yup.string()
     .required('password is must')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,'Enter Strong Password'),
     cpassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),   
+})
+
+export const addressAddSchema = yup.object().shape({
+  name:yup.string().required("Name is required").typeError('Input must be a string'),
+  mobile:yup.string().required("Mobile number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter exactly 10 digits'),
+  pincode:yup.string().required("Pincode is required"),
+  address:yup.string().required("Address is required").typeError('Input must be a string'),
+  locality:yup.string().required("Locality is required").typeError('Input must be a string'),
+
+
+
 })
 
 const emailRegex =

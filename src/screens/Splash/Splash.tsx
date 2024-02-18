@@ -47,11 +47,11 @@ export default function Splash() {
         console.log('tokenINvalid ')
 
        let body2 = {
-          token:v?.refreshToken
+        refreshToken:v?.refreshToken
         }
         const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );
 
-        console.log( 'expiredtokenFetchedNewToken', body2, reftechAccessToken,  )
+        console.log( 'expiredtokenFetchedNewToken', body2, reftechAccessToken, v  )
         if( reftechAccessToken.result.success==true){
           await setAccessToken('AccessTokenInfo',
           JSON.stringify({

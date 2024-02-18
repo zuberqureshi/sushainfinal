@@ -38,7 +38,7 @@ export const StackNav = {
   ProductsReview:'ProductsReview',
   MedicineHome:'MedicineHome',
   Cart:'Cart',
-  MedicineAddress:'MedicineAddress',
+  Address:'Address',
   OrderSummery:'OrderSummery',
   Appointments:'Appointments',
   LifeStyleDrawer:'LifeStyleDrawer',

@@ -38,7 +38,7 @@ import ProductByCategories from "../screens/Medicines/ProductByCategories";
 import ProductDetail from "../screens/Medicines/ProductDetail";
 import ProductsReview from "../screens/Medicines/ProductsReview";
 
-import MedicineAddress from "../screens/Medicines/MedicineAddress";
+
 import OrderSummery from "../screens/OrderSummery/OrderSummery";
 import AppointmentBooked from "../screens/CommonScreens/AppointmentBooked";
 import AppointmentCancellation from "../screens/CommonScreens/AppointmentCancellation";
@@ -53,6 +53,7 @@ import PatientsReview from "../screens/CommonScreens/PatientsReview";
 import LifeStyle from "../screens/LifeStyle/LifeStyle";
 import Signup from "../screens/auth/Signup";
 import Cart from "../screens/CommonScreens/Cart";
+import Address from "../screens/CommonScreens/Address";
 
 
 
@@ -100,7 +101,7 @@ export const StackRoute = {
   ProductDetail,
   ProductsReview,
   Cart,
-  MedicineAddress,
+  Address,
   OrderSummery,
   Appointments,
   LifeStyle,

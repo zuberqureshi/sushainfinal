@@ -60,8 +60,10 @@ function CallApiJson(endpoint, method = 'GET', body = null, token = null) {
       headers: headres,
       body: body,
     })
-    .then(   r => {  r.json();    })
+    .then(   r => {  r.json();       console.log('apiresjson', r.json() )
+  })
     .then(response => {
+      console.log('apires', response )
         resolve(response);
       })
       .catch(e => {
