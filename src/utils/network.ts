@@ -107,6 +107,48 @@ async function removeAccessToken(name) {
 }
 
 
+async function refreshTokenFetch() {
+
+  const value =   await AsyncStorage.getItem('AccessTokenInfo') ;
+  const tkn = JSON.parse( value );
+ 
+const refreshTokenEndpoint = API_uri+'/auth/refreshtoken';
+
+// Assuming you have a refresh token stored somewhere
+const refreshToken = tkn.refreshToken;
+
+// Prepare the request body
+const requestBody = {
+   refreshToken: refreshToken, 
+};
+
+
+  try {
+    const response = await fetch(refreshTokenEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any additional headers required by your authentication server
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh token');
+    }
+
+    const tokenData = await response.json();
+ 
+     return tokenData;
+  } catch (error) {
+    console.error('Error refreshing token:', error.message);
+    // Handle the error or rethrow it based on your application's needs
+    throw error;
+  }
+}
+
+
+
 // async function getToken() {
 //   const token = await EncryptedStorage.getItem('token');
 //    return token;
@@ -122,4 +164,4 @@ async function removeAccessToken(name) {
 
 export default CallApi  ;
  
-export { setAccessToken , getAccessToken,removeAccessToken,  CallApiJson};
+export { setAccessToken , getAccessToken,removeAccessToken,  CallApiJson , refreshTokenFetch };

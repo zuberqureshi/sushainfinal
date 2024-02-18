@@ -12,7 +12,7 @@ import { StackNav } from '../../navigation/NavigationKeys';
 // import {userSettingAPI} from '../api/authApi';
 import { AuthContext } from '../../context/AuthContext'
 
- import { getAccessToken, setAccessToken, CallApiJson } from '../../utils/network'
+ import { getAccessToken, setAccessToken, CallApiJson,  refreshTokenFetch } from '../../utils/network'
 export default function Splash() {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const authContext:any = useContext(AuthContext  );
@@ -49,22 +49,23 @@ export default function Splash() {
        let body2 = {
         refreshToken:v?.refreshToken
         }
-        const reftechAccessToken =  await CallApiJson( 'auth/refreshtoken', 'POST', body2 );
 
+        const reftechAccessToken=  await refreshTokenFetch();
+ 
         console.log( 'expiredtokenFetchedNewToken', body2, reftechAccessToken, v  )
-        if( reftechAccessToken.result.success==true){
+        if( reftechAccessToken.success==true){
           await setAccessToken('AccessTokenInfo',
           JSON.stringify({
-            accessToken:reftechAccessToken.result.access_token,
+            accessToken:reftechAccessToken.result[0].token,
             refreshToken:v?.refreshToken,
-            expirationTime: reftechAccessToken.result.ExpirationTime,
+            expirationTime: reftechAccessToken.result[0].ExpirationTime,
           }) )
 
            authContext.setAuthState({
           
-            accessToken:reftechAccessToken.result.access_token,
+            accessToken:reftechAccessToken.result[0].token,
             refreshToken:v?.refreshToken,
-            expirationTime: reftechAccessToken.result.ExpirationTime,
+            expirationTime: reftechAccessToken.result[0].ExpirationTime,
             authenticated: true,
 
           });
@@ -72,6 +73,7 @@ export default function Splash() {
 
  
         }else{
+          loginstatus =true
           console.log('redirect to login ');
         }
 
@@ -82,6 +84,7 @@ export default function Splash() {
 
 
     }else{
+      loginstatus =true
       console.log('No tokeninfo from memoery' )
 
     }
