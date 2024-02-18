@@ -25,14 +25,14 @@ const ImageCarousel = ({data}:any) => {
   //   setEntries(ENTRIES1);
   // }, []);
 
-  // console.log(data);
+//  console.log('ImageCarousel',API_IMAGE_BASE_URL+data[0].img);
   
 
   const renderItem = ({item, index}: any, parallaxProps: any) => {
     return (
       <View  style={localStyles.item}>
         <ParallaxImage
-          source={{uri: `${API_IMAGE_BASE_URL}${item.img}`}}
+          source={{uri:`${API_IMAGE_BASE_URL}${item.img}`}}
           containerStyle={localStyles.imageContainer}
           style={localStyles.image}
           parallaxFactor={0.4}

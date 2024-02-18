@@ -30,7 +30,7 @@ const RenderDSpecialities = memo(({item, onPressDoctorSpeciality}: any) => {
         style={localStyles.rootContaienr}>
         <View style={localStyles.imgOuterContainer}>
           <Image
-            source={{uri: API_IMAGE_BASE_URL + item?.app_icon}}
+            source={{uri:API_IMAGE_BASE_URL+item?.app_icon}}
             style={localStyles.imgStyle}
           />
         </View>

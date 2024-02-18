@@ -30,7 +30,7 @@ const RenderDSpecialities = ({item}: {item: general_sub_category}) => {
   return (
     <TouchableOpacity onPress={()=>{ navigation.navigate(StackNav.CategoryDoctorList, {itm:item?.specilization_name });}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
-        <Image source={{uri : `${API_IMAGE_BASE_URL}${item?.img}`}} style={localStyles.imgStyle} />
+        <Image source={{uri :`${API_IMAGE_BASE_URL}${item?.img}`}} style={localStyles.imgStyle} />
       </View>
       <View style={localStyles.titleContainer}>
         <CText type="m12" align="center" style={styles.ph5} numberOfLines={2}>
