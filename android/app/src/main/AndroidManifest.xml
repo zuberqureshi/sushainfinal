@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 
+<!-- videosdk permission  -->
+
     <!-- Give all the required permissions to app -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -23,12 +25,21 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />    
 
+<!-- videosdk permission  -->
+
+
+
     <!-- Define ACCESS_FINE_LOCATION if you will use enableHighAccuracy=true  -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- Define ACCESS_COARSE_LOCATION if you will use enableHighAccuracy=false  -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+
+ 
+
+
 
     <application
       android:name=".MainApplication"
@@ -50,6 +61,8 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
+<!-- videosdk permission  -->
        <meta-data
       android:name="live.videosdk.rnfgservice.notification_channel_name"
       android:value="Meeting Notification"
@@ -64,5 +77,8 @@
     />
     <service android:name="live.videosdk.rnfgservice.ForegroundService" android:foregroundServiceType="mediaProjection"></service>
     <service android:name="live.videosdk.rnfgservice.ForegroundServiceTask"></service>
+<!-- videosdk permission  -->
+
+
     </application>
 </manifest>
