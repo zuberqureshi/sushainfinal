@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 
+<!-- videosdk permission  -->
+
     <!-- Give all the required permissions to app -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -23,6 +25,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />    
 
+<!-- videosdk permission  -->
+
+
+
     <!-- Define ACCESS_FINE_LOCATION if you will use enableHighAccuracy=true  -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
@@ -31,27 +37,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
 
- <!-- additional permission  -->
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-
-    <!-- Needed to communicate with already-paired Bluetooth devices. (Legacy up to Android 11) -->
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-
-    <!-- Needed to communicate with already-paired Bluetooth devices. (Android 12 upwards)-->
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
- <!-- additional permission  -->
+ 
 
 
 
@@ -75,6 +61,8 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
+<!-- videosdk permission  -->
        <meta-data
       android:name="live.videosdk.rnfgservice.notification_channel_name"
       android:value="Meeting Notification"
@@ -89,5 +77,8 @@
     />
     <service android:name="live.videosdk.rnfgservice.ForegroundService" android:foregroundServiceType="mediaProjection"></service>
     <service android:name="live.videosdk.rnfgservice.ForegroundServiceTask"></service>
+<!-- videosdk permission  -->
+
+
     </application>
 </manifest>
