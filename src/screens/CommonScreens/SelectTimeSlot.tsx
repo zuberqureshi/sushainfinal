@@ -44,6 +44,7 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { Spinner } from '@gluestack-ui/themed';
 import useCreateConsultation from '../../hooks/booking/create-consultation';
 import Loader from '../../components/Loader/Loader';
+import { getAccessToken } from '../../utils/network';
 
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
@@ -61,6 +62,8 @@ export default function SelectTimeSlot({ route, }: Props) {
   const [selectedDateOption, setSelectedDateOption] = useState(0)
   const [datePickerModel, setDatePickerModel] = useState(false)
   const [payPrice, setPayPrice] = useState('')
+  const [userInfo, setUserInfo] = useState();
+
 
   //init
   const { doctorid, doctorslots,instantconsultation } = route.params;
@@ -75,10 +78,10 @@ export default function SelectTimeSlot({ route, }: Props) {
   const today = new Date()
   const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
 
-  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
-  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item.id)).map(item => item);
+  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
+  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
 
-  useEffect(() => {
+  useEffect(async() => {
     CFPaymentGatewayService.setCallback({
       onVerify(orderID: string): void {
         console.log('success ', orderID);
@@ -90,8 +93,12 @@ export default function SelectTimeSlot({ route, }: Props) {
         // navigation.navigate(NAVIGATION.PaymentFailed);
       },
     });
-    return () => CFPaymentGatewayService.removeCallback();
+    setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+    return () => CFPaymentGatewayService?.removeCallback();
+
   }, []);
+
+  
 
   const startCheckout = (sessionId,orderId) => {
     try {
@@ -153,21 +160,25 @@ export default function SelectTimeSlot({ route, }: Props) {
 
       } else {
         const payload = {
-          userId: "",
-          "doc_id": doctorid,
-          "slot_id": formik.values.slottimeid,
-          "booking_date": formik.values.slotdateday,
-          "voucher": formik.values.couponcode,
-          "instant_consultation": instantconsultation,  // YES , NO 
-          "bookingspecilization": "",
-          "usercity": "Gwalior",
-          "country_code": "IN",
-          "person_name": formik.values.patientname,
-          "person": formik.values.bookingfor,
-          "person_age": formik.values.patientage,
-          "person_mobile": formik.values.patientnumber,
-          "person_weight": formik.values.patientweight,
-          "person_gender": formik.values.patientgender
+          userId: userInfo?.userId,
+          doc_id: doctorid,
+          slot_id: formik.values.slottimeid?.toString(),
+          booking_date: formik.values.slotdateday,
+          voucher: '',
+          instant_consultation: instantconsultation,  // YES , NO 
+          bookingspecilization: "",
+          usercity: "Gwalior",
+          country_code: "IN",
+          person_name: formik.values.patientname,
+          person: formik.values.bookingfor,
+          person_age: formik.values.patientage,
+          person_mobile: formik.values.patientnumber,
+          person_weight: formik.values.patientweight,
+          person_gender: formik.values.patientgender,
+          followup:"NO"  ,   //YES , NO
+          type:"virtual", // virtual , CLINIC
+          device_name:"Android honor7x",
+          device_type:"NATIVEAPP"
         }
 
         console.log({payload});
@@ -175,20 +186,34 @@ export default function SelectTimeSlot({ route, }: Props) {
 
         useCreateConsultationMutation.mutate(payload, {
           onSuccess: (data) => {
-            console.log(data?.data?.result[0].paymentCreatedData);
+            console.log(data?.data,'susuuscc');
 
-            toast.show({
-              placement: "bottom",
-              render: ({ id }: { id: string }) => {
-                const toastId = "toast-" + id
-                return (
-                  <Toast nativeID={toastId} variant="accent" action="success">
-                    <ToastTitle>Submit Succesfully</ToastTitle>
-                  </Toast>
-                );
-              },
-            })
-           startCheckout(data?.data?.result[0].paymentCreatedData?.payment_session_id,data?.data?.result[0].paymentCreatedData?.order_id)
+            if(data?.data?.success){
+              toast.show({
+                placement: "bottom",
+                render: ({ id }: { id: string }) => {
+                  const toastId = "toast-" + id
+                  return (
+                    <Toast nativeID={toastId} variant="accent" action="success">
+                      <ToastTitle>Submit Succesfully</ToastTitle>
+                    </Toast>
+                  );
+                },
+              })
+             startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+            }else{
+              toast.show({
+                placement: "bottom",
+                render: ({ id }: { id: string }) => {
+                  const toastId = "toast-" + id
+                  return (
+                    <Toast nativeID={toastId} variant="accent" action="success">
+                      <ToastTitle>{data?.data?.message}</ToastTitle>
+                    </Toast>
+                  );
+                },
+              })
+            }
             // setPayPrice(data?.data?.result[0]?.finalPrice)
             // setApplyCoupon(true)
 
