@@ -206,7 +206,7 @@ function MeetingView() {
 
 const Test = () => {
     const [userInfo, setUserInfo] = useState();
-    const [meetingId, setMeetingId] = useState('123456');
+    const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
 
      async function load(){
       setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
@@ -226,7 +226,7 @@ const Test = () => {
             webcamEnabled: true,
             name: 'Zuber User',
           }}
-          token={`2c820edf-c987-4602-b2a7-5cead28e44b7`}>
+          token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIyYzgyMGVkZi1jOTg3LTQ2MDItYjJhNy01Y2VhZDI4ZTQ0YjciLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcwODM0NTgzOCwiZXhwIjoxODY2MTMzODM4fQ.0PJziz8wk472-GHp-ZCrjoxAHxWH-jw2V6nP39m1rFo`}>
           <MeetingView />
         </MeetingProvider>
       </SafeAreaView>
