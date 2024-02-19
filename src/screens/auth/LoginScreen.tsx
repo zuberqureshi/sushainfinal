@@ -1,7 +1,7 @@
-import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView, ActivityIndicator } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
-import { Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
+import { Modal, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,7 +12,7 @@ import images from '../../assets/images'
 import { colors, styles } from '../../themes'
 import strings from '../../i18n/strings'
 import { StackNav } from '../../navigation/NavigationKeys'
-import { getHeight, moderateScale } from '../../common/constants'
+import { getDeviceIp, getHeight, moderateScale } from '../../common/constants'
 import { loginSchema } from '../../utils/validators'
 import { Eye, EyeDashed } from '../../assets/svgs'
 import typography from '../../themes/typography'
@@ -27,11 +27,16 @@ import useLoginByPassword from '../../hooks/auth/loginbypassword'
 import { setAccessToken, getAccessToken } from '../../utils/network'
 import SignInMOdal from '../../components/common/modal/SignInModal'
 import SignInModal from '../../components/common/modal/SignInModal'
+import useUserRegister from '../../hooks/auth/user-register'
+import { getDeviceName } from 'react-native-device-info'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Loader from '../../components/Loader/Loader'
 
 const LoginScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [skipLoader, setSkipLoader] = useState(true)
   const authContext = useContext(AuthContext);
 
   async function load() {
@@ -42,8 +47,24 @@ const LoginScreen = () => {
   }
 
 
+ 
+  //api call
+  const useUserRegisterMutation = useUserRegister()
+  const getDeviceDataFetch = async () => {
+    let ip = await getDeviceIp()
+    let nm = await getDeviceName()
+    // formik.setFieldValue( 'devicename' , nm )
+    // formik.setFieldValue( 'deviceip' , ip )
+    let fcmToken =  await AsyncStorage.getItem('fcmToken')
+    // formik.setFieldValue( 'devicefcm' , fcmToken )
+   
+    let deviceData = {ip:ip,nm:nm,fcmToken:fcmToken}
+    return deviceData
+}
+
   useEffect(() => {
     load();
+    // getDeviceDataFetch()
   }, []);
 
   const toast = useToast()
@@ -135,14 +156,96 @@ const LoginScreen = () => {
 
 
   const onPressSkip = async () => {
+    setSkipLoader(true)
     navigation.reset({
       index: 0,
       routes: [{ name: StackNav.DrawerNavigation }],
     });
+
+    setSkipLoader(false)
   };
 
+
+
+  function isTenDigitNumber(str) {
+    // Check if the string consists of exactly 10 digits
+    return /^\d{10}$/.test(str);
+  }
+
   const onPressSignInWithOtp = async () => {
-    navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp'})
+
+    let deviceInfo = await getDeviceDataFetch()
+    console.log({deviceInfo});
+    
+   
+   if(isTenDigitNumber(formik.values.userid)){
+
+    const payload = {
+      mobile: formik.values.userid,  // mandatory 
+      device_name: deviceInfo?.nm,
+      // name :`${values.firstname} ${values.lastname}`,
+      // password:values.password,
+      // email: values.email,
+      device_type: "MOBILEAPP",     //  MOBILEAPP
+      device_data: "duii",
+      login_ip: deviceInfo?.fcmToken,
+      country_code: "IN", // country code ISO
+      app_fcm_token: deviceInfo?.fcmToken
+  }
+  // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+
+    useUserRegisterMutation.mutate(payload, {
+      onSuccess: (data) => {
+
+        console.log('SUGNUPP DATA',data?.data);
+        let otp = data?.data?.result[0].otpValue
+
+        toast.show({
+          placement: "top",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success" >
+                <ToastTitle>OTP Sent </ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+        navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp',otp})
+
+      },
+      onError: (error) => {
+     
+        
+        toast.show({
+          placement: "top",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error" >
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
+    // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp'})
+   }else{
+    toast.show({
+      placement: "bottom",
+      render: ({ id }) => {
+        const toastId = "toast-" + id
+
+        return (
+          <Toast nativeID={toastId} variant="accent" action="error">
+            <ToastTitle>Please enter mobile number</ToastTitle>
+          </Toast>
+        );
+      },
+    })
+   }
    
   };
 
@@ -326,6 +429,7 @@ const LoginScreen = () => {
       <ForgotePassword SheetRef={forgotePasswordRef} />
 
       <SignInModal  SheetRef={signInModalRef}  />
+    
     </Container>
 
   )
@@ -384,6 +488,22 @@ const localStyles = StyleSheet.create({
     ...styles.mv10,
     width: '55%',
     ...styles.selfCenter,
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
   },
 
 })

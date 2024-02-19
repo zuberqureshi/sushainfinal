@@ -35,7 +35,7 @@ export default function SignInModal(props: any) {
     const toast = useToast()
 
     const [otpInput, setOtpInput] = useState<string>('');
-    // const [deviceName, setDeviceName] = useState('')
+    const [otpCode, setOtpCode] = useState('')
     const [signInState, setSignInState] = useState(true)
 
     //api call
@@ -61,7 +61,7 @@ export default function SignInModal(props: any) {
                 device_data: "duii",
                 login_ip: formik.values.deviceip,
                 country_code: "IN", // country code ISO
-                app_fcm_token: "ffjjj"
+                app_fcm_token: formik.values.devicefcm
             }
             // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
 
@@ -69,6 +69,7 @@ export default function SignInModal(props: any) {
                 onSuccess: (data) => {
 
                   console.log('SUGNUPP DATA',data?.data);
+                  setOtpCode(data?.data?.result[0]?.otpValue)
 
                   toast.show({
                     placement: "top",
@@ -116,7 +117,7 @@ export default function SignInModal(props: any) {
          useLoginOtpVerifyMutation.mutate(payload, {
             onSuccess: async (data) => {
              
-                console.log('sigggg',data);
+                // console.log('sigggg',data);
                 
     
                 toast.show({
@@ -212,7 +213,7 @@ export default function SignInModal(props: any) {
         }
     };
 
-    console.log('otp....', otpInput);
+ 
 
 
     return (
@@ -220,12 +221,13 @@ export default function SignInModal(props: any) {
             ref={SheetRef}
             onClose={onActionSheetClose}
             keyboardShouldPersistTaps={'handled'}
-
+            defaultOverlayOpacity={0}
+            
             containerStyle={localStyles.rootContainer}>
             <Box mx={5} >
 
                 <Box flexDirection='row' alignItems='center' justifyContent='space-between' >
-                    <Text fontFamily='$InterMedium' fontSize={14} color={colors.black} >Sign in to Continue</Text>
+                    <Text fontFamily='$InterMedium' fontSize={14} color={colors.black} >Sign in to Continue {otpCode}</Text>
                     <Pressable onPress={onPressCloseSheet} >
                         <CrossIconBlack />
                     </Pressable>
@@ -296,6 +298,8 @@ const localStyles = StyleSheet.create({
         ...styles.p20,
         borderTopLeftRadius: moderateScale(20),
         borderTopRightRadius: moderateScale(20),
+        
+        
     },
     otpInputContainerStyle: {
         height: moderateScale(36),

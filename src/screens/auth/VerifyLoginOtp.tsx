@@ -42,11 +42,12 @@ type Props = {
 };
 
 const VerifyLoginOtp = ({route, navigation}:Props) => {
-  const {mobile,screenType} = route.params;
+  const {mobile,screenType,otp} = route.params;
   const input = useRef(null)
   const toast = useToast()
 
   const [otpInput, setOtpInput] = useState<string>('');
+  const [loader, setLoader] = useState(false)
   const onPinChange = (code: React.SetStateAction<string>) => setPin(code);
   const [isTimeOver, setIsTimeOver] = useState(false);
 
@@ -69,6 +70,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
 
   
   const otpVerify = async () => {
+    setLoader(true)
     let payload = {
       mobile: mobile,
       otp: otpInput,
@@ -77,6 +79,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
     console.log('oTPPP',payload);
 
      useLoginOtpVerifyMutation.mutate(payload, {
+      
         onSuccess: async (data) => {
          
 
@@ -94,8 +97,10 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
               },
             })
             return;
+            setLoader(false)
           }else if (screenType === 'signinwithotp'){
                  
+
             await setAccessToken('AccessTokenInfo',
             JSON.stringify({
               accessToken: data?.data?.result[0]?.token,
@@ -116,13 +121,27 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
 
           }
          
-        
+          toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>SignIn Successfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
 
-         
-           
+            navigation.reset({
+              index: 0,
+              routes: [{ name: StackNav.DrawerNavigation }],
+            });
+            setLoader(false)
         
         },
         onError: (error) => {
+
           toast.show({
             placement: "bottom",
             render: ({ id }: { id: string }) => {
@@ -134,6 +153,8 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
               )
             }
           })
+
+          setLoader(false)
         }
       })
   };
@@ -202,7 +223,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
       </TouchableOpacity>
       <Image source={images.otpImage} style={localStyles.otpImageStyle} />
       <Text fontFamily='$InterSemiBold' fontSize={16} style={styles.mt20}>
-        {strings.verificationCode}
+        {strings.verificationCode}{otp}
       </Text>
       <Text
       fontFamily='$InterRegular' fontSize={12} color={colors.black} textAlign='center'
@@ -223,7 +244,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
           tintColor={colors.primary}
         />
        
-    { !isTimeOver &&  <PrimaryButton buttonText='Verify OTP' onPress={otpVerify} disabled={useLoginOtpVerifyMutation.isPending} loading={useLoginOtpVerifyMutation.isPending} marginTop={responsiveHeight(2.5)} height={35} borderRadius={10}  /> }
+  <PrimaryButton buttonText='Verify OTP' onPress={otpVerify} disabled={useLoginOtpVerifyMutation.isPending || loader} loading={useLoginOtpVerifyMutation.isPending || loader} marginTop={responsiveHeight(2.5)} height={35} borderRadius={10}  /> 
 
       <View style={styles.rowCenter}> 
         {isTimeOver ? (

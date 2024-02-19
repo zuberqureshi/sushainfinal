@@ -95,8 +95,10 @@ const InnerSubDrawerComponent = (props: any) => {
   //   }
   // }
 
+  
+
   return (
-    <TouchableOpacity onPress={()=>{onPress(title)}} style={localStyles.subDrawerStyle}>
+    <TouchableOpacity disabled={!(!!onPress) } onPress={()=>{onPress(title)}} style={localStyles.subDrawerStyle}>
       <View style={localStyles.innerDrwerIconStyle}>{icon}</View>
       <CText
         type="r12"
@@ -140,7 +142,7 @@ const InnerDrawerComponent = (props: any) => {
       {isOpen && (
         <View style={localStyles.subContainerStyle}>
           <InnerSubDrawerComponent icon={icon1} title={title1} onPress={onPress1} />
-          <InnerSubDrawerComponent icon={icon2} title={title2} onPress={onPress2} />
+          <InnerSubDrawerComponent icon={icon2} title={title2}  />
           {title3 && <InnerSubDrawerComponent icon={icon3} title={title3}  />}
         </View>
       )}
