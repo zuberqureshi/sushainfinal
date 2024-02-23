@@ -300,7 +300,10 @@ const DrawerView = () => {
               {strings.newTicket}
             </CText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.mt5}>
+          <TouchableOpacity onPress={()=>{
+            navigation.navigate(StackNav.AppointmentBooked)
+            }}
+           style={styles.mt5}>
             <CText type="r12" color={colors.textColor5}>
               {strings.viewTicket}
             </CText>

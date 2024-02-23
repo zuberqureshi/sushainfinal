@@ -9,6 +9,8 @@ class AddressService {
     getCitiesByState: 'getCitiesByState',
     getUserAddresses: 'getUserAddresses',
     addNewAddress : 'addNewAddress',
+    deleteAddress : 'deleteAddress',
+    updateUserAddress : 'updateUserAddress',
 
     
   };
@@ -23,7 +25,7 @@ class AddressService {
 
   getStateByCountry = async (data:{countryId:string}) => {
     const { countryId } = data
-   
+    console.log({countryId});
     return fetcher({
       url: `/order/statesbycountryid?countryId=${countryId}`,
       method: 'GET',
@@ -32,7 +34,8 @@ class AddressService {
 
   getCitiesByState = async (data:{stateId:string}) => {
     const { stateId } = data
-   
+     console.log({stateId});
+     
     return fetcher({
       url: `/order/citiesbystateid?stateId=${stateId}`,
       method: 'GET',
@@ -41,7 +44,7 @@ class AddressService {
 
   getUserAddresses = async (data:{userUniqueId:string}) => {
     const { userUniqueId } = data
-   
+
     return fetcher({
       url: `order/getuseraddress?userID=${userUniqueId}`,
       method: 'GET',
@@ -58,6 +61,23 @@ class AddressService {
     });
  
   }
+
+  deleteAddress = async (data:any) => {
+    return fetcher({
+      url: `order/address/${data}`,
+      method: 'DELETE',
+    });
+  }
+
+  updateUserAddress = async (data:{payload:any,id:number}) => {
+    const {payload,id} = data
+    return fetcher({
+      url: `order/address/${id}`,
+      method: 'PUT',
+      data:payload,
+    });
+  }
+
 
   
 

@@ -75,7 +75,7 @@ const LoginScreen = () => {
     validationSchema: loginSchema,
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
-      console.warn('formsubmit', values);
+      // console.warn('formsubmit', values);
       setLoading(true)
       var body = {
         mobile: values.userid,
@@ -88,7 +88,9 @@ const LoginScreen = () => {
       
 
         onSuccess: async (data) => {
-          console.warn('afterlogindata', data?.data?.result[0]);
+          console.log('afterlogindata', data?.data);
+
+          if(data?.data?.success){
 
           await setAccessToken('AccessTokenInfo',
             JSON.stringify({
@@ -97,15 +99,12 @@ const LoginScreen = () => {
               expirationTime: data?.data?.result[0]?.ExpirationTime,
             }))
 
-
           await setAccessToken('userInfo',
             JSON.stringify({
-
               userUniqueId: data?.data?.result[0]?.user.user_unique_id,
               userId: data?.data?.result[0]?.user.id,
               userName: data?.data?.result[0]?.user.first_name,
               userMobile: data?.data?.result[0]?.user.mobile,
-              
             }))
 
           toast.show({
@@ -125,10 +124,37 @@ const LoginScreen = () => {
             index: 0,
             routes: [{ name: StackNav.DrawerNavigation }],
           });
+          
+          }else{
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="warning">
+                    <ToastTitle>{data?.data?.message}</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+          }
 
           setLoading(false)
         },
         onError: (error) => {
+
+          toast.show({
+            placement: "bottom",
+            render: ({ id }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>Something went wrong while login</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+          setLoading(false)
           console.log('errorafterlogin', error)
         }
       })
@@ -201,7 +227,7 @@ const LoginScreen = () => {
         let otp = data?.data?.result[0].otpValue
 
         toast.show({
-          placement: "top",
+          placement: "bottom",
           render: ({ id }: { id: string }) => {
             const toastId = "toast-" + id
             return (

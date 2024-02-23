@@ -2,7 +2,7 @@
 
 
 
-const API_uri = 'http://3.110.107.128:3006/api/v1/';
+const API_uri = 'http://13.232.170.16:3006/api/v1/';
 function CallApi(endpoint, method = 'GET', body = null, token = null) {
   const toUrlEncoded = obj =>
     Object.keys(obj)

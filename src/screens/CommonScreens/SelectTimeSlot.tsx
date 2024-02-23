@@ -81,22 +81,38 @@ export default function SelectTimeSlot({ route, }: Props) {
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
 
-  useEffect(async() => {
-    CFPaymentGatewayService.setCallback({
-      onVerify(orderID: string): void {
-        console.log('success ', orderID);
-        //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-        // navigation.navigate(NAVIGATION.PaymentSuccess);
-      },
-      onError(error: CFErrorResponse, orderID: string): void {
-        console.log('failed ', orderID);
-        // navigation.navigate(NAVIGATION.PaymentFailed);
-      },
-    });
-    setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
-    return () => CFPaymentGatewayService?.removeCallback();
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Set the callback for CFPaymentGatewayService
+        CFPaymentGatewayService.setCallback({
+          onVerify(orderID: string): void {
+            console.log('success ', orderID);
+            //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
+            navigation.navigate(StackNav.AppointmentBooked);
+          },
+          onError(error: CFErrorResponse, orderID: string): void {
+            console.log('failed ', orderID);
+            // navigation.navigate(NAVIGATION.PaymentFailed);
+          },
+        });
+  
+        // Fetch user info
+        const userInfo = await getAccessToken('userInfo');
+        setUserInfo(JSON.parse(userInfo));
+      } catch (error) {
+        console.error('Error in fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  
+    return () => {
+      // Remove the callback for CFPaymentGatewayService
+      CFPaymentGatewayService?.removeCallback();
+    };
   }, []);
+  
 
   
 
@@ -142,98 +158,116 @@ export default function SelectTimeSlot({ route, }: Props) {
       // console.log('updatePatient', values);
       // action.resetForm()
       // loadUserInfo();
-      if (!(!!values.slottimeid) || !(!!values.slotdateday)) {
-        toast.show({
-          placement: "bottom",
-          render: ({ id }) => {
-            const toastId = "toast-" + id
-            return (
-              <Toast nativeID={toastId} action="error" variant="accent">
-                <VStack space="xs">
-                  <ToastTitle>Please select slottime and date</ToastTitle>
-
-                </VStack>
-              </Toast>
-            )
-          },
-        })
-
-      } else {
-        const payload = {
-          userId: userInfo?.userId,
-          doc_id: doctorid,
-          slot_id: formik.values.slottimeid?.toString(),
-          booking_date: formik.values.slotdateday,
-          voucher: '',
-          instant_consultation: instantconsultation,  // YES , NO 
-          bookingspecilization: "",
-          usercity: "Gwalior",
-          country_code: "IN",
-          person_name: formik.values.patientname,
-          person: formik.values.bookingfor,
-          person_age: formik.values.patientage,
-          person_mobile: formik.values.patientnumber,
-          person_weight: formik.values.patientweight,
-          person_gender: formik.values.patientgender,
-          followup:"NO"  ,   //YES , NO
-          type:"virtual", // virtual , CLINIC
-          device_name:"Android honor7x",
-          device_type:"NATIVEAPP"
-        }
-
-        console.log({payload});
-        
-
-        useCreateConsultationMutation.mutate(payload, {
-          onSuccess: (data) => {
-            console.log(data?.data,'susuuscc');
-
-            if(data?.data?.success){
+     
+      if(coloredCheckBoxValue){
+        if (!(!!values.slottimeid) || !(!!values.slotdateday)) {
+          toast.show({
+            placement: "bottom",
+            render: ({ id }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} action="error" variant="accent">
+                  <VStack space="xs">
+                    <ToastTitle>Please select slottime and date</ToastTitle>
+  
+                  </VStack>
+                </Toast>
+              )
+            },
+          })
+  
+        } else {
+          const payload = {
+            userId: userInfo?.userId,
+            doc_id: doctorid,
+            slot_id: formik.values.slottimeid?.toString(),
+            booking_date: formik.values.slotdateday,
+            voucher: '',
+            instant_consultation: instantconsultation,  // YES , NO 
+            bookingspecilization: "",
+            usercity: "Gwalior",
+            country_code: "IN",
+            person_name: formik.values.patientname,
+            person: formik.values.bookingfor,
+            person_age: formik.values.patientage,
+            person_mobile: formik.values.patientnumber,
+            person_weight: formik.values.patientweight,
+            person_gender: formik.values.patientgender,
+            followup:"NO"  ,   //YES , NO
+            type:"virtual", // virtual , CLINIC
+            device_name:"Android honor7x",
+            device_type:"NATIVEAPP"
+          }
+  
+          console.log({payload});
+          
+  
+          useCreateConsultationMutation.mutate(payload, {
+            onSuccess: (data) => {
+              console.log(data?.data,'susuuscc');
+  
+              if(data?.data?.success){
+                toast.show({
+                  placement: "bottom",
+                  render: ({ id }: { id: string }) => {
+                    const toastId = "toast-" + id
+                    return (
+                      <Toast nativeID={toastId} variant="accent" action="success">
+                        <ToastTitle>Submit Succesfully</ToastTitle>
+                      </Toast>
+                    );
+                  },
+                })
+               startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+              }else{
+                toast.show({
+                  placement: "bottom",
+                  render: ({ id }: { id: string }) => {
+                    const toastId = "toast-" + id
+                    return (
+                      <Toast nativeID={toastId} variant="accent" action="warning">
+                        <ToastTitle>{data?.data?.message}</ToastTitle>
+                      </Toast>
+                    );
+                  },
+                })
+              }
+              // setPayPrice(data?.data?.result[0]?.finalPrice)
+              // setApplyCoupon(true)
+  
+            },
+            onError: (error: any) => {
+  
               toast.show({
                 placement: "bottom",
                 render: ({ id }: { id: string }) => {
                   const toastId = "toast-" + id
                   return (
-                    <Toast nativeID={toastId} variant="accent" action="success">
-                      <ToastTitle>Submit Succesfully</ToastTitle>
-                    </Toast>
-                  );
-                },
-              })
-             startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
-            }else{
-              toast.show({
-                placement: "bottom",
-                render: ({ id }: { id: string }) => {
-                  const toastId = "toast-" + id
-                  return (
-                    <Toast nativeID={toastId} variant="accent" action="success">
-                      <ToastTitle>{data?.data?.message}</ToastTitle>
+                    <Toast nativeID={toastId} variant="accent" action="error">
+                      <ToastTitle>Something went wrong, please try again later</ToastTitle>
                     </Toast>
                   );
                 },
               })
             }
-            // setPayPrice(data?.data?.result[0]?.finalPrice)
-            // setApplyCoupon(true)
-
+          })
+        }
+      }else{
+         
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="warning" >
+                <ToastTitle>Please accept T&C</ToastTitle>
+              </Toast>
+            );
           },
-          onError: (error: any) => {
-
-            toast.show({
-              placement: "bottom",
-              render: ({ id }: { id: string }) => {
-                const toastId = "toast-" + id
-                return (
-                  <Toast nativeID={toastId} variant="accent" action="error">
-                    <ToastTitle>Something went wrong, please try again later</ToastTitle>
-                  </Toast>
-                );
-              },
-            })
-          }
         })
       }
+
+     
 
 
 
@@ -533,9 +567,9 @@ export default function SelectTimeSlot({ route, }: Props) {
                       setSelectedDateOption(index)
                       formik.setFieldValue('slotdateday', item)
                     }} >
-                      <View style={{ backgroundColor: selectedDateOption === index ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-                        <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
-                        <Text style={{ color: selectedDateOption === index ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
+                      <View style={{ backgroundColor: formik.values.slotdateday === item ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
+                        <Text style={{ color: formik.values.slotdateday === item ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
+                        <Text style={{ color: formik.values.slotdateday === item ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
                       </View>
 
                     </TouchableOpacity>

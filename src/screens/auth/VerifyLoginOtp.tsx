@@ -50,6 +50,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
   const [loader, setLoader] = useState(false)
   const onPinChange = (code: React.SetStateAction<string>) => setPin(code);
   const [isTimeOver, setIsTimeOver] = useState(false);
+  const [resendOtp, setResendOtp] = useState(otp)
 
     //api call
   const useLoginOtpVerifyMutation = useLoginOtpVerify()
@@ -96,51 +97,73 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
                 );
               },
             })
-            return;
+       
             setLoader(false)
           }else if (screenType === 'signinwithotp'){
-                 
 
-            await setAccessToken('AccessTokenInfo',
-            JSON.stringify({
-              accessToken: data?.data?.result[0]?.token,
-              refreshToken: data?.data?.result[0]?.refreshToken,
-              expirationTime: data?.data?.result[0]?.ExpirationTime,
-            }))
+             
+            if(data?.data?.success){
 
-
-          await setAccessToken('userInfo',
-            JSON.stringify({
-
-              userUniqueId: data?.data?.result[0]?.user.user_unique_id,
-              userId: data?.data?.result[0]?.user.id,
-              userName: data?.data?.result[0]?.user.first_name,
-              userMobile: data?.data?.result[0]?.user.mobile,
+              console.log('signinn OTP',data?.data);
               
-            }))
 
-          }
+              await setAccessToken('AccessTokenInfo',
+              JSON.stringify({
+                accessToken: data?.data?.result[0]?.token,
+                refreshToken: data?.data?.result[0]?.refreshToken,
+                expirationTime: data?.data?.result[0]?.ExpirationTime,
+              }))
+  
+  
+            await setAccessToken('userInfo',
+              JSON.stringify({
+  
+                userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+                userId: data?.data?.result[0]?.user.id,
+                userName: data?.data?.result[0]?.user.first_name,
+                userMobile: data?.data?.result[0]?.user.mobile,
+                
+              }))
+  
+            
+           
+            toast.show({
+                placement: "bottom",
+                render: ({ id }: { id: string }) => {
+                  const toastId = "toast-" + id
+                  return (
+                    <Toast nativeID={toastId} variant="accent" action="success">
+                      <ToastTitle>SignIn Successfully</ToastTitle>
+                    </Toast>
+                  );
+                },
+              })
+  
+              navigation.reset({
+                index: 0,
+                routes: [{ name: StackNav.DrawerNavigation }],
+              });
+              
+              }else{
+                toast.show({
+                  placement: "bottom",
+                  render: ({ id }: { id: string }) => {
+                    const toastId = "toast-" + id
+                    return (
+                      <Toast nativeID={toastId} variant="accent" action="warning">
+                        <ToastTitle>{data?.data?.message}</ToastTitle>
+                      </Toast>
+                    );
+                  },
+                })
+              }
+
          
-          toast.show({
-              placement: "bottom",
-              render: ({ id }: { id: string }) => {
-                const toastId = "toast-" + id
-                return (
-                  <Toast nativeID={toastId} variant="accent" action="success">
-                    <ToastTitle>SignIn Successfully</ToastTitle>
-                  </Toast>
-                );
-              },
-            })
-
-            navigation.reset({
-              index: 0,
-              routes: [{ name: StackNav.DrawerNavigation }],
-            });
             setLoader(false)
         
-        },
-        onError: (error) => {
+        }
+      },
+       onError: (error) => {
 
           toast.show({
             placement: "bottom",
@@ -180,6 +203,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
     useResendOtpMutation.mutate(payload, {
       onSuccess: (data) => {
         console.log('OTP RESEND DATA',data?.data);
+         setResendOtp(data?.data?.result[0]?.otpValue)
         toast.show({
           placement: "bottom",
           render: ({ id }: { id: string }) => {
@@ -223,7 +247,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
       </TouchableOpacity>
       <Image source={images.otpImage} style={localStyles.otpImageStyle} />
       <Text fontFamily='$InterSemiBold' fontSize={16} style={styles.mt20}>
-        {strings.verificationCode}{otp}
+        {strings.verificationCode}{resendOtp}
       </Text>
       <Text
       fontFamily='$InterRegular' fontSize={12} color={colors.black} textAlign='center'

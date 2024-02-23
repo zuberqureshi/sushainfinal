@@ -26,7 +26,7 @@ export const fetcher = async (config: AxiosRequestConfig) => {
 
  console.log('tokenfetcher',token)
   return await Axios.request({
-    baseURL: `http://3.110.107.128:3006/api/v1/`,
+    baseURL: `http://13.232.170.16:3006/api/v1/`,
     url,
     method: method ?? 'GET',
     data,

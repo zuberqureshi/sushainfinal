@@ -33,7 +33,7 @@ import CheckBox from 'react-native-check-box'
 
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
-import { Box, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
+import { Box, Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
 import { useFormik } from 'formik';
 import useGetAddressCountries from '../../hooks/address/get-address-countries';
 import useGetStateByCountry from '../../hooks/address/get-state-by-country';
@@ -45,14 +45,17 @@ import useAddNewAddress from '../../hooks/address/add-new-address';
 import { queryClient } from '../../react-query/client';
 import addressService from '../../services/address-service';
 import { addressAddSchema } from '../../utils/validators';
+import Loader from '../../components/Loader/Loader';
+import useDeleteAddress from '../../hooks/address/delete-address';
+import UpdateUserAddress from '../../hooks/address/update-user-address';
 
 const Address = () => {
-  
+
   const toast = useToast()
   const [stepCurrentPosition, setStepCurrentPosition] = useState(1)
- 
+
   const [userAlternateNoShow, setUserAlternateNoShow] = useState(false);
-  
+
   const [userInfo, setUserInfo] = useState();
   const [addressCheckBox, setAddressCheckBox] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState(0)
@@ -60,64 +63,71 @@ const Address = () => {
   const [countryList, setCountryList] = useState([])
   const [stateList, setStateList] = useState([])
   const [citiesList, setCitiesList] = useState([])
+  const [isEdit, setIsEdit] = useState(false)
+  const [updatedAddressID, setUpdatedAddressID] = useState()
 
- 
-  
 
 
-    const useAddNewAddressMutation = useAddNewAddress()
-  
+
+
+  const useAddNewAddressMutation = useAddNewAddress()
+  const useDeleteAddressMutation = useDeleteAddress()
+  const updateUserAddressMutation = UpdateUserAddress()
+
+
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: { name: "", mobile: "" , alternatemobile: "" , pincode : "" , address : "" , locality : "" , country : {id:"",name:""} , city : {id:"",name:""}  , state : {id:"",name:""} ,type: 'Home' },
+    initialValues: { name: "", mobile: "", alternatemobile: "", pincode: "", address: "", locality: "", country: { id: "", name: "" }, city: { id: "", name: "" }, state: { id: "", name: "" }, type: 'Home' },
     validationSchema: addressAddSchema,
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
       // console.warn('formsubmit', values);
-      if(!(!!values.country.name)){
-       
+      if (!(!!values.country.name)) {
+
         toast.show({
-                placement: "bottom",
-                render: ({ id }: { id: string }) => {
-                  const toastId = "toast-" + id
-                  return (
-                    <Toast nativeID={toastId} variant="accent" action="error">
-                      <ToastTitle>Please Select Country</ToastTitle>
-                    </Toast>
-                  );
-                },
-              })
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Please Select Country</ToastTitle>
+              </Toast>
+            );
+          },
+        })
       }
-      if(!(!!values.state.name)){
-       
+      if (!(!!values.state.name)) {
+
         toast.show({
-                placement: "bottom",
-                render: ({ id }: { id: string }) => {
-                  const toastId = "toast-" + id
-                  return (
-                    <Toast nativeID={toastId} variant="accent" action="error">
-                      <ToastTitle>Please Select State</ToastTitle>
-                    </Toast>
-                  );
-                },
-              })
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Please Select State</ToastTitle>
+              </Toast>
+            );
+          },
+        })
       }
-      if(!(!!values.city.name)){
-       
+      if (!(!!values.city.name)) {
+
         toast.show({
-                placement: "bottom",
-                render: ({ id }: { id: string }) => {
-                  const toastId = "toast-" + id
-                  return (
-                    <Toast nativeID={toastId} variant="accent" action='error'>
-                      <ToastTitle>Please Select City</ToastTitle>
-                    </Toast>
-                  );
-                },
-              })
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action='error'>
+                <ToastTitle>Please Select City</ToastTitle>
+              </Toast>
+            );
+          },
+        })
       }
+
+
       const payload = {
-        user_id:userInfo?.userUniqueId,
+        user_id: userInfo?.userUniqueId,
         type: formik.values.type,  // Home , Office
         name: formik.values.name,
         mobile_no: formik.values.mobile,
@@ -126,119 +136,282 @@ const Address = () => {
         city: formik.values.city?.name,
         state_id: formik.values.state?.id,
         state: formik.values.state?.name,
+        country_id: formik.values.country?.id,
         country: formik.values.country?.name,
-        pincode: Number(formik.values.pincode) 
-        }
+        pincode: Number(formik.values.pincode)
+      }
 
-        console.log('PAYLOAD',payload);
-        
-        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+      console.log('PAYLOAD', payload);
+
+      if(!isEdit){
         useAddNewAddressMutation.mutate(payload, {
-        onSuccess: (data) => {
-          
-          // console.log('SUGNUPP DATA',data?.data);
-          
-          toast.show({
-            placement: "bottom",
-            render: ({ id }: { id: string }) => {
-              const toastId = "toast-" + id
-              return (
-                <Toast nativeID={toastId} variant="accent" action="success">
-                  <ToastTitle>Address Added Successfully</ToastTitle>
-                </Toast>
-              );
-            },
-          })
+          onSuccess: (data) => {
+  
+            // console.log('SUGNUPP DATA',data?.data);
+  
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>Address Added Successfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+  
+  
+  
+            queryClient.invalidateQueries({
+              queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+            })
+  
+            // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+            formik.resetForm()
+            setAddNewAddress(true)
+          },
+          onError: (error) => {
+            console.log(error);
+  
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="error">
+                    <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                  </Toast>
+                )
+              }
+            })
+          }
+        })
+    
+      }else if(isEdit){
 
-          
-
-          queryClient.invalidateQueries({
-            queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
-          })
-           
-          // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
-          formik.resetForm()
-          setAddNewAddress(true)
-        },
-        onError: (error) => {
-          console.log(error);
-          
-          toast.show({
-            placement: "bottom",
-            render: ({ id }: { id: string }) => {
-              const toastId = "toast-" + id
-              return (
-                <Toast nativeID={toastId} variant="accent" action="error">
-                  <ToastTitle>Something went wrong, please try again later</ToastTitle>
-                </Toast>
-              )
-            }
-          })
+        const payload = {
+          user_id: userInfo?.userUniqueId,
+          type: formik.values.type,  // Home , Office
+          name: formik.values.name,
+          mobile_no: formik.values.mobile,
+          address: formik.values.address,
+          city_id: formik.values.city?.id,
+          city: formik.values.city?.name,
+          state_id: formik.values.state?.id,
+          state: formik.values.state?.name,
+          country_id: formik.values.country?.id,
+          country: formik.values.country?.name,
+          pincode: Number(formik.values.pincode)
         }
-      })
-      
+
+        updateUserAddressMutation.mutate({ payload: payload, id: Number(updatedAddressID) }, {
+          onSuccess: (data) => {
+  
+            // console.log('SUGNUPP DATA',data?.data);
+  
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>Address Updated Successfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+  
+  
+  
+            queryClient.invalidateQueries({
+              queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+            })
+  
+            // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+            formik.resetForm()
+            setAddNewAddress(true)
+          },
+          onError: (error) => {
+            console.log(error);
+  
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="error">
+                    <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                  </Toast>
+                )
+              }
+            })
+          }
+        })
+        
+       
+        
+      }
+
+      // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
+     
+
 
     }
 
   });
 
-  async function load(){
-    setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+
+  async function load() {
+    setUserInfo(JSON.parse(await getAccessToken('userInfo')));
   }
-  
+
+  const deleteUserAddress = (id) => {
+
+
+
+    useDeleteAddressMutation.mutate(id, {
+      onSuccess: (data) => {
+
+        // console.log('SUGNUPP DATA',data?.data);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Address Deleted Successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+
+
+        queryClient.invalidateQueries({
+          queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+        })
+
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+        formik.resetForm()
+        setAddNewAddress(true)
+      },
+      onError: (error) => {
+        console.log(error);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
+  }
+
+  const editAddress = async (item) => {
+
+    await setIsEdit(true)
+
+
+    formik.setFieldValue('name', item?.name)
+    formik.setFieldValue('mobile', item?.mobile_no)
+    formik.setFieldValue('pincode', item?.pincode.toString())
+    formik.setFieldValue('address', item?.address)
+    formik.setFieldValue('country', { id: item?.country_id, name: item?.country })
+    formik.setFieldValue('state', { id: item?.state_id, name: item?.state })
+    formik.setFieldValue('city', { id: item?.city_id, name: item?.city })
+    formik.setFieldValue('type', item?.type)
+    setUpdatedAddressID(item?.id)
+
+    setAddNewAddress(false)
+
+  }
+
   useEffect(() => {
     load();
   }, []);
-  console.log('UserData....',userInfo?.userUniqueId);
+  // console.log('UserData....', userInfo?.userUniqueId);
 
   //api call
-  const {data : addressCountriesData , isLoading : addressCountriesDataIsLoading} = useGetAddressCountries()
-  const {data : stateByCountryData , isLoading : stateByCountryDataIsLoading,isFetching:stateByCountryDataIsFetching} = useGetStateByCountry({countryId: formik?.values?.country?.id })
-  const {data : citiesByStateData , isLoading : citiesByStateDataIsLoading,isFetching:citiesByStateDataIsFetching} = useGetCitiesByState({stateId: formik?.values?.state?.id})
-  const {data : userAddressesData , isLoading : userAddressesDataIsLoading,isFetching:userAddressesDataIsFetching} = useGetUserAddresses({userUniqueId: userInfo?.userUniqueId})
-  // console.log('ADDRESS COTRY',userAddressesData?.data?.result[0]);
-  
-
-  const onChangeCountry = (item: any) => formik.setFieldValue('country',{id:item.value,name:item.iso});
-  const onChangeCity = (item: any) => formik.setFieldValue('city',{id:item.value,name:item.label});
-  const onChangeState = (item: any) => formik.setFieldValue('state',{id:item.value,name:item.label});
+  const { data: addressCountriesData, isLoading: addressCountriesDataIsLoading } = useGetAddressCountries()
+  const { data: stateByCountryData, isLoading: stateByCountryDataIsLoading, isFetching: stateByCountryDataIsFetching } = useGetStateByCountry({ countryId: formik?.values?.country?.id })
+  const { data: citiesByStateData, isLoading: citiesByStateDataIsLoading, isFetching: citiesByStateDataIsFetching } = useGetCitiesByState({ stateId: formik?.values?.state?.id })
+  const { data: userAddressesData, isLoading: userAddressesDataIsLoading, isFetching: userAddressesDataIsFetching } = useGetUserAddresses({ userUniqueId: userInfo?.userUniqueId })
+  console.log('ADDRESS COTRY',stateByCountryData?.data?.result[0]?.statesList[0],'city',citiesByStateData?.data?.result[0]?.citiesList[0]);
 
 
-  
 
+  const onChangeCountry = async(item: any) => {
+   await formik.setFieldValue('country', { id: item.value, name: item.label })
+
+  };
+  const onChangeCity = (item: any) => formik.setFieldValue('city', { id: item.value, name: item.label });
+  const onChangeState = (item: any) => formik.setFieldValue('state', { id: item.value, name: item.label });
 
 
   useEffect(() => {
     if (addressCountriesData?.data && !addressCountriesDataIsLoading) {
-      const updatedData = addressCountriesData?.data?.result[0].countriesList?.map((item: any) => {
-        return {label: item?.name, value: item?.id,iso: item?.iso2 }
+      const updatedData = addressCountriesData?.data?.result[0]?.countriesList?.map((item: any) => {
+        return { label: item?.name, value: item?.id }
       })
 
       setCountryList(updatedData)
+
+    }
+  }, [addressCountriesDataIsLoading])
+
+
+
+
+  useEffect(() => {
+
+    const fetchStates = async () => {
+
+      if (stateByCountryData?.data && !stateByCountryDataIsLoading) {
+        setStateList([])
+
+        const updatedData = await stateByCountryData?.data?.result[0]?.statesList?.map((item: any) => {
+          return { label: item?.name, value: item?.id }
+        })
+
+        console.log('state chnges', updatedData);
+
+        setStateList((prev: any[]) => {
+          // Ensure updatedData is an array and merge it with the previous state list
+          return [...prev, ...(updatedData || [])];
+        })
+
+      }
+
+      if (citiesByStateData?.data && !citiesByStateDataIsLoading) {
+        setCitiesList([])
+        console.log('City chnges');
+
+        const updatedData = await citiesByStateData?.data?.result[0]?.citiesList?.map((item: any) => {
+          return { label: item?.name, value: item?.id }
+        })
+
+        setCitiesList((prev: any[]) => {
+          // Ensure updatedData is an array and merge it with the previous state list
+          return [...prev, ...(updatedData || [])];
+        })
+      }
+
+
+
     }
 
-    if (stateByCountryData?.data && !stateByCountryDataIsLoading) {
-      console.log('state chnges');
-      
-      const updatedData = stateByCountryData?.data?.result[0].statesList?.map((item: any) => {
-        return {label: item?.name, value: item?.id }
-      })
+    fetchStates()
 
-      setStateList(updatedData)
-    }
+  }, [stateByCountryDataIsLoading, citiesByStateDataIsLoading, formik?.values?.country, formik?.values?.state])
 
-    if (citiesByStateData?.data && !citiesByStateDataIsLoading) {
-      console.log('state chnges');
-      
-      const updatedData = citiesByStateData?.data?.result[0].citiesList?.map((item: any) => {
-        return {label: item?.name, value: item?.id }
-      })
-
-      setCitiesList(updatedData)
-    }
-
-
-  }, [addressCountriesDataIsLoading,formik?.values?.country,stateByCountryDataIsFetching,formik?.values?.state,citiesByStateDataIsFetching])
 
 
   const labels = ["Cart", "Address", "Payment", "Summary"];
@@ -272,6 +445,11 @@ const Address = () => {
     setStepCurrentPosition(position);
   }
 
+  if (userAddressesDataIsLoading) {
+    return (<Container statusBarStyle='dark-content' >
+      <Loader />
+    </Container>)
+  }
 
 
 
@@ -303,10 +481,10 @@ const Address = () => {
 
           <View style={{ paddingHorizontal: responsiveWidth(3), marginTop: responsiveHeight(1), gap: responsiveHeight(1.5) }} >
 
-         
-       
 
-         
+
+
+
             <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
               <TextInput
                 style={localStyles.textInput}
@@ -319,7 +497,7 @@ const Address = () => {
               />
             </Box>
             {(formik.errors.name && formik.touched.name) ? <Text fontFamily='$InterRegular' lineHeight={14} fontSize={12} style={{ color: 'red', }} >{formik.errors.name}</Text> : null}
-     
+
             <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
               <TextInput
                 style={localStyles.textInput}
@@ -402,18 +580,18 @@ const Address = () => {
               valueField="value"
               placeholder={'countries*'}
               value={formik.values.country?.id}
-             
+
               onChange={onChangeCountry}
               renderRightIcon={() => <BottomIcon />}
               itemTextStyle={localStyles.selectedTextStyle}
               itemContainerStyle={localStyles.itemContainerStyle}
               selectedTextProps={{ numberOfLines: 1 }}
-              renderItem={(item)=>{return(<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1}  style={{paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1)}} >{item?.label}</Text>)}}
+              renderItem={(item) => { return (<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1} style={{ paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(1) }} >{item?.label}</Text>) }}
               activeColor={colors.primary3}
             />
 
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2) }} >
-            <Dropdown
+              <Dropdown
                 style={localStyles.dropdown}
                 placeholderStyle={localStyles.placeholderStyle}
                 selectedTextStyle={localStyles.selectedTextStyle}
@@ -428,9 +606,9 @@ const Address = () => {
                 itemTextStyle={localStyles.selectedTextStyle}
                 itemContainerStyle={localStyles.itemContainerStyle}
                 selectedTextProps={{ numberOfLines: 1 }}
-                renderItem={(item)=>{return(<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1}  style={{paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1)}} >{item?.label}</Text>)}}
+                renderItem={(item) => { return (<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1} style={{ paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(1) }} >{item?.label}</Text>) }}
                 activeColor={colors.primary3}
-             />
+              />
               <Dropdown
                 style={localStyles.dropdown}
                 placeholderStyle={localStyles.placeholderStyle}
@@ -446,10 +624,10 @@ const Address = () => {
                 itemTextStyle={localStyles.selectedTextStyle}
                 itemContainerStyle={localStyles.itemContainerStyle}
                 selectedTextProps={{ numberOfLines: 1 }}
-                renderItem={(item)=>{return(<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1}  style={{paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1)}} >{item?.label}</Text>)}}
+                renderItem={(item) => { return (<Text fontFamily='$InterMedium' fontSize={12} lineHeight={14} numberOfLines={1} style={{ paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(1) }} >{item?.label}</Text>) }}
                 activeColor={colors.primary3}
               />
-            
+
 
 
             </View>
@@ -458,11 +636,11 @@ const Address = () => {
 
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }} >
 
-              <Pressable onPress={() => { formik.setFieldValue('type','Home') }} style={{ backgroundColor: formik.values.type === 'Home' ? colors.primary : colors.white, borderRadius: responsiveWidth(3), paddingHorizontal: responsiveWidth(3), paddingVertical: formik.values.type === 'Home' ? responsiveHeight(0.5) : responsiveHeight(0.4), borderWidth: formik.values.type === 'Home'? 0 : 1, borderColor: colors.primary }} >
+              <Pressable onPress={() => { formik.setFieldValue('type', 'Home') }} style={{ backgroundColor: formik.values.type === 'Home' ? colors.primary : colors.white, borderRadius: responsiveWidth(3), paddingHorizontal: responsiveWidth(3), paddingVertical: formik.values.type === 'Home' ? responsiveHeight(0.5) : responsiveHeight(0.4), borderWidth: formik.values.type === 'Home' ? 0 : 1, borderColor: colors.primary }} >
                 <CText type='b12' color={formik.values.type === 'Home' ? colors.white : colors.black} >Home</CText>
               </Pressable>
 
-              <Pressable onPress={() => { formik.setFieldValue('type','Work')}} style={{ backgroundColor: formik.values.type === 'Work' ? colors.primary : colors.white, borderRadius: responsiveWidth(3), paddingHorizontal: responsiveWidth(3.5), paddingVertical: formik.values.type === 'Work' ? responsiveHeight(0.5) : responsiveHeight(0.4), borderWidth: formik.values.type === 'Work' ? 0 : 1, borderColor: colors.primary }} >
+              <Pressable onPress={() => { formik.setFieldValue('type', 'Work') }} style={{ backgroundColor: formik.values.type === 'Work' ? colors.primary : colors.white, borderRadius: responsiveWidth(3), paddingHorizontal: responsiveWidth(3.5), paddingVertical: formik.values.type === 'Work' ? responsiveHeight(0.5) : responsiveHeight(0.4), borderWidth: formik.values.type === 'Work' ? 0 : 1, borderColor: colors.primary }} >
                 <CText type='b12' color={formik.values.type === 'Work' ? colors.white : colors.black} >Work</CText>
               </Pressable>
 
@@ -470,7 +648,7 @@ const Address = () => {
 
           </View>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2), paddingHorizontal: responsiveWidth(3), marginTop: responsiveHeight(3.5) }} >
+          {/* <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2), paddingHorizontal: responsiveWidth(3), marginTop: responsiveHeight(3.5) }} >
 
             <CheckBox
               style={{}}
@@ -484,23 +662,26 @@ const Address = () => {
 
             <CText type='s12' >Make this my default address</CText>
 
-          </View>
+          </View> */}
 
-    
 
-          <PrimaryButton disabled={useAddNewAddressMutation.isPending} loading={useAddNewAddressMutation.isPending} onPress={formik.handleSubmit} buttonText='Add Address' marginHorizontal={responsiveWidth(3)} marginTop={responsiveHeight(1.5)} />
+
+          <PrimaryButton disabled={useAddNewAddressMutation.isPending || updateUserAddressMutation ?.isPending} loading={useAddNewAddressMutation.isPending || updateUserAddressMutation ?.isPending} onPress={formik.handleSubmit} buttonText={isEdit ? 'Update Address' : 'Add Address'} marginHorizontal={responsiveWidth(3)} marginTop={responsiveHeight(2.5)} />
 
         </View>}
 
         {addNewAddress && <View style={{ borderTopWidth: 1, borderTopColor: '#DAD9D9' }} >
 
-          <TouchableOpacity style={{ backgroundColor: '#F9F4F4', paddingVertical: responsiveHeight(1.3), marginHorizontal: responsiveWidth(5), marginVertical: responsiveHeight(1.5), borderRadius: responsiveWidth(3), borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
+          {/* <TouchableOpacity style={{ backgroundColor: '#F9F4F4', paddingVertical: responsiveHeight(1.3), marginHorizontal: responsiveWidth(5), marginVertical: responsiveHeight(1.5), borderRadius: responsiveWidth(3), borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
             <View style={{ backgroundColor: colors.primary, width: '11%', height: responsiveHeight(5.2), position: 'absolute', borderTopRightRadius: responsiveWidth(2), borderBottomRightRadius: responsiveWidth(2) }} ></View>
             <CText type='m12' style={{ alignSelf: 'center' }} >Address Saved</CText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
 
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setAddNewAddress(!addNewAddress) }} >
+          <TouchableOpacity activeOpacity={0.6} onPress={() => {
+            setIsEdit(false)
+            setAddNewAddress(!addNewAddress)
+          }} >
             <CText type='m14' color={colors.primary} style={{ paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5) }} >
               + ADD NEW ADDRESS
             </CText>
@@ -530,15 +711,15 @@ const Address = () => {
 
                   <View style={{ ...styles.flexRow, alignItems: 'center', gap: responsiveWidth(5) }} >
 
-                    <Pressable>
+                    <TouchableOpacity onPress={() => { editAddress(item) }} >
                       <CText type='s12' color='#F27636' >EDIT</CText>
-                    </Pressable>
-                    <Pressable>
-                      <CText type='s12' color='#F27636' >REMOVE</CText>
-                    </Pressable>
-                    <Pressable>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { deleteUserAddress(item?.id) }} >
+                      {useAddNewAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
+                    </TouchableOpacity>
+                    <TouchableOpacity>
                       <CText type='s12' color='#F27636' >SET AS DEFAULT</CText>
-                    </Pressable>
+                    </TouchableOpacity>
 
                   </View>
 
@@ -597,7 +778,7 @@ const localStyles = StyleSheet.create({
     ...typography.fontSizes.f12,
     ...typography.fontWeights.Medium,
     color: colors.gray7,
-    
+
   },
   itemContainerStyle: {
     // ...styles.ph10,

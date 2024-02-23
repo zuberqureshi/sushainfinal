@@ -6,6 +6,7 @@ class AppointmentsService {
   queryKeys = {
     getUpcomingAppointments: 'getUpcomingAppointments',
     getCompletedAppointments: 'getCompletedAppointments',
+    getReportByAppointmentId : 'getReportByAppointmentId',
     
 
     
@@ -27,6 +28,14 @@ class AppointmentsService {
 
     return fetcher({
       url: `/booking/completedappointmentbyuserid?userId=${userid}`,
+      method: 'GET',
+    });
+  }
+
+  getReportByAppointmentId = async (data:any) => {
+
+    return fetcher({
+      url: `/video/reportview?appId=${data}`,
       method: 'GET',
     });
   }
