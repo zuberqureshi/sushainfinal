@@ -25,14 +25,14 @@ const Appointments = () => {
   //api call
   const { data: upcomingAppointmentData, isLoading: isLoadingUpcomingAppointment } = useGetUpcomingAppointments({ userid: 257 })
   const { data: completedAppointmentData, isLoading: isLoadingCompletedAppointment } = useGetCompletedAppointments({ userid: 257 })
-
+  
   const [status, setStatus] = useState(false)
   const [selectedAppointmentView, setselectedAppointmentView] = useState('upcoming')
   const [selectedReviewStar, setSelectedReviewStar] = useState<number>(0)
 
-  if(isLoadingCompletedAppointment || isLoadingUpcomingAppointment){
+  if(isLoadingCompletedAppointment || isLoadingUpcomingAppointment ){
     return(
-      <Container>
+      <Container statusBarStyle='dark-content' >
         <CHeader title='Appointments' />
         <Loader/>
       </Container>

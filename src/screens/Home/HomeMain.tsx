@@ -166,8 +166,8 @@ const locationSet = async() => {
           <TouchableOpacity style={localStyles.locationContainer}>
             <Location />
             <View>
-              <CText type={'s12'}>
-                {strings.hi}  { userInfo?.userName }
+              <CText type={'s12'} style={{textTransform:'capitalize'}} >
+                {strings.hi} { userInfo?.userName }
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
               <Pressable onPress={()=>{getLocation()}} style={localStyles.locationContainer}>
