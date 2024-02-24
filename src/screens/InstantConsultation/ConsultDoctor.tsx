@@ -49,15 +49,16 @@ const ConsultDoctor = () => {
       // console.log('updatePatient', values);
       // action.resetForm()
       // loadUserInfo();
+     if(isChecked){
       if (!(!!values.healthissue) || !(!!values.language)) {
         toast.show({
           placement: "bottom",
           render: ({ id }) => {
             const toastId = "toast-" + id
             return (
-              <Toast nativeID={toastId} action="error" variant="accent">
+              <Toast nativeID={toastId} action="warning" variant="accent">
                 <VStack space="xs">
-                  <ToastTitle>Please select info</ToastTitle>
+                  <ToastTitle>Please select HealthIssue & Language</ToastTitle>
 
                 </VStack>
               </Toast>
@@ -69,6 +70,22 @@ const ConsultDoctor = () => {
         console.log(values,'sbmit jjj');
         
       }
+     }else{
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          const toastId = "toast-" + id
+          return (
+            <Toast nativeID={toastId} action="warning" variant="accent">
+              <VStack space="xs">
+                <ToastTitle>Please accept T&C</ToastTitle>
+
+              </VStack>
+            </Toast>
+          )
+        },
+      })
+     }
 
 
 

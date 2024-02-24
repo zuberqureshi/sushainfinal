@@ -3,18 +3,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PermissionsAndroid, Platform} from 'react-native';
 
 export async function requestUserPermission() {
- 
-    if(Platform.OS === 'android'){PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);} //show allow notifucation dialog
-  const authStatus = await messaging().requestPermission();
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    // await messaging().registerDeviceForRemoteMessages();
-  if (enabled) {
-    console.log('Authorization status:', authStatus);
-    await messaging().registerDeviceForRemoteMessages();
-    getFCMToken()
-  }
+  if(Platform.OS == 'android' && Platform.Version >= 33){
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+      if(granted == PermissionsAndroid.RESULTS.GRANTED){
+              getFCMToken()
+      }else{
+        console.log('Permission Denied');
+        
+      }
+    
+    }else{
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        // await messaging().registerDeviceForRemoteMessages();
+      if (enabled) {
+        console.log('Authorization status:', authStatus);
+        await messaging().registerDeviceForRemoteMessages();
+        getFCMToken()
+      }
+    }
 }
 
 const getFCMToken = async()=>{

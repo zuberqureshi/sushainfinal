@@ -167,9 +167,14 @@ const AppointmentBooked = () => {
   const onSubmitReport = () => {
 
 
-    var formData = new FormData();
+    var formData = {
+      app_id : '',
+      images : '',
+      report_name: '',
+      tab : '',
+    };
 
-    formData.append('report', 'dattttt');
+
 
     // formData.append('report_name','danish textreport')
     // formData.append('tab','appointment')

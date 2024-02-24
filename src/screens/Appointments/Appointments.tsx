@@ -1,11 +1,10 @@
 import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { Box, Spinner, Text, Toast, ToastTitle, useToast, Pressable } from '@gluestack-ui/themed';
 import React, { useState } from 'react'
 import { Container } from '../../components/Container'
 import Body from '../../components/Body/Body'
 import CHeader from '../../components/common/CHeader'
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent'
-import { Box, Pressable } from '@gluestack-ui/themed'
-import { Text } from '@gluestack-ui/themed'
 import { AppointmentBeautyIcon, AppointmentMedicinesIcon, AppointmentOrderIcon, BuyPrescription, CalenderIcon, ClockSmallColorIcon, DiscountGreenIcon, DownloadWhiteIcon, GreaterThanBlack, GreaterThanIcon, ShakeHand, StarFilledPrimaryColor, StarUnFilledPrimaryColor, UploadDocIcon, VideoCallIcon, ViewBlackEyeIcon, WatchIcon } from '../../assets/svgs'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { colors, styles } from '../../themes'
@@ -19,26 +18,95 @@ import useGetUpcomingAppointments from '../../hooks/appointment/get-upcoming-app
 import moment from 'moment'
 import useGetCompletedAppointments from '../../hooks/appointment/get-completed-appointments'
 import Loader from '../../components/Loader/Loader'
+import useRatingAndReviewCompletedAppointment from '../../hooks/appointment/submit-rating-review-completed-appointment'
+import appointmentService from '../../services/appointment-service';
+import { queryClient } from '../../react-query/client';
 
 const Appointments = () => {
+
+  const toast = useToast()
 
   //api call
   const { data: upcomingAppointmentData, isLoading: isLoadingUpcomingAppointment } = useGetUpcomingAppointments({ userid: 257 })
   const { data: completedAppointmentData, isLoading: isLoadingCompletedAppointment } = useGetCompletedAppointments({ userid: 257 })
-  
+  const useRatingAndReviewCompletedAppointmentMutation = useRatingAndReviewCompletedAppointment()
+
   const [status, setStatus] = useState(false)
   const [selectedAppointmentView, setselectedAppointmentView] = useState('upcoming')
-  const [selectedReviewStar, setSelectedReviewStar] = useState<number>(0)
+  const [selectedReviewStar, setSelectedReviewStar] = useState({id:'',star:''})
 
-  if(isLoadingCompletedAppointment || isLoadingUpcomingAppointment ){
-    return(
+  const submitRatingAndReview = (id,docid,orderid) => {
+
+    const payload = {
+      id: id,
+      docId: docid,
+      userId: 257,
+      orderId: orderid,
+      rating: selectedReviewStar?.star,
+      type: "VIDEO CLINIC"
+    }
+
+    console.log({payload});
+    
+
+
+    useRatingAndReviewCompletedAppointmentMutation.mutate(payload, {
+      onSuccess: (data) => {
+
+        // console.log('SUGNUPP DATA',data?.data);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Rating & Review Submited Successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+
+
+        queryClient.invalidateQueries({
+          queryKey: [appointmentService.queryKeys.getCompletedAppointments + 257]
+        })
+
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+        // formik.resetForm()
+        // setAddNewAddress(true)
+      },
+      onError: (error) => {
+        console.log(error);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
+  }
+
+
+  if (isLoadingCompletedAppointment || isLoadingUpcomingAppointment) {
+    return (
       <Container statusBarStyle='dark-content' >
         <CHeader title='Appointments' />
-        <Loader/>
+        <Loader />
       </Container>
 
     )
   }
+
+
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -141,7 +209,7 @@ const Appointments = () => {
             <Box backgroundColor='#ffffff' mb={10} >
 
               <Box px={16} >
-                {upcomingAppointmentData?.data?.result[0]?.upcomingAppointmentList?.slice(0,2)?.map((item, index) => {
+                {upcomingAppointmentData?.data?.result[0]?.upcomingAppointmentList?.slice(0, 2)?.map((item, index) => {
 
                   const date = new Date(item?.start_time);
 
@@ -267,172 +335,172 @@ const Appointments = () => {
             <Box backgroundColor='#F7F7F7' pb={25} mb={10} mt={10} >
               <Text fontFamily='$InikaRegular' fontSize={13} color={'#696767'} my={8} mx={16} >Don’t forget to take Follow up</Text>
 
-              {completedAppointmentData?.data?.result[0]?.completedAppointmentList?.slice(0,2)?.map((item, index) => {
-
+              {completedAppointmentData?.data?.result[0]?.completedAppointmentList?.slice(0, 2)?.map((item, index) => {
 
                 return (
                   <Box key={index.toString()} >
-                   <Box  backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{ ...styles.shadowStyle }} >
-                <Box flexDirection='row' alignItems='center' gap={18} py={10}>
-                  <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
-                  <Box flexDirection='column' gap={9} >
-                    <Box flexDirection='row' alignItems='center' >
-                      <Box gap={3} >
-                        <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
-                        <Text fontFamily='$InterRegular' w={254} lineHeight={13} fontSize={10} numberOfLines={3} color={colors.black} >Gynae and Fertility, Neuro, Hormonal Imbalances, PCOD and UT Fibroid, Pre Conception Care, Pre and Post Natal Care, Hypertension</Text>
+                    <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={10} style={{ ...styles.shadowStyle }} >
+                      <Box flexDirection='row' alignItems='center' gap={18} py={10}>
+                        <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
+                        <Box flexDirection='column' gap={9} >
+                          <Box flexDirection='row' alignItems='center' >
+                            <Box gap={3} >
+                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
+                              <Text fontFamily='$InterRegular' w={254} lineHeight={13} fontSize={10} numberOfLines={3} color={colors.black} >Gynae and Fertility, Neuro, Hormonal Imbalances, PCOD and UT Fibroid, Pre Conception Care, Pre and Post Natal Care, Hypertension</Text>
+                            </Box>
+
+
+                          </Box>
+
+
+
+
+                          <View style={localStyles.btnContainer}>
+                            <TouchableOpacity activeOpacity={0.6} >
+                              <Box backgroundColor={colors.success} flex={1} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} px={10} >
+                                <Text fontFamily='$InterMedium' fontSize={10} color={colors.white}>Book Followup</Text>
+                              </Box>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <Box backgroundColor={colors.success} flex={1} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} px={10} >
+                                <DownloadWhiteIcon />
+                                <Text fontFamily='$InterMedium' fontSize={10} color={colors.white}>Download Prescription</Text>
+                              </Box>
+                            </TouchableOpacity>
+                          </View>
+
+
+                          <View style={[localStyles.btnContainer, { marginVertical: responsiveHeight(1.5) }]}>
+                            <TouchableOpacity style={localStyles.uploadBtnStyle}>
+                              <ViewBlackEyeIcon
+                                width={moderateScale(16)}
+                                height={moderateScale(16)}
+                              />
+                              <CText type="m10" style={styles.ml5} color={'#777474'}>
+                                View Report
+                              </CText>
+                            </TouchableOpacity>
+
+                          </View>
+
+
+                        </Box>
                       </Box>
 
 
                     </Box>
 
+                    {!(!!item?.rating) && <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{ ...styles.shadowStyle }} >
+                      <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : Dr. Anshu Sharma</Text>
 
+                      <Box flexDirection='row' gap={5} >
 
+                        {['1', '2', '3', '4', '5'].map((itemStar, indexStar): any => {
+                          return (
+                            <TouchableOpacity key={indexStar.toString()} onPress={() => { setSelectedReviewStar({id:item?.id,star:indexStar+1}) }} activeOpacity={0.6} >
+                              {itemStar < (item?.id == selectedReviewStar?.id ? selectedReviewStar.star+1 : 1) ? <StarFilledPrimaryColor /> : <StarUnFilledPrimaryColor />}
+                            </TouchableOpacity>
 
-                    <View style={localStyles.btnContainer}>
-                      <TouchableOpacity activeOpacity={0.6} >
-                        <Box backgroundColor={colors.success} flex={1} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} px={10} >
-                          <Text fontFamily='$InterMedium' fontSize={10} color={colors.white}>Book Followup</Text>
-                        </Box>
-                      </TouchableOpacity>
+                          )
+                        })}
+                      </Box>
 
-                      <TouchableOpacity>
-                        <Box backgroundColor={colors.success} flex={1} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} px={10} >
-                          <DownloadWhiteIcon />
-                          <Text fontFamily='$InterMedium' fontSize={10} color={colors.white}>Download Prescription</Text>
-                        </Box>
-                      </TouchableOpacity>
-                    </View>
-
-
-                    <View style={[localStyles.btnContainer, { marginVertical: responsiveHeight(1.5) }]}>
-                      <TouchableOpacity style={localStyles.uploadBtnStyle}>
-                        <ViewBlackEyeIcon
-                          width={moderateScale(16)}
-                          height={moderateScale(16)}
+                      <Box flexDirection='row' alignItems='center' borderWidth={1} borderRadius={10} borderColor='#C7C2C2' overflow='hidden' px={8} >
+                        <TextInput
+                          placeholder='Type here........'
+                          placeholderTextColor={colors.black}
+                          multiline={true}
+                          numberOfLines={10}
+                          style={{ height: responsiveHeight(16), width: '87%', textAlignVertical: 'top', color: colors.black }}
                         />
-                        <CText type="m10" style={styles.ml5} color={'#777474'}>
-                          View Report
-                        </CText>
-                      </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>{submitRatingAndReview(item?.id,item?.doc_id,item?.orderId)}} activeOpacity={0.6} style={{ alignSelf: 'flex-start' }} >
+                          <Text fontFamily='$InterMedium' fontSize={11} lineHeight={13} color={'#858181'} mt={8} >Submit</Text>
+                        </TouchableOpacity>
 
-                    </View>
+                      </Box>
+
+
+                    </Box>}
 
 
                   </Box>
+                )
+              })}
+
+
+
+
+
+              <TouchableOpacity activeOpacity={0.6} >
+                <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
+                  <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
                 </Box>
+              </TouchableOpacity>
+
+
+
+              <Box pb={30} pt={8} px={16} >
+
+                <Box flexDirection='row' alignItems='center' gap={5} mb={15}>
+                  <DiscountGreenIcon style={{ alignSelf: 'flex-start', marginTop: responsiveHeight(0.9) }} />
+                  <Text fontFamily='$InterMedium' fontSize={10} color={'#696767'} numberOfLines={2} >Your medicines are added to cart. Get 20%off on medicine orders. Apply Coupon PURE20 at checkout  </Text>
+                </Box>
+
+                <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
+                  elevation: 3,
+                }} >
+                  <Box flexDirection='row' alignItems='center' gap={5}>
+                    <AppointmentMedicinesIcon />
+                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
+                  </Box>
+                  <GreaterThanBlack />
+                </Box>
+
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
+                  elevation: 3,
+                }} >
+                  <Box flexDirection='row' alignItems='center' gap={5}>
+                    <AppointmentBeautyIcon />
+                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
+                  </Box>
+                  <GreaterThanBlack />
+                </Box>
+
+                <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
+                  elevation: 3,
+                }} >
+                  <Box flexDirection='row' alignItems='center' gap={5}>
+                    <AppointmentOrderIcon />
+                    <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
+                  </Box>
+                  <GreaterThanBlack />
+                </Box>
+
 
 
               </Box>
-              
-              { !!item?.rating && <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{ ...styles.shadowStyle }} >
-                <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : Dr. Anshu Sharma</Text>
-
-                <Box flexDirection='row' gap={5} >
-
-                  {['1', '2', '3', '4', '5'].map((item, index): any => {
-                    return (
-                      <TouchableOpacity key={index.toString()} onPress={() => { setSelectedReviewStar(index + 1) }} activeOpacity={0.6} >
-                        {item < (selectedReviewStar + 1) ? <StarFilledPrimaryColor /> : <StarUnFilledPrimaryColor />}
-                      </TouchableOpacity>
-
-                    )
-                  })}
-                </Box>
-
-                <Box flexDirection='row' alignItems='center' borderWidth={1} borderRadius={10} borderColor='#C7C2C2' overflow='hidden' px={8} >
-                  <TextInput
-                    placeholder='Type here........'
-                    placeholderTextColor={colors.black}
-                    multiline={true}
-                    numberOfLines={10}
-                    style={{ height: responsiveHeight(16), width: '87%', textAlignVertical: 'top', }}
-                  />
-                  <TouchableOpacity activeOpacity={0.6} style={{ alignSelf: 'flex-start' }} >
-                    <Text fontFamily='$InterMedium' fontSize={11} lineHeight={13} color={'#858181'} mt={8} >Submit</Text>
-                  </TouchableOpacity>
-
-                </Box>
-
-
-              </Box>}
-
-                  
-                  </Box>
-                ) }) }
-
-                 
-
-             
-
-              <TouchableOpacity activeOpacity={0.6} >
-                  <Box backgroundColor={colors.primary} alignSelf='center' h={24} w={109} borderRadius={10} alignItems='center' my={30} >
-                    <Text fontFamily='$InterMedium' fontSize={13} color={colors.white}>Show more</Text>
-                  </Box>
-                </TouchableOpacity>
-
-
-
-                <Box pb={30} pt={8} px={16} >
-
-                  <Box flexDirection='row' alignItems='center' gap={5} mb={15}>
-                    <DiscountGreenIcon style={{ alignSelf: 'flex-start', marginTop: responsiveHeight(0.9) }} />
-                    <Text fontFamily='$InterMedium' fontSize={10} color={'#696767'} numberOfLines={2} >Your medicines are added to cart. Get 20%off on medicine orders. Apply Coupon PURE20 at checkout  </Text>
-                  </Box>
-
-                  <Box flexDirection='row' alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.22,
-                    shadowRadius: 2.22,
-                    elevation: 3,
-                  }} >
-                    <Box flexDirection='row' alignItems='center' gap={5}>
-                      <AppointmentMedicinesIcon />
-                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Show more</Text>
-                    </Box>
-                    <GreaterThanBlack />
-                  </Box>
-
-                  <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.22,
-                    shadowRadius: 2.22,
-                    elevation: 3,
-                  }} >
-                    <Box flexDirection='row' alignItems='center' gap={5}>
-                      <AppointmentBeautyIcon />
-                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>Buy Beauty & personal care products</Text>
-                    </Box>
-                    <GreaterThanBlack />
-                  </Box>
-
-                  <Box flexDirection='row' mt={18} alignItems='center' justifyContent='space-between' backgroundColor={colors.white} px={10} h={53} borderRadius={10} style={{
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.22,
-                    shadowRadius: 2.22,
-                    elevation: 3,
-                  }} >
-                    <Box flexDirection='row' alignItems='center' gap={5}>
-                      <AppointmentOrderIcon />
-                      <Text fontFamily='$InterMedium' fontSize={13} color={'#5E5F5C'}>My Orders</Text>
-                    </Box>
-                    <GreaterThanBlack />
-                  </Box>
-
-
-
-                </Box>
 
 
 

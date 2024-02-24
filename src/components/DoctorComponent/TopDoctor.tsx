@@ -30,7 +30,7 @@ interface Top_Rate_Doctor_Data {
 export default function TopDoctor({data}:any) {
 
    const RenderItem = ({item,index}:{item:Top_Rate_Doctor_Data,index:number}) => {
-    console.log(item?.name,index,'lllkkk');
+    // console.log(item?.name,index,'lllkkk');
     return (
       <View key={item?.photo?.toString()} style={localStyles.cardMainContainer}>
         <View style={styles.flexRow}>

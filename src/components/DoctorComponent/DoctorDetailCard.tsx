@@ -117,7 +117,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
             <CButton
               title={strings.bookNow}
               containerStyle={localStyles.bookNowBtnStyle}
-              onPress={() => {navigation.navigate(StackNav.SelectTimeSlot, { id:item?.id,doctorslots:item?.slots }) }}
+              onPress={() => {navigation.navigate(StackNav.SelectTimeSlot, { id:item?.id,doctorslots:item?.slots,instantconsultation:'NO'}) }}
               bgColor={colors.success}
               color={colors.white}
               type="b12"

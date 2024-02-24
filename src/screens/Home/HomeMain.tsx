@@ -46,6 +46,7 @@ import { shopByategoryData } from '../../api/constant';
 import { getLocation } from '../../utils/service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Box, Pressable,Text } from '@gluestack-ui/themed';
+import CheckInternet from '../../components/common/CommonComponent/CheckInternet';
 // import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
@@ -250,6 +251,7 @@ const locationSet = async() => {
         )}
 
       </Body>
+      <CheckInternet />
     </Container>
   );
 };

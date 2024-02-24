@@ -7,6 +7,7 @@ class AppointmentsService {
     getUpcomingAppointments: 'getUpcomingAppointments',
     getCompletedAppointments: 'getCompletedAppointments',
     getReportByAppointmentId : 'getReportByAppointmentId',
+    ratingAndReviewCompletedAppointment : 'ratingAndReviewCompletedAppointment',
     
 
     
@@ -31,6 +32,16 @@ class AppointmentsService {
       method: 'GET',
     });
   }
+
+  ratingAndReviewCompletedAppointment = async (data:any) => {
+
+     return fetcher({
+       url: '/booking/ratingandreview',
+       method: 'POST',
+       data
+     });
+  
+   }
 
   getReportByAppointmentId = async (data:any) => {
 

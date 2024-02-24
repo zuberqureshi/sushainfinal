@@ -52,8 +52,7 @@ class AddressService {
   }
 
   addNewAddress = async (data:any) => {
-   console.log(data,'ttt');
-   
+
     return fetcher({
       url: 'order/createuseraddress',
       method: 'POST',

@@ -540,6 +540,7 @@ const localStyles = StyleSheet.create({
     ...typography.fontSizes.f14,
     ...typography.fontWeights.Regular,
     ...styles.ph10,
+    color:colors.black,
 
 
 

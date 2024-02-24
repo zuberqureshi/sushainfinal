@@ -317,6 +317,7 @@ const Address = () => {
 
   const editAddress = async (item) => {
 
+
     await setIsEdit(true)
 
 
@@ -712,10 +713,10 @@ const Address = () => {
                   <View style={{ ...styles.flexRow, alignItems: 'center', gap: responsiveWidth(5) }} >
 
                     <TouchableOpacity onPress={() => { editAddress(item) }} >
-                      <CText type='s12' color='#F27636' >EDIT</CText>
+                     <CText type='s12' color='#F27636' >EDIT</CText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { deleteUserAddress(item?.id) }} >
-                      {useAddNewAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
+                      {useDeleteAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
                     </TouchableOpacity>
                     <TouchableOpacity>
                       <CText type='s12' color='#F27636' >SET AS DEFAULT</CText>
@@ -789,6 +790,7 @@ const localStyles = StyleSheet.create({
     paddingLeft: responsiveWidth(3),
     ...typography.fontSizes.f12,
     ...typography.fontWeights.Medium,
+    color:colors.black
 
 
 
