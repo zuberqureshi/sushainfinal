@@ -25,6 +25,8 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+pod 'react-native-webrtc', :path => '../node_modules/@videosdk.live/react-native-webrtc';
+
 target 'sushain' do
   config = use_native_modules!
 
