@@ -54,6 +54,7 @@ import LifeStyle from "../screens/LifeStyle/LifeStyle";
 import Signup from "../screens/auth/Signup";
 import Cart from "../screens/CommonScreens/Cart";
 import Address from "../screens/CommonScreens/Address";
+import VideoCall from "../screens/CommonScreens/VideoCall";
 
 
 
@@ -105,6 +106,7 @@ export const StackRoute = {
   OrderSummery,
   Appointments,
   LifeStyle,
+  VideoCall,
 
 
 };

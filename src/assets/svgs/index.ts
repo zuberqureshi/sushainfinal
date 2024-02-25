@@ -125,6 +125,10 @@ import MedicineBottleLineGreen from './medicineBottleLineGreen.svg'
 import PlanNotebookIcon from './planNotebookIcon.svg'
 import UterusIcon from './uterusIcon.svg'
 import DropdownFilledIcon from './dropdownFilledIcon.svg'
+import OppsIcon from './oppsIcon.svg'
+import CallEndIcon from './callEndIcon.svg'
+import MuteIcon from './muteIcon.svg'
+import NoVideoIcon from './NoVideoIcon.svg'
 
 
 export {
@@ -252,5 +256,9 @@ export {
   PlanNotebookIcon,
   UterusIcon,
   DropdownFilledIcon,
+  OppsIcon,
+  CallEndIcon,
+  MuteIcon,
+  NoVideoIcon,
 
 };

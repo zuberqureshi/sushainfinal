@@ -6,7 +6,7 @@ import { getLng } from '../../i18n/changeLng';
 import strings from '../../i18n/strings';
 import { AuthContext } from '../../context/AuthContext'
 import { getLocation } from '../../utils/service';
-import Test from '../../screens/CommonScreens/Test';
+import Test from '../../screens/CommonScreens/VideoCall';
 
 const Stack = createNativeStackNavigator();
 
@@ -155,8 +155,8 @@ export default function StackNavigation() {
       />
 
       <Stack.Screen
-        name={'Test'}
-        component={Test}
+        name={StackNav.VideoCall}
+        component={StackRoute.VideoCall}
       />
 
 

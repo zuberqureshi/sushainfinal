@@ -42,5 +42,6 @@ export const StackNav = {
   OrderSummery:'OrderSummery',
   Appointments:'Appointments',
   LifeStyleDrawer:'LifeStyleDrawer',
+  VideoCall : 'VideoCall',
 
 };
