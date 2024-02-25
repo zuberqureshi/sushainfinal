@@ -29,7 +29,7 @@ export default function Splash() {
 
     if(  v?.accessToken){
       loginstatus =true
-      let  currentTime = Math.floor(new Date().getTime());
+      let  currentTime = Math.floor(new Date().getTime()/1000);
       console.log('tokeninfo from memoery',currentTime,v)
 
       if( currentTime < v?.expirationTime ){
