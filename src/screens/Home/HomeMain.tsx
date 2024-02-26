@@ -172,7 +172,7 @@ const locationSet = async() => {
               </CText>
               <Pressable onPress={()=>{getLocation()}} style={localStyles.locationContainer}>
                 <CText type={'s10'} color={colors.gray4}>
-                  {userLocation}
+                {!!userLocation ? userLocation : 'User Location'}
                 </CText>
                 <ArrowDown />
               </Pressable>

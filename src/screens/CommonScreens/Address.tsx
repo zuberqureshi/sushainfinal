@@ -485,7 +485,7 @@ const Address = () => {
 
 
 
-            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}  justifyContent='center'  >
               <TextInput
                 style={localStyles.textInput}
                 placeholderTextColor={colors.placeHolderColor}
@@ -498,7 +498,7 @@ const Address = () => {
             </Box>
             {(formik.errors.name && formik.touched.name) ? <Text fontFamily='$InterRegular' lineHeight={14} fontSize={12} style={{ color: 'red', }} >{formik.errors.name}</Text> : null}
 
-            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40} justifyContent='center'  >
               <TextInput
                 style={localStyles.textInput}
                 placeholderTextColor={colors.placeHolderColor}
@@ -511,7 +511,7 @@ const Address = () => {
             </Box>
             {(formik.errors.mobile && formik.touched.mobile) ? <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} style={{ color: 'red', }} >{formik.errors.mobile}</Text> : null}
 
-            {userAlternateNoShow && <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            {userAlternateNoShow && <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40} justifyContent='center'   >
               <TextInput
                 style={localStyles.textInput}
                 onChangeText={formik.handleChange('alternatemobile')}
@@ -531,7 +531,7 @@ const Address = () => {
           <CText type='b14' style={{ paddingHorizontal: responsiveWidth(3), marginVertical: responsiveHeight(1) }} >Address</CText>
 
           <View style={{ paddingHorizontal: responsiveWidth(3), marginTop: responsiveHeight(1), gap: responsiveHeight(1.5) }} >
-            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40} justifyContent='center'  >
               <TextInput
                 style={localStyles.textInput}
                 onChangeText={formik.handleChange('pincode')}
@@ -544,7 +544,7 @@ const Address = () => {
             </Box>
             {(formik.errors.pincode && formik.touched.pincode) ? <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} style={{ color: 'red', }}>{formik.errors.pincode}</Text> : null}
 
-            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}  justifyContent='center'  >
               <TextInput
                 style={localStyles.textInput}
                 onChangeText={formik.handleChange('address')}
@@ -557,7 +557,7 @@ const Address = () => {
             </Box>
             {(formik.errors.address && formik.touched.address) ? <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} style={{ color: 'red', }}>{formik.errors.address}</Text> : null}
 
-            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40}   >
+            <Box borderWidth={1} borderColor={colors.primary} borderRadius={6} height={40} justifyContent='center'   >
               <TextInput
                 style={localStyles.textInput}
                 onChangeText={formik.handleChange('locality')}

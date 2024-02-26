@@ -67,6 +67,8 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   //init
   const { doctorid, doctorslots,instantconsultation } = route.params;
+  console.log({doctorid});
+  
   const { data: allSlotsData, isLoading } = useGetDoctorsAllSlots()
   const useCheckCouponCodeMutation = useCheckCouponCode()
   const useCreateConsultationMutation = useCreateConsultation()
@@ -180,7 +182,7 @@ export default function SelectTimeSlot({ route, }: Props) {
           const payload = {
             userId: userInfo?.userId,
             doc_id: doctorid,
-            slot_id: formik.values.slottimeid?.toString(),
+            slot_id: formik.values.slottimeid,
             booking_date: formik.values.slotdateday,
             voucher: '',
             instant_consultation: instantconsultation,  // YES , NO 
