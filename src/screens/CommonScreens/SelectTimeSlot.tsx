@@ -88,8 +88,19 @@ export default function SelectTimeSlot({ route, }: Props) {
         CFPaymentGatewayService.setCallback({
           onVerify(orderID: string): void {
             console.log('success ', orderID);
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>Booked Succesfully</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
             //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-            navigation.navigate(StackNav.AppointmentBooked);
+            // navigation.navigate(StackNav.AppointmentBooked);
           },
           onError(error: CFErrorResponse, orderID: string): void {
             console.log('failed ', orderID);
@@ -117,6 +128,8 @@ export default function SelectTimeSlot({ route, }: Props) {
   
 
   const startCheckout = (sessionId,orderId) => {
+    console.log(sessionId,orderId);
+    
     try {
       const session = new CFSession(
         sessionId,
@@ -180,7 +193,7 @@ export default function SelectTimeSlot({ route, }: Props) {
           const payload = {
             userId: userInfo?.userId,
             doc_id: doctorid,
-            slot_id: formik.values.slottimeid?.toString(),
+            slot_id: formik.values.slottimeid,
             booking_date: formik.values.slotdateday,
             voucher: '',
             instant_consultation: instantconsultation,  // YES , NO 
@@ -204,21 +217,12 @@ export default function SelectTimeSlot({ route, }: Props) {
   
           useCreateConsultationMutation.mutate(payload, {
             onSuccess: (data) => {
-              console.log(data?.data,'susuuscc');
+              console.log(data?.data?.result[0],'susuuscc');
   
               if(data?.data?.success){
-                toast.show({
-                  placement: "bottom",
-                  render: ({ id }: { id: string }) => {
-                    const toastId = "toast-" + id
-                    return (
-                      <Toast nativeID={toastId} variant="accent" action="success">
-                        <ToastTitle>Submit Succesfully</ToastTitle>
-                      </Toast>
-                    );
-                  },
-                })
+               
                startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+               
               }else{
                 toast.show({
                   placement: "bottom",

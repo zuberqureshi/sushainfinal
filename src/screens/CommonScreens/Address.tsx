@@ -143,12 +143,12 @@ const Address = () => {
 
       console.log('PAYLOAD', payload);
 
-      if(!isEdit){
+      if (!isEdit) {
         useAddNewAddressMutation.mutate(payload, {
           onSuccess: (data) => {
-  
+
             // console.log('SUGNUPP DATA',data?.data);
-  
+
             toast.show({
               placement: "bottom",
               render: ({ id }: { id: string }) => {
@@ -160,20 +160,20 @@ const Address = () => {
                 );
               },
             })
-  
-  
-  
+
+
+
             queryClient.invalidateQueries({
               queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
             })
-  
+
             // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
             formik.resetForm()
             setAddNewAddress(true)
           },
           onError: (error) => {
             console.log(error);
-  
+
             toast.show({
               placement: "bottom",
               render: ({ id }: { id: string }) => {
@@ -187,8 +187,8 @@ const Address = () => {
             })
           }
         })
-    
-      }else if(isEdit){
+
+      } else if (isEdit) {
 
         const payload = {
           user_id: userInfo?.userUniqueId,
@@ -207,9 +207,9 @@ const Address = () => {
 
         updateUserAddressMutation.mutate({ payload: payload, id: Number(updatedAddressID) }, {
           onSuccess: (data) => {
-  
+
             // console.log('SUGNUPP DATA',data?.data);
-  
+
             toast.show({
               placement: "bottom",
               render: ({ id }: { id: string }) => {
@@ -221,20 +221,20 @@ const Address = () => {
                 );
               },
             })
-  
-  
-  
+
+
+
             queryClient.invalidateQueries({
               queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
             })
-  
+
             // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
             formik.resetForm()
             setAddNewAddress(true)
           },
           onError: (error) => {
             console.log(error);
-  
+
             toast.show({
               placement: "bottom",
               render: ({ id }: { id: string }) => {
@@ -248,13 +248,13 @@ const Address = () => {
             })
           }
         })
-        
-       
-        
+
+
+
       }
 
       // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
-     
+
 
 
     }
@@ -345,12 +345,12 @@ const Address = () => {
   const { data: stateByCountryData, isLoading: stateByCountryDataIsLoading, isFetching: stateByCountryDataIsFetching } = useGetStateByCountry({ countryId: formik?.values?.country?.id })
   const { data: citiesByStateData, isLoading: citiesByStateDataIsLoading, isFetching: citiesByStateDataIsFetching } = useGetCitiesByState({ stateId: formik?.values?.state?.id })
   const { data: userAddressesData, isLoading: userAddressesDataIsLoading, isFetching: userAddressesDataIsFetching } = useGetUserAddresses({ userUniqueId: userInfo?.userUniqueId })
-  console.log('ADDRESS COTRY',stateByCountryData?.data?.result[0]?.statesList[0],'city',citiesByStateData?.data?.result[0]?.citiesList[0]);
+  console.log('ADDRESS COTRY', stateByCountryData?.data?.result[0]?.statesList[0], 'city', citiesByStateData?.data?.result[0]?.citiesList[0]);
 
 
 
-  const onChangeCountry = async(item: any) => {
-   await formik.setFieldValue('country', { id: item.value, name: item.label })
+  const onChangeCountry = async (item: any) => {
+    await formik.setFieldValue('country', { id: item.value, name: item.label })
 
   };
   const onChangeCity = (item: any) => formik.setFieldValue('city', { id: item.value, name: item.label });
@@ -413,7 +413,12 @@ const Address = () => {
 
   }, [stateByCountryDataIsLoading, citiesByStateDataIsLoading, formik?.values?.country, formik?.values?.state])
 
-
+  if (userAddressesDataIsLoading) {
+    return (<Container statusBarStyle='dark-content' >
+      <CHeader title='Add Address' />
+      <Loader />
+    </Container>)
+  }
 
   const labels = ["Cart", "Address", "Payment", "Summary"];
   const customStyles = {
@@ -667,7 +672,7 @@ const Address = () => {
 
 
 
-          <PrimaryButton disabled={useAddNewAddressMutation.isPending || updateUserAddressMutation ?.isPending} loading={useAddNewAddressMutation.isPending || updateUserAddressMutation ?.isPending} onPress={formik.handleSubmit} buttonText={isEdit ? 'Update Address' : 'Add Address'} marginHorizontal={responsiveWidth(3)} marginTop={responsiveHeight(2.5)} />
+          <PrimaryButton disabled={useAddNewAddressMutation.isPending || updateUserAddressMutation?.isPending} loading={useAddNewAddressMutation.isPending || updateUserAddressMutation?.isPending} onPress={formik.handleSubmit} buttonText={isEdit ? 'Update Address' : 'Add Address'} marginHorizontal={responsiveWidth(3)} marginTop={responsiveHeight(2.5)} />
 
         </View>}
 
@@ -713,7 +718,7 @@ const Address = () => {
                   <View style={{ ...styles.flexRow, alignItems: 'center', gap: responsiveWidth(5) }} >
 
                     <TouchableOpacity onPress={() => { editAddress(item) }} >
-                     <CText type='s12' color='#F27636' >EDIT</CText>
+                      <CText type='s12' color='#F27636' >EDIT</CText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { deleteUserAddress(item?.id) }} >
                       {useDeleteAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
@@ -790,7 +795,7 @@ const localStyles = StyleSheet.create({
     paddingLeft: responsiveWidth(3),
     ...typography.fontSizes.f12,
     ...typography.fontWeights.Medium,
-    color:colors.black
+    color: colors.black
 
 
 

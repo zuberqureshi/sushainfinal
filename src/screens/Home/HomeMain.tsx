@@ -168,12 +168,12 @@ const locationSet = async() => {
             <Location />
             <View>
               <CText type={'s12'} style={{textTransform:'capitalize'}} >
-                {strings.hi} { userInfo?.userName }
+                {strings.hi} {userInfo?.userName}
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
               <Pressable onPress={()=>{getLocation()}} style={localStyles.locationContainer}>
                 <CText type={'s10'} color={colors.gray4}>
-                  {userLocation}
+                  {!!userLocation ? userLocation : 'User Location'}
                 </CText>
                 <ArrowDown />
               </Pressable>

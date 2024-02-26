@@ -45,7 +45,7 @@ const RenderFooterComponent = ({ resultValue, isLoading }: any) => {
           {strings.viewAll}
         </CText>
       </TouchableOpacity>
-      <View style={{ height: '90%', justifyContent: !isLoading ? 'flex-start' : 'center', }}  >
+      <View style={{ height: '90%', justifyContent:'center', }}  >
         { resultValue?.length >=1 ? <FlashList
           data={resultValue?.slice(0, 6)}
           renderItem={RenderDoctorCard}
