@@ -159,6 +159,11 @@ export default function StackNavigation() {
         component={StackRoute.VideoCall}
       />
 
+      <Stack.Screen
+        name={StackNav.VideoCompleted}
+        component={StackRoute.VideoCompleted}
+      />
+
 
     </Stack.Navigator>
   );

@@ -715,7 +715,7 @@ const Address = () => {
                       <CText type='s12' color='#F27636' >EDIT</CText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { deleteUserAddress(item?.id) }} >
-                      {useAddNewAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
+                      {useDeleteAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
                     </TouchableOpacity>
                     <TouchableOpacity>
                       <CText type='s12' color='#F27636' >SET AS DEFAULT</CText>

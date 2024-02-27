@@ -11,7 +11,7 @@ import {
   FlatList,
   Modal,
   Image,
-  PermissionsAndroid,
+  PermissionsAndroid,BackHandler, Alert
 } from 'react-native';
 import {
   MeetingProvider,
@@ -29,6 +29,9 @@ import { CallEndIcon, MuteIcon, NoVideoIcon, OppsIcon } from '../../assets/svgs'
 import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { useNavigation } from '@react-navigation/native';
 import CHeader from '../../components/common/CHeader';
+import { androidCameraAudioPermission } from '../../utils/permission';
+import { StackNav } from '../../navigation/NavigationKeys';
+import { useBackHandler } from '@react-native-community/hooks';
 
 
 const NotFoundScreen = () => {
@@ -36,6 +39,7 @@ const NotFoundScreen = () => {
   const [modalVisible, setModalVisible] = useState(true)
 
   const navigation = useNavigation()
+  
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -69,7 +73,7 @@ const NotFoundScreen = () => {
 }
 
 
-function ControlsContainer({ join, leave, toggleWebcam, toggleMic }) {
+function ControlsContainer({ join, leave, toggleWebcam, toggleMic,end }) {
   const navigation = useNavigation()
   return (
     <View
@@ -97,10 +101,10 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic }) {
       </TouchableOpacity>
 
         
-      <TouchableOpacity onPress={()=>{
+      <TouchableOpacity onPress={async()=>{
         
-        leave()
-        navigation.goBack()
+        await end()
+        navigation.navigate(StackNav.VideoCompleted)
         }}  activeOpacity={0.6} >
       <Box backgroundColor='#FF0000' px={20} py={8} borderRadius={8} >
         <CallEndIcon width={24} height={24} />
@@ -170,7 +174,7 @@ function ParticipantList({ participants }) {
 
 function MeetingView() {
   // Get `participants` from useMeeting Hook
-  const { join, leave, toggleWebcam, toggleMic, participants, meetingId } = useMeeting({});
+  const { join, leave, toggleWebcam, toggleMic, participants, meetingId,end } = useMeeting({});
   const participantsArrId = [...participants.keys()];
   useEffect(
 
@@ -195,6 +199,7 @@ function MeetingView() {
       <ControlsContainer
         join={join}
         leave={leave}
+        end={end}
         toggleWebcam={toggleWebcam}
         toggleMic={toggleMic}
       />
@@ -209,35 +214,29 @@ const VideoCall = () => {
 
   async function load() {
     setUserInfo(JSON.parse(await getAccessToken('userInfo')));
+    await androidCameraAudioPermission()
   }
 
-  const requestCameraPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: 'Camera Permission',
-          message:
-            'Sushain needs access to your camera ' +
-            'so you can video calling',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the camera');
-      } else {
-        console.log('Camera permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
+  const backAction = () => {
+    console.log('ddddddddddddddddddd');
+    
+    Alert.alert('Hold on!', 'Are you sure you want to exit', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: () => BackHandler.exitApp()},
+        ]);
+    return true;
   };
+
+  useBackHandler(backAction)
+
 
   useEffect(() => {
     load();
-    requestCameraPermission()
+ 
   }, []);
   console.log('TEST....', userInfo);
 

@@ -55,6 +55,7 @@ import Signup from "../screens/auth/Signup";
 import Cart from "../screens/CommonScreens/Cart";
 import Address from "../screens/CommonScreens/Address";
 import VideoCall from "../screens/CommonScreens/VideoCall";
+import VideoCompleted from "../screens/CommonScreens/VideoCompleted";
 
 
 
@@ -107,6 +108,7 @@ export const StackRoute = {
   Appointments,
   LifeStyle,
   VideoCall,
+  VideoCompleted,
 
 
 };
