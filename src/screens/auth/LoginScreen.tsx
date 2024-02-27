@@ -92,39 +92,57 @@ const LoginScreen = () => {
 
           if(data?.data?.success){
 
-          await setAccessToken('AccessTokenInfo',
-            JSON.stringify({
-              accessToken: data?.data?.result[0]?.token,
-              refreshToken: data?.data?.result[0]?.refreshToken,
-              expirationTime: data?.data?.result[0]?.ExpirationTime,
-            }))
+                  if(data?.data?.success==true  ){
+                        await setAccessToken('AccessTokenInfo',
+                          JSON.stringify({
+                            accessToken: data?.data?.result[0]?.token,
+                            refreshToken: data?.data?.result[0]?.refreshToken,
+                            expirationTime: data?.data?.result[0]?.ExpirationTime,
+                          }))
 
-          await setAccessToken('userInfo',
-            JSON.stringify({
-              userUniqueId: data?.data?.result[0]?.user.user_unique_id,
-              userId: data?.data?.result[0]?.user.id,
-              userName: data?.data?.result[0]?.user.first_name,
-              userMobile: data?.data?.result[0]?.user.mobile,
-            }))
+                        await setAccessToken('userInfo',
+                          JSON.stringify({
+                            userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+                            userId: data?.data?.result[0]?.user.id,
+                            userName: data?.data?.result[0]?.user.first_name,
+                            userMobile: data?.data?.result[0]?.user.mobile,
+                          }))
 
-          toast.show({
-            placement: "bottom",
-            render: ({ id }) => {
-              const toastId = "toast-" + id
+                        toast.show({
+                          placement: "bottom",
+                          render: ({ id }) => {
+                            const toastId = "toast-" + id
 
-              return (
-                <Toast nativeID={toastId} variant="accent" action="success">
-                  <ToastTitle>Logged In successfully</ToastTitle>
-                </Toast>
-              );
-            },
-          })
+                            return (
+                              <Toast nativeID={toastId} variant="accent" action="success">
+                                <ToastTitle>Logged In successfully</ToastTitle>
+                              </Toast>
+                            );
+                          },
+                        })
 
-          navigation.reset({
-            index: 0,
-            routes: [{ name: StackNav.DrawerNavigation }],
-          });
-          
+                        navigation.reset({
+                          index: 0,
+                          routes: [{ name: StackNav.DrawerNavigation }],
+                        });
+               }else{
+
+                    toast.show({
+                      placement: "bottom",
+                      render: ({ id }) => {
+                        const toastId = "toast-" + id
+
+                        return (
+                          <Toast nativeID={toastId} variant="accent" action="error">
+                            <ToastTitle>Logged In Failed { data?.data?.message}</ToastTitle>
+                          </Toast>
+                        );
+                      },
+                    })
+               }
+
+
+
           }else{
             toast.show({
               placement: "bottom",
