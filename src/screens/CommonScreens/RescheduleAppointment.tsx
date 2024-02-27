@@ -13,30 +13,165 @@ import CText from '../../components/common/CText';
 import { FlashList } from '@shopify/flash-list';
 import { deviceHeight, moderateScale } from '../../common/constants';
 import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
+import useGetAppointmentDetail from '../../hooks/appointment/get-appointment-detail';
+import { Container } from '../../components/Container';
+import Loader from '../../components/Loader/Loader';
+import moment from 'moment';
+import { Formik, useFormik } from 'formik';
+import PrimaryButton from '../../components/common/Button/PrimaryButton';
+import useGetDoctorsAllSlots from '../../hooks/doctor/get-doctor-all-slots';
+import useGetDoctorsProfile from '../../hooks/doctor/get-doctor-profile';
+import { Spinner, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
+import Body from '../../components/Body/Body';
+import useRescheduleConsultation from '../../hooks/appointment/reschedule-consultation';
 
-const RescheduleAppointment = () => {
+const RescheduleAppointment = ({route}) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { type, appid } = route.params;
+  const toast = useToast()
+  // Get the current date
+  const currentDate = moment();
 
 
   const [datePickerModel, setDatePickerModel] = useState(false)
   const [selectedDateOption, setSelectedDateOption] = useState(0)
 
-
-
-  const today = new Date()
-  const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY/MM/DD')
+  //api call
+  const { data : doctorsProfileData, isLoading : doctorsProfileIsLoading } = useGetDoctorsProfile(181) //doctorId
+  const { data: allSlotsData, isLoading : allSlotsIsLoading } = useGetDoctorsAllSlots()
+  const {data:appointmentDetailData , isLoading:appointmentDetailIsLoading} = useGetAppointmentDetail({type:type,appId:appid})
+  const useRescheduleConsultationMutation = useRescheduleConsultation()
+  // console.log('appointmentDetailData',appointmentDetailData?.data?.result[0]?.orderDetail);
+  
+  const today = new Date(appointmentDetailData?.data?.result[0]?.orderDetail?.date)
+  const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
   const [selectedDate, setSelectedDate] = useState(startDate);
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: { appid: appointmentDetailData?.data?.result[0]?.orderDetail?.orderId,  slotdateday: startDate, slottimeid: appointmentDetailData?.data?.result[0]?.orderDetail?.slot , type:appointmentDetailData?.data?.result[0]?.orderDetail?.type},
+    // validationSchema: patientBookingValidationSchema,
+    onSubmit: values => {
+      // updateProfile(values.country,values.address,values.name,values.mobile)
+      console.log('update', values);
+      // action.resetForm()
+      // loadUserInfo();
+
+      const payload ={
+         type: formik.values.type,
+         appId : formik.values.appid,
+         slot_it : formik.values.slottimeid,
+         date : formik.values.slotdateday,
+      }
+
+      
+
+      useRescheduleConsultationMutation.mutate(payload, {
+      onSuccess: (data) => {
+
+        // console.log('SUGNUPP DATA',data?.data);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Appointment rescheduled</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+
+
+        // queryClient.invalidateQueries({
+        //   queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+        // })
+
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+        // formik.resetForm()
+        // setAddNewAddress(true)
+      },
+      onError: (error) => {
+        console.log(error);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
+    }
+
+  })
+
+  const doctorSlotsArray = doctorsProfileData?.data?.result[0]?.doctorProfileDetail?.slots.split(',').map(Number)
+  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
+  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
+
+  // console.log('Slotss',slotListMorningArray,'SLOT MM',slotListEveningArray);
+  
 
 
   const renderSlotItem = ({ item, index }: any) => {
+    const date = new Date(item?.slot_start_time);
+
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
     return (
-      <TouchableOpacity style={localStyles.slotContainer}>
-        <CText type="m10">{'9:30AM'}</CText>
-      </TouchableOpacity>
+      <>
+        {item?.slot === 'MORNING' && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{formattedTime}</CText>
+        </TouchableOpacity>}
+      </>
+
     );
   };
 
+  const renderEveningSlotItem = ({ item, index }: any) => {
+    const date = new Date(item?.slot_start_time);
+
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+
+    return (
+      <>
+        {item?.slot === 'EVENING' && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black} >{formattedTime}</CText>
+        </TouchableOpacity>}
+      </>
+
+    );
+  };
 
   const renderNoSlotItem = ({ item, index }: any) => {
     return (
@@ -48,11 +183,49 @@ const RescheduleAppointment = () => {
     );
   };
 
+  if(appointmentDetailIsLoading || doctorsProfileIsLoading || allSlotsIsLoading ){
+    return(
+      <Container statusBarStyle='dark-content' >
+        <CHeader title={strings.RescheduleAppointment} />
+        <Loader/>
+      </Container>
+    )
+  }
+
+  const getAppointmentTime = () => {
+    const date = new Date(appointmentDetailData?.data?.result[0]?.orderDetail?.start_time);
+
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+    return formattedTime
+  }
+
+  
+  // Array to store the next five dates
+  const nextFiveDates:any = [];
+
+  // Loop to add the next five dates to the array
+  for (let i = 0; i <= 4; i++) {
+    const nextDate: any = moment(currentDate).add(i, 'days');
+    nextFiveDates.push(nextDate.format('YYYY-MM-DD'));
+  }
+
 
   return (
-    <CSafeAreaView>
+    <Container statusBarStyle='dark-content'>
 
       <CHeader title={strings.RescheduleAppointment} />
+      <Body>
 
       <View style={localStyles.existingDateWrapper} >
         <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Medium, }}>{strings.existingDateTime}</Text>
@@ -60,12 +233,12 @@ const RescheduleAppointment = () => {
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: responsiveHeight(1), gap: responsiveWidth(4) }} >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1) }} >
             <CalendarIconSmall />
-            <Text style={{ color: '#444343', ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >13 Oct,2023</Text>
+            <Text style={{ color: '#444343', ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('DD')} {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('MMM')},{moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('YYYY')}</Text>
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1) }}  >
             <ClockIconSmall />
-            <Text style={{ color: '#444343', ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>11:35AM</Text>
+            <Text style={{ color: '#444343', ...typography.fontSizes.f12, ...typography.fontWeights.Medium,textTransform:'uppercase' }}>{getAppointmentTime()} </Text>
           </View>
 
         </View>
@@ -85,7 +258,7 @@ const RescheduleAppointment = () => {
               <Text style={{
                 color: colors.white, ...typography.fontSizes.f10,
                 ...typography.fontWeights.SemiBold,
-              }} >Aug,2023</Text>
+              }} >{moment(currentDate).format('MMM')},{moment(currentDate).format('YYYY')}</Text>
               <BottomIconWhite />
             </View>
 
@@ -95,43 +268,25 @@ const RescheduleAppointment = () => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: responsiveHeight(2.5) }} >
 
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setSelectedDateOption(0) }} >
-            <View style={{ backgroundColor: selectedDateOption === 0 ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-              <Text style={{ color: selectedDateOption === 0 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >Sat</Text>
-              <Text style={{ color: selectedDateOption === 0 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>13</Text>
-            </View>
-
-          </TouchableOpacity>
+              {
+                nextFiveDates.map((item, index) => {
 
 
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setSelectedDateOption(1) }}>
-            <View style={{ backgroundColor: selectedDateOption === 1 ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-              <Text style={{ color: selectedDateOption === 1 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >Mon</Text>
-              <Text style={{ color: selectedDateOption === 1 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>15</Text>
-            </View>
 
-          </TouchableOpacity>
+                  return (
+                    <TouchableOpacity key={index.toString()} activeOpacity={0.6} onPress={() => {
+              
+                      formik.setFieldValue('slotdateday', item)
+                    }} >
+                      <View style={{ backgroundColor: formik.values.slotdateday === item ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
+                        <Text style={{ color: formik.values.slotdateday === item ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >{moment(item).format('ddd')}</Text>
+                        <Text style={{ color: formik.values.slotdateday === item ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>{moment(item).format('D')}</Text>
+                      </View>
 
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setSelectedDateOption(2) }}>
-            <View style={{ backgroundColor: selectedDateOption === 2 ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-              <Text style={{ color: selectedDateOption === 2 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >Tue</Text>
-              <Text style={{ color: selectedDateOption === 2 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>16</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setSelectedDateOption(3) }}>
-            <View style={{ backgroundColor: selectedDateOption === 3 ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-              <Text style={{ color: selectedDateOption === 3 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >Wed</Text>
-              <Text style={{ color: selectedDateOption === 3 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>17</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { setSelectedDateOption(4) }}>
-            <View style={{ backgroundColor: selectedDateOption === 4 ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(1.5), gap: responsiveHeight(1.5), justifyContent: 'center', alignItems: 'center', borderRadius: responsiveWidth(3) }} >
-              <Text style={{ color: selectedDateOption === 4 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }} >Thu</Text>
-              <Text style={{ color: selectedDateOption === 4 ? colors.white : colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Medium, }}>18</Text>
-            </View>
-          </TouchableOpacity>
+                    </TouchableOpacity>
+                  )
+                })
+              }
 
 
 
@@ -159,32 +314,46 @@ const RescheduleAppointment = () => {
           {strings.morningSlots}
         </CText>
       </View>
-      <View style={{ height: responsiveHeight(15) }}>
-        <FlashList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-          renderItem={renderSlotItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={5}
-          estimatedItemSize={100}
-        // justifyContent="space-between"
-        />
-      </View>
+      <View style={{}}>
+            {!!slotListMorningArray ? <FlashList
+              data={slotListMorningArray}
+              renderItem={renderSlotItem}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={5}
+              ListEmptyComponent={() => {
+                return (
+                  <CText type="r14" numberOfLines={1} color={colors.success}>
+                    No Slots Available
+                  </CText>)
+              }}
+              estimatedItemSize={100}
+            // justifyContent="space-between"
+            /> : <Spinner size={'small'} color={colors.primary} />}
+          </View>
       <View style={localStyles.rowStyle}>
         <EveningSlotIcon />
         <CText type="r12" style={styles.ph5}>
           {strings.eveningsSlots}
         </CText>
       </View>
-      <View style={{ height: responsiveHeight(15) }}>
-        <FlashList
+      <View style={{}} >
+            {!!slotListEveningArray ? <FlashList
+              data={slotListEveningArray}
+              renderItem={renderEveningSlotItem}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={5}
+              ListEmptyComponent={() => {
+                return (
+                  <CText type="r14" numberOfLines={1} color={colors.success}>
+                    No Slots Available
+                  </CText>)
+              }}
+              estimatedItemSize={100}
+            // justifyContent="space-between"
+            /> : <Spinner size={'small'} color={colors.primary} />}
+          </View>
 
-          data={[1]}
-          renderItem={renderNoSlotItem}
-          keyExtractor={(item, index) => index.toString()}
-          estimatedItemSize={100}
-        // justifyContent="space-between"
-        />
-      </View>
+      <PrimaryButton loading={useRescheduleConsultationMutation.isPending} disabled={useRescheduleConsultationMutation.isPending} buttonText='Submit' onPress={formik.handleSubmit} marginHorizontal={responsiveWidth(4)} marginTop={responsiveHeight(1.5)} />
 
 
 
@@ -203,9 +372,10 @@ const RescheduleAppointment = () => {
 
             <DatePicker
               mode='calendar'
-              selected={selectedDate}
-              onDateChange={(propDate) => { setSelectedDate(propDate) }}
+              selected={formik.values.slotdateday}
+              onDateChange={(propDate) => { formik.setFieldValue('slotdateday', moment(propDate, 'YYYY/MM/DD').format('YYYY-MM-DD')) }}
               minimumDate={startDate}
+            
             />
 
 
@@ -229,8 +399,10 @@ const RescheduleAppointment = () => {
       </Modal>
 
 
+             
+      </Body>
 
-    </CSafeAreaView>
+    </Container>
   )
 }
 

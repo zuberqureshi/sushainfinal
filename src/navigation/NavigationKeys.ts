@@ -43,5 +43,6 @@ export const StackNav = {
   Appointments:'Appointments',
   LifeStyleDrawer:'LifeStyleDrawer',
   VideoCall : 'VideoCall',
+  VideoCompleted : 'VideoCompleted',
 
 };

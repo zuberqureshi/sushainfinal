@@ -19,8 +19,9 @@ import useGetUpcomingAppointments from '../../hooks/appointment/get-upcoming-app
 import moment from 'moment'
 import useGetCompletedAppointments from '../../hooks/appointment/get-completed-appointments'
 import Loader from '../../components/Loader/Loader'
+import { StackNav } from '../../navigation/NavigationKeys'
 
-const Appointments = () => {
+const Appointments = ({navigation}) => {
 
   //api call
   const { data: upcomingAppointmentData, isLoading: isLoadingUpcomingAppointment } = useGetUpcomingAppointments({ userid: 257 })
@@ -94,7 +95,7 @@ const Appointments = () => {
                     {status ? 'Buy Prescription' : 'Join Video call'}
                   </CText>
                 </TouchableOpacity>
-                <TouchableOpacity style={localStyles.resheduleBtn}>
+                <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.RescheduleAppointment,{type:'virtual',appid:'86391634831916'})}}  style={localStyles.resheduleBtn}>
                   <CText type="r12" color={colors.primary2}>
                     {status ? 'Book Follow Up' : 'Reschedule'}
                   </CText>
@@ -187,10 +188,10 @@ const Appointments = () => {
 
 
                           <View style={localStyles.btnContainer}>
-                            <TouchableOpacity style={localStyles.resheduleBtn}>
+                            <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.AppointmentCancellation,{type:'virtual',appid:'86391634831916'})}} style={localStyles.resheduleBtn}>
                               <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={15} >Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={localStyles.resheduleBtn}>
+                            <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.RescheduleAppointment,{type:'virtual',appid:'86391634831916'})}} style={localStyles.resheduleBtn}>
                               <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={4}>Reschedule</Text>
                             </TouchableOpacity>
                           </View>

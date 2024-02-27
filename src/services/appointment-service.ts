@@ -7,7 +7,9 @@ class AppointmentsService {
     getUpcomingAppointments: 'getUpcomingAppointments',
     getCompletedAppointments: 'getCompletedAppointments',
     getReportByAppointmentId : 'getReportByAppointmentId',
-    
+    getAppointmentDetail : 'getAppointmentDetail',
+    rescheduleConsultation : 'rescheduleConsultation',
+    deleteReportById : 'deleteReportById',
 
     
   };
@@ -37,6 +39,32 @@ class AppointmentsService {
     return fetcher({
       url: `/video/reportview?appId=${data}`,
       method: 'GET',
+    });
+  }
+
+  deleteReportById = async (data:any) => {
+    return fetcher({
+      url: `/video/report/${data}`,
+      method: 'DELETE',
+    });
+  }
+
+  getAppointmentDetail = async (data:{type:string,appId:string}) => {
+
+    const {type,appId} = data
+
+    return fetcher({
+      url: `video/consultationdetail?type=${type}&appId=${appId}`,
+      method: 'GET',
+    });
+  }
+
+  rescheduleConsultation = async (data) => {
+
+
+    return fetcher({
+      url: `video/rescheduleconsultation`,
+      method: 'POST',
     });
   }
 

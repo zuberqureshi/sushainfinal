@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Platform
 } from 'react-native';
 import React, { useState, useRef } from 'react';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
@@ -27,11 +28,20 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-nat
 import { ProgressView } from "@react-native-community/progress-view";
 import typography from '../../themes/typography';
 import RBSheet from "react-native-raw-bottom-sheet";
-import { Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
+import { Toast, ToastTitle, useToast , Spinner } from '@gluestack-ui/themed';
 import { getAccessToken } from '../../utils/network';
 import useGetReportByAppointmentId from '../../hooks/appointment/get-report-by-appointment';
 import { Container } from '../../components/Container';
 import Loader from '../../components/Loader/Loader';
+import ImagePicker from 'react-native-image-crop-picker';
+import { androidCameraPermission } from '../../utils/permission';
+import { queryClient } from '../../react-query/client';
+import appointmentService from '../../services/appointment-service';
+import useDeleteReportById from '../../hooks/appointment/delete-report';
+import useGetAppointmentDetail from '../../hooks/appointment/get-appointment-detail';
+import moment from 'moment';
+import Body from '../../components/Body/Body';
+
 
 
 const AppointmentBooked = () => {
@@ -49,13 +59,17 @@ const AppointmentBooked = () => {
   const [slectedFileData, setSlectedFileData] = useState({ uri: '', type: '' })
 
   const [reportUploadShow, setReportUploadShow] = useState(false)
+  const [reportUploadIsLoading, setReportUploadIsLoading] = useState(false)
 
-  const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId('61691634399122')
+  const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId('258257')
+  const {data:appointmentDetailData , isLoading:appointmentDetailIsLoading} = useGetAppointmentDetail({type:'virtual',appId:'86391634831916'})
+  const useDeleteReportMutation = useDeleteReportById()
   console.log('repoooo datt', reportByAppointmentIdData?.data);
 
   if (isLoadingReportByAppointmentId) {
     return (
       <Container statusBarStyle='dark-content' >
+        <CHeader title='' />
         <Loader />
       </Container>
 
@@ -83,16 +97,16 @@ const AppointmentBooked = () => {
       case 'bmp':
         fileType = 'image/bmp'
       case 'tiff ':
-        fileType = 'image/tiff '
+        fileType = 'image/tiff'
       case 'tif':
         fileType = 'image/tif'
       case 'webp':
         fileType = 'image/webp'
       case 'svg':
         fileType = 'image/svg'
-      case 'pdf':
-        fileType = 'application/pdf'
-        break;
+      // case 'pdf':
+      //   fileType = 'application/pdf'
+      //   break;
       // Add more cases for other file types as needed
       default:
         fileType = 'Unknown';
@@ -132,28 +146,45 @@ const AppointmentBooked = () => {
       //   allowMultiSelection: true
       // });
       // const doc = await DocumentPicker.pickSingle()
-      const doc = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
-      });
-      console.log('Selected DOc', doc);
-      setSlectedFileData({
-        uri: doc?.uri,
-        type: doc.type as string
-      })
+      // const doc = await DocumentPicker.pickSingle({
+      //   type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
+      // });
+      // console.log('Selected DOc', doc);
+      // setSlectedFileData({
+      //   uri: doc?.uri,
+      //   type: doc.type as string
+      // })
+      const permissionStatus = await androidCameraPermission()
+
+      if(permissionStatus || Platform.OS == 'ios'){
+  
+        ImagePicker.openPicker({
+          width: 300,
+          height: 400,
+          cropping: true
+        }).then(image => {
+          console.log('Selected DOc', image);
+           setSlectedFileData({
+          uri: image?.path,
+          type: image?.mime as string
+        })
+        });
+      }
 
     } catch (err) {
-      if (DocumentPicker.isCancel(err))
+      // if (DocumentPicker.isCancel(err))
 
-        console.log('User cancelled the upload', err);
-      else console.log(err);
+      //   console.log('User cancelled the upload', err);
+      // else console.log(err);
+      console.log(err);
     }
   };
 
   const openPdfInBrowser = async (url) => {
     try {
-      const supported = await Linking.canOpenURL(`${API_IMAGE_BASE_URL}${url}`);
+      const supported = await Linking.canOpenURL(`${'https://sushainclinic.s3.ap-south-1.amazonaws.com/'}${url}`);
       if (supported) {
-        await Linking.openURL(`${API_IMAGE_BASE_URL}${url}`);
+        await Linking.openURL(`${'https://sushainclinic.s3.ap-south-1.amazonaws.com/'}${url}`);
       } else {
         console.error("Don't know how to open URI: " + url);
       }
@@ -164,95 +195,160 @@ const AppointmentBooked = () => {
 
 
 
-  const onSubmitReport = () => {
+  const onSubmitReport = async() => {
+    
+    setReportUploadIsLoading(true)
+    const formData  = new FormData()
 
 
-    var formData = new FormData();
+    formData.append('app_id',"258257")
+    if (slectedFileData?.uri !== '') {
+      formData.append('images', {
+        uri: slectedFileData.uri as string,
+        type: slectedFileData.type,
+        name: parseUri(slectedFileData.uri).name,
+      });
+    }
+    formData.append('report_name',"danish")
+    formData.append('tab','virtual')
+   
+    const obj = Object.fromEntries(formData?._parts);
 
-    formData.append('report', 'dattttt');
+    console.log('Submit File', obj);
 
-    // formData.append('report_name','danish textreport')
-    // formData.append('tab','appointment')
+    const updateReportPayload: any = {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        // Authorization: token ? `Bearer ${token}` : undefined,
+      },
+    }
 
-    // if (slectedFileData?.uri !== '') {
-    //   formData.append('profile_picture', {
-    //     uri: slectedFileData.uri as string,
-    //     type: slectedFileData.type,
-    //     name: parseUri(slectedFileData.uri).name,
-    //   });
-    // }
+      try {
+        const response =  await fetch('http://13.232.170.16:3006/api/v1/video/reportupload', updateReportPayload);
+        const responseJson = await response.json()
+        console.log('uplao',responseJson);
 
-    // let formData ={
-    //   appid : '31341633595550',
-    //   report :'gghggj',
-    //   report_name : 'Dansh Repoot55',
-    //   tab : 'appointment'
-    // }
+        queryClient.invalidateQueries({
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + '258257' ]
+        })
+        
+        
+        // queryClient.invalidateQueries({
+        //   queryKey: [ProfileService.queryKeys.completeProfile]
+        // })
 
-    // formData?._parts.forEach((value, key) => {
-    //   console.log(`${key}:`, value);
-    // });
+        // queryClient.invalidateQueries({
+        //   queryKey: [ProfileService.queryKeys.retrieveRoleProfile]
+        // })
+
+        if(responseJson?.success){
+           toast.show({
+          placement: "bottom",
+          render: ({ id }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Report uploaded successfully.</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+         setSlectedFileData({ uri: '', type: '' })
+
+        }
+
+       
+        setReportUploadIsLoading(false)
+      } catch (error) {
+        console.log('err',error);
+        setReportUploadIsLoading(false)
+        toast.show({
+          placement: "bottom",
+          render: ({ id }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong please try again later.</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+      }
+
+  }
+
+  const deleteReport= (id) => {
 
 
-    console.log('Submit File', formData);
 
-    // const updateReportPayload: any = {
-    //   method: 'POST',
-    //   body: formData,
-    //   headers: {
-    //     'Content-Type': 'application/json; ',
-    //     // Authorization: token ? `Bearer ${token}` : undefined,
-    //   },
-    // }
+    useDeleteReportMutation.mutate(id, {
+      onSuccess: (data) => {
 
-    //   try {
-    //     await fetch('http://3.110.107.128:3006/api/v1/video/reportupload', updateReportPayload);
+        // console.log('SUGNUPP DATA',data?.data);
 
-    //     // queryClient.invalidateQueries({
-    //     //   queryKey: [ProfileService.queryKeys.retrieveProfile]
-    //     // })
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Deleted Successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
 
-    //     // queryClient.invalidateQueries({
-    //     //   queryKey: [ProfileService.queryKeys.completeProfile]
-    //     // })
+        queryClient.invalidateQueries({
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + '258257' ]
+        })
 
-    //     // queryClient.invalidateQueries({
-    //     //   queryKey: [ProfileService.queryKeys.retrieveRoleProfile]
-    //     // })
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+        // formik.resetForm()
+        // setAddNewAddress(true)
+      },
+      onError: (error) => {
+        console.log(error);
 
-    //     toast.show({
-    //       placement: "bottom",
-    //       render: ({ id }) => {
-    //         const toastId = "toast-" + id
-    //         return (
-    //           <Toast nativeID={toastId} variant="accent" action="success">
-    //             <ToastTitle>Report uploaded successfully.</ToastTitle>
-    //           </Toast>
-    //         );
-    //       },
-    //     })
-    //   } catch (error) {
-    //     console.log('err',error);
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
+  }
 
-    //     toast.show({
-    //       placement: "bottom",
-    //       render: ({ id }) => {
-    //         const toastId = "toast-" + id
-    //         return (
-    //           <Toast nativeID={toastId} variant="accent" action="error">
-    //             <ToastTitle>Something went wrong please try again later.</ToastTitle>
-    //           </Toast>
-    //         );
-    //       },
-    //     })
-    //   }
+  const getAppointmentTime = () => {
+    const date = new Date(appointmentDetailData?.data?.result[0]?.orderDetail?.start_time);
 
+
+    // Specify Indian Standard Time zone offset
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+
+    // Adjust the date to IST by subtracting the offset
+    date.setTime(date.getTime() - ISTOffset);
+
+    // Format options for time
+    const timeOptions: any = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+    // Get formatted time in Indian Standard Time
+    const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+    return formattedTime
   }
 
 
   return (
-    <CSafeAreaView>
-      <KeyBoardAvoidWrapper>
+    <Container statusBarStyle='dark-content' >
+      <Body>
         <CHeader title={''} />
         <View style={localStyles.headerSection}>
           <Image source={images.booking} style={localStyles.videoIcon} />
@@ -268,7 +364,7 @@ const AppointmentBooked = () => {
         <View style={localStyles.sec}>
           <View style={localStyles.detailSec}>
             <CText type="b12" numberOfLines={1} color={colors.white}>
-              {strings.PreetiChhabra}
+              {appointmentDetailData?.data?.result[0]?.orderDetail?.doc_name}
             </CText>
             <View style={localStyles.rowStyle}>
               <CText type="b12" numberOfLines={1} color={colors.white}>
@@ -289,15 +385,15 @@ const AppointmentBooked = () => {
                 {strings.Date}
               </CText>
               <CText type="b12" numberOfLines={1} color={colors.black}>
-                13 Oct,2023
+              {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('DD')} {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('MMM')},{moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('YYYY')}
               </CText>
             </View>
             <View style={localStyles.secondSec}>
               <CText type="b12" numberOfLines={1} color={colors.black}>
                 {strings.time}
               </CText>
-              <CText type="b12" numberOfLines={1} color={colors.black}>
-                {strings.Time}
+              <CText type="b12" numberOfLines={1} color={colors.black} style={{textTransform:'uppercase'}} >
+              {getAppointmentTime()} 
               </CText>
             </View>
             {/* <View style={localStyles.secondSec}>
@@ -348,16 +444,22 @@ const AppointmentBooked = () => {
                   color={colors.black}
                 /> */}
 
-            <TouchableOpacity activeOpacity={0.6} onPress={selectDoc} style={{ borderWidth: 1, borderColor: colors.black, paddingHorizontal: responsiveWidth(2.5), borderRadius: responsiveWidth(6), alignItems: 'center', justifyContent: 'center' }} >
-              <Text style={{ color: colors.black, fontSize: responsiveFontSize(3), fontWeight: '400' }} >+</Text>
-            </TouchableOpacity>
-            <CText
+           { slectedFileData?.uri === '' && <TouchableOpacity activeOpacity={0.6} onPress={selectDoc} style={{ borderWidth: 1, borderColor: colors.black, borderRadius: responsiveWidth(6), alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={{ color: colors.black, fontSize: responsiveFontSize(3), fontWeight: '400',marginHorizontal:responsiveWidth(2.5) }} >+</Text>
+            </TouchableOpacity>  }
+          { slectedFileData?.uri === '' ? <CText
               type="b12"
               numberOfLines={1}
               color={colors.black}
               style={styles.mv10}>
               {strings.Dragyourfileshere}
-            </CText>
+            </CText> : <CText
+              type="b12"
+              numberOfLines={1}
+              color={colors.green1}
+              style={styles.mv10}>
+              {'Image added successfully'}
+            </CText> }
             <CText type="m12" color={colors.black} align="center">
               <CText
                 suppressHighlighting={true}
@@ -376,13 +478,13 @@ const AppointmentBooked = () => {
             </CText>
           </View>
           <View>
-            <TouchableOpacity
+          { reportUploadIsLoading ? <Spinner  size={'small'} color={colors.primary} /> : <TouchableOpacity
               style={localStyles.uplodeBtn}
               onPress={onSubmitReport}>
               <CText type="m12" numberOfLines={1} color={colors.primary}>
                 {strings.submit}
               </CText>
-            </TouchableOpacity>
+            </TouchableOpacity> }
           </View>
 
          {reportByAppointmentIdData?.data?.result[0]?.reportView?.map((item,index)=>{
@@ -392,7 +494,7 @@ const AppointmentBooked = () => {
             <PrescriptionDrawerIconFilled />
             <View style={{ marginLeft: responsiveWidth(1) }} >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(50) }} >
-                <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} >{strings.liverreports}</Text>
+                <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} >{item?.report_name}</Text>
                 <ReportTick />
               </View>
 
@@ -413,13 +515,16 @@ const AppointmentBooked = () => {
                     <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
+                  <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
                     <Text style={{ color: '#9DA3A4', ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >View</Text>
                   </TouchableOpacity>
 
                 </View>
 
+               <TouchableOpacity onPress={()=>{deleteReport(item?.id)}} activeOpacity={0.6} >
                 <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
+                </TouchableOpacity>  
+              
 
               </View>
 
@@ -654,7 +759,7 @@ const AppointmentBooked = () => {
                     //     setVisibleAppointment(false);
                     //   }}
                     activeOpacity={0.6}
-                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment) }}
+                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment,{type:'virtual',appid:'86391634831916'}) }}
                   >
                     <CText
                       type="m14"
@@ -668,7 +773,7 @@ const AppointmentBooked = () => {
                   <TouchableOpacity
                     style={localStyles.bottamBtm}
                     activeOpacity={0.6}
-                    onPress={closeAppointmentModal}>
+                    onPress={() => refRBSheetReschedule.current.close()}>
                     <CText
                       type="m14"
                       numberOfLines={2}
@@ -777,7 +882,7 @@ const AppointmentBooked = () => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation) }}
+                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation,{type:'virtual',appid:'86391634831916'}) }}
                 style={[localStyles.btn]}
               //   onPress={() => {
               //     navigation.navigate(StackNav.AppointmentCancellation);
@@ -794,14 +899,14 @@ const AppointmentBooked = () => {
         </View>
         <TouchableOpacity style={localStyles.consultationBtn}>
           <CText type="m14" numberOfLines={1} color={colors.gray7}>
-            Consultation fees you have paid ₹ 150
+            Consultation fees you have paid ₹ {appointmentDetailData?.data?.result[0]?.orderDetail?.orderAmount}
           </CText>
         </TouchableOpacity>
 
 
 
-      </KeyBoardAvoidWrapper>
-    </CSafeAreaView>
+      </Body>
+    </Container>
   );
 };
 
