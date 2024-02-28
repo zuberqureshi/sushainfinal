@@ -24,7 +24,11 @@ export default function Splash() {
 
   async function load () {
     console.log('APP aload splash')
+    var medType =  await getAccessToken('medType')
 
+    if( !medType )
+    await setAccessToken('medType','ayurvedic');
+  
     let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
 
     if(  v?.accessToken){
@@ -69,11 +73,12 @@ export default function Splash() {
             authenticated: true,
 
           });
+          loginstatus =true
 
 
  
         }else{
-          loginstatus =true
+          loginstatus =false
           console.log('redirect to login ');
         }
 
@@ -84,7 +89,7 @@ export default function Splash() {
 
 
     }else{
-      loginstatus =true
+      loginstatus =false
       console.log('No tokeninfo from memoery' )
 
     }

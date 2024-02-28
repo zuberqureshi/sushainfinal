@@ -54,7 +54,6 @@ export default function AppNavigator() {
             });
 
 
-
           }else{
             console.log('redirect to login ');
           }
@@ -76,7 +75,7 @@ export default function AppNavigator() {
 
    ()=>{
 
-load()
+        // load()
 
 },[]
 

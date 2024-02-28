@@ -21,7 +21,7 @@ import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Container } from '../../components/Container';
 import Body from '../../components/Body/Body';
-import {getAccessToken} from '../../utils/network'
+import {getAccessToken, setAccessToken} from '../../utils/network'
 // import DoctorSpecialities from '../../components/HomeComponent/DoctorSpecialities';
 // import ShopCategory from '../../components/HomeComponent/ShopCategory';
 // import AyurvedicProducts from '../../components/HomeComponent/AyurvedicProducts';
@@ -64,15 +64,6 @@ const HomeMain = () => {
   const [searchResult, setSearchResult] = useState([]);
 
 
-  async function load(){
-      setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
-   }
-  
-  useEffect(() => {
-    load();
-  }, []);
-
-
   const [userLocation, setUserLocation] = useState('')
    // const [homeBannerData, setResultData] = useState<any>([]);
   
@@ -93,6 +84,20 @@ const HomeMain = () => {
 //     console.log("Drawer LOggggggg",lngData);
 
 //   }
+
+
+async function load (){
+  await  setSlectedTypeNeed( await getAccessToken('medType') );
+    setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+
+    console.log( 'slectedTypeNeed', slectedTypeNeed)
+ }
+
+useEffect(() => {
+  load();
+}, []);
+
+
 const locationSet = async() => {
   const  location = await AsyncStorage.getItem('getUserCity')
   setUserLocation(location as string)
@@ -216,14 +221,14 @@ const locationSet = async() => {
           )}
         </View>
         <Box alignSelf='flex-end' flexDirection='row' gap={10} mr={20} >
-            <Pressable onPress={()=>{setSlectedTypeNeed('ayurvedic')}} >
+            <Pressable onPress={ async ()=>{ await setAccessToken('medType','ayurvedic'); setSlectedTypeNeed('ayurvedic')}} >
             <Box backgroundColor={slectedTypeNeed === 'ayurvedic' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'ayurvedic' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'ayurvedic' && 5} px={slectedTypeNeed === 'ayurvedic' ? 0 : 5}  h={26} borderRadius={5} flexDirection='row' alignItems='center'  >
             <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} >Ayurvedic</Text>
             { slectedTypeNeed === 'ayurvedic' && <CrossIconBlack />}
             </Box>   
             </Pressable>
 
-            <Pressable onPress={()=>{setSlectedTypeNeed('homeopathy')}} >
+            <Pressable onPress={ async ()=>{ await setAccessToken('medType','homeopathy');   setSlectedTypeNeed('homeopathy')}} >
             <Box backgroundColor={slectedTypeNeed === 'homeopathy' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'homeopathy' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'homeopathy' && 5 } px={slectedTypeNeed === 'homeopathy' ? 0 : 5}     h={26} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' >
             <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} textAlign='center' >Homeopathy</Text>
             { slectedTypeNeed === 'homeopathy' && <CrossIconBlack />}

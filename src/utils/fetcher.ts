@@ -10,7 +10,7 @@ export const fetcher = async (config: AxiosRequestConfig) => {
 
    var token = '';
    let fetchToken =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
-
+   var medType = await getAccessToken('medType')
    if(  fetchToken?.accessToken){
     token = fetchToken?.accessToken
    }
@@ -32,6 +32,7 @@ export const fetcher = async (config: AxiosRequestConfig) => {
     data,
     ...config,
     headers: {
+      appType: medType,
       Authorization: `Bearer ${token}`,
       ...config?.headers,
       ...headers,
