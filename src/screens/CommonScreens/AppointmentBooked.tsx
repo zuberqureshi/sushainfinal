@@ -9,13 +9,13 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef ,useEffect } from 'react';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import CHeader from '../../components/common/CHeader';
 import strings from '../../i18n/strings';
 import images from '../../assets/images';
-import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants';
+import { API_IMAGE_BASE_URL, Api_Image_Base_Url, getHeight, moderateScale } from '../../common/constants';
 import { colors, styles } from '../../themes';
 import CText from '../../components/common/CText';
 import { BottomIconWhite, PrescriptionDrawerIcon, PrescriptionDrawerIconFilled, ReportDeleteIcon, ReportTick, RightArrow } from '../../assets/svgs';
@@ -44,8 +44,9 @@ import Body from '../../components/Body/Body';
 
 
 
-const AppointmentBooked = () => {
+const AppointmentBooked = ({route}) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { appid , userinfo } = route.params;
 
   const refRBSheet = useRef();
   const toast = useToast()
@@ -57,14 +58,15 @@ const AppointmentBooked = () => {
   const [visibleAppointment, setVisibleAppointment] = useState(false);
   const [selectedValue, setSelectedValue]: any = useState('option1');
   const [slectedFileData, setSlectedFileData] = useState({ uri: '', type: '' })
+  const [userInfo, setUserInfo] = useState();
 
   const [reportUploadShow, setReportUploadShow] = useState(false)
   const [reportUploadIsLoading, setReportUploadIsLoading] = useState(false)
 
-  const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId('258257')
-  const {data:appointmentDetailData , isLoading:appointmentDetailIsLoading} = useGetAppointmentDetail({type:'virtual',appId:'86391634831916'})
+  const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(appid)
+  const {data:appointmentDetailData , isLoading:appointmentDetailIsLoading} = useGetAppointmentDetail({type:'virtual',appId:appid})
   const useDeleteReportMutation = useDeleteReportById()
-  console.log('repoooo datt', reportByAppointmentIdData?.data);
+  console.log('repoooo datt', userinfo);
 
   if (isLoadingReportByAppointmentId) {
     return (
@@ -75,6 +77,17 @@ const AppointmentBooked = () => {
 
     )
   }
+
+//  const fetchUserData = async() => {
+//   setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+ 
+  
+//  }
+
+  // useEffect(() => {
+  //   fetchUserData()
+  // }, [])
+  
 
   const parseUri = (uri: any) => {
     // Extract the file name from the URI
@@ -182,9 +195,9 @@ const AppointmentBooked = () => {
 
   const openPdfInBrowser = async (url) => {
     try {
-      const supported = await Linking.canOpenURL(`${'https://sushainclinic.s3.ap-south-1.amazonaws.com/'}${url}`);
+      const supported = await Linking.canOpenURL(`${Api_Image_Base_Url}${url}`);
       if (supported) {
-        await Linking.openURL(`${'https://sushainclinic.s3.ap-south-1.amazonaws.com/'}${url}`);
+        await Linking.openURL(`${Api_Image_Base_Url}${url}`);
       } else {
         console.error("Don't know how to open URI: " + url);
       }
@@ -201,7 +214,7 @@ const AppointmentBooked = () => {
     const formData  = new FormData()
 
 
-    formData.append('app_id',"258257")
+    formData.append('app_id',appid)
     if (slectedFileData?.uri !== '') {
       formData.append('images', {
         uri: slectedFileData.uri as string,
@@ -209,7 +222,7 @@ const AppointmentBooked = () => {
         name: parseUri(slectedFileData.uri).name,
       });
     }
-    formData.append('report_name',"danish")
+    formData.append('report_name',userinfo?.userName)
     formData.append('tab','virtual')
    
     const obj = Object.fromEntries(formData?._parts);
@@ -231,7 +244,7 @@ const AppointmentBooked = () => {
         console.log('uplao',responseJson);
 
         queryClient.invalidateQueries({
-          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + '258257' ]
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid ]
         })
         
         
@@ -302,7 +315,7 @@ const AppointmentBooked = () => {
         })
 
         queryClient.invalidateQueries({
-          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + '258257' ]
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid ]
         })
 
         // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
@@ -515,9 +528,9 @@ const AppointmentBooked = () => {
                     <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
+                  {/* <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
                     <Text style={{ color: '#9DA3A4', ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >View</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
 
                 </View>
 

@@ -174,8 +174,30 @@ function ParticipantList({ participants }) {
 
 function MeetingView() {
   // Get `participants` from useMeeting Hook
+  const navigation = useNavigation()
   const { join, leave, toggleWebcam, toggleMic, participants, meetingId,end } = useMeeting({});
   const participantsArrId = [...participants.keys()];
+
+  const backAction = () => {
+
+    
+    Alert.alert('Hold on!', 'Are you sure you want to end a call', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: async() => {
+            await end()
+            navigation.navigate(StackNav.VideoCompleted)
+
+          }},
+        ]);
+    return true;
+  };
+
+  useBackHandler(backAction)
+
   useEffect(
 
     () => {
@@ -208,9 +230,11 @@ function MeetingView() {
 }
 
 
-const VideoCall = () => {
+const VideoCall = ({navigation}) => {
   const [userInfo, setUserInfo] = useState();
   const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
+
+  // const { end } = useMeeting({});
 
   async function load() {
     setUserInfo(JSON.parse(await getAccessToken('userInfo')));
@@ -226,12 +250,16 @@ const VideoCall = () => {
             onPress: () => null,
             style: 'cancel',
           },
-          {text: 'YES', onPress: () => BackHandler.exitApp()},
+          {text: 'YES', onPress: async() => {
+            // await end()
+            navigation.navigate(StackNav.VideoCompleted)
+
+          }},
         ]);
     return true;
   };
 
-  useBackHandler(backAction)
+  // useBackHandler(backAction)
 
 
   useEffect(() => {

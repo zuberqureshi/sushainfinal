@@ -11,10 +11,12 @@ const AuthProvider = ({children}) => {
     authenticated: false,
   });
   const [userInfo, setUserInfo] = useState({
-    name: null,
-    mobile: null,
-    email: null,
-    walletCoin: null,
+
+    userUniqueId: null,
+    userId: null,
+    userName: null,
+    userMobile: null,
+  
   });
   const logout = async () => {
    // await Keychain.resetGenericPassword();
@@ -33,6 +35,7 @@ const AuthProvider = ({children}) => {
     <Provider
       value={{
         authState,
+        userInfo,
         getAccessToken,
         setAuthState,
         setUserInfo,

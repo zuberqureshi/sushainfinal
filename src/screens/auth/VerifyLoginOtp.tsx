@@ -1,4 +1,4 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Image, Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
 // import CountDown from 'react-native-countdown-component';
 import {ParamListBase} from '@react-navigation/native';
@@ -42,7 +42,7 @@ type Props = {
 };
 
 const VerifyLoginOtp = ({route, navigation}:Props) => {
-  const {mobile,screenType,otp} = route.params;
+  const {mobile,screenType} = route.params;
   const input = useRef(null)
   const toast = useToast()
 
@@ -50,7 +50,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
   const [loader, setLoader] = useState(false)
   const onPinChange = (code: React.SetStateAction<string>) => setPin(code);
   const [isTimeOver, setIsTimeOver] = useState(false);
-  const [resendOtp, setResendOtp] = useState(otp)
+  const [resendOtp, setResendOtp] = useState()
 
     //api call
   const useLoginOtpVerifyMutation = useLoginOtpVerify()
@@ -71,12 +71,14 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
 
   
   const otpVerify = async () => {
+    Keyboard.dismiss()
     setLoader(true)
+
     let payload = {
       mobile: mobile,
       otp: otpInput,
     };
-
+   
     console.log('oTPPP',payload);
 
      useLoginOtpVerifyMutation.mutate(payload, {
@@ -203,7 +205,11 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
     useResendOtpMutation.mutate(payload, {
       onSuccess: (data) => {
         console.log('OTP RESEND DATA',data?.data);
+
          setResendOtp(data?.data?.result[0]?.otpValue)
+
+         if(data?.data?.success){
+          
         toast.show({
           placement: "bottom",
           render: ({ id }: { id: string }) => {
@@ -215,7 +221,20 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
             );
           },
         })
-         
+      }else{
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="warning">
+                <ToastTitle>{data?.data?.message}</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+      }
+  
         // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
       
       },
@@ -247,7 +266,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
       </TouchableOpacity>
       <Image source={images.otpImage} style={localStyles.otpImageStyle} />
       <Text fontFamily='$InterSemiBold' fontSize={16} style={styles.mt20}>
-        {strings.verificationCode}{resendOtp}
+        {strings.verificationCode}
       </Text>
       <Text
       fontFamily='$InterRegular' fontSize={12} color={colors.black} textAlign='center'

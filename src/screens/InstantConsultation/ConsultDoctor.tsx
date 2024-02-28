@@ -28,6 +28,7 @@ import SubHeader from '../../components/common/CommonComponent/SubHeader'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import { useFormik } from 'formik'
 import useCheckCouponCode from '../../hooks/booking/check-coupon-code'
+import { getAccessToken } from '../../utils/network'
 
 const ConsultDoctor = () => {
 
@@ -37,6 +38,7 @@ const ConsultDoctor = () => {
   const [applyCoupon, setApplyCoupon] = useState(false)
   const [payPrice, setPayPrice] = useState('')
   const [isChecked, setIsChecked] = useState(false)
+  const [mediType, setMediType] = useState<string>('')
  
    const toast = useToast()
    
@@ -67,18 +69,26 @@ const ConsultDoctor = () => {
 
       } else {
         console.log(values,'sbmit jjj');
-        
       }
-
-
-
     },
 
   });
 
+  const fetchType = async () => {
+    let medType = await getAccessToken('medType')
+    console.log({ medType });
+    setMediType(medType)
+    return medType;
+
+  }
+  
+  useEffect(() => {
+    fetchType();
+  }, []);
+
   //api call
   const { data: speclizationlistData, isLoading: isLoadingSpeclizationlist } = useGetInstantspeclizationlist()
-  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetInstantDoctorsBySpeclization({ specialization: !!formik.values.healthissue ? formik.values.healthissue : 'Diabetes' })
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetInstantDoctorsBySpeclization({ specialization: !!formik.values.healthissue ? formik.values.healthissue : 'Diabetes' , type : mediType})
   const useCheckCouponCodeMutation = useCheckCouponCode()
   //  console.log(doctorBySpeclizationData?.data?.result[0].instantdocList[0],'INSTANAT')
 

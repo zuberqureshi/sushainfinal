@@ -20,6 +20,7 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Loader from '../../common/Loader';
 import { StackNav, TabNav } from '../../navigation/NavigationKeys';
+import { getAccessToken } from '../../utils/network';
 
 const getYear = new Date().getFullYear();
 
@@ -122,10 +123,12 @@ const RenderDSpecialities = memo(
     onPressTab: ({ id, specType }: any) => void;
     selectedTabValue: number;
   }) => {
+    // console.log(item?.name);
+    
     return (
       <View style={localStyles.mainContaienr}>
         <TouchableOpacity
-          onPress={() => onPressTab({ id: item.id, specType: item.name })}
+          onPress={() => onPressTab({ id: item.id, specType: item.name , index })}
           style={localStyles.rootContaienr}>
           <View style={localStyles.imgOuterContainer}>
             <Image
@@ -154,11 +157,27 @@ export default function DoctorSpecialities() {
   const [resultData, setResultData] = useState<[DoctorSpecialityListData]>();
   const [selectedTab, setSelectedTab] = useState<any>(0);
   const [extraData, setExtraData] = useState<boolean>(false);
-  const [selectedSpecDoctor, setSelectedSpecDoctor] = useState<string>('diabetes');
+  const [selectedSpecDoctor, setSelectedSpecDoctor] = useState<string>('Kidney related diseases');
+  const [mediType, setMediType] = useState<string>('')
+
+
+
+
+  const fetchType = async () => {
+    let medType = await getAccessToken('medType')
+    // console.log({ medType });
+    setMediType(medType)
+    return medType;
+
+  }
+
+  // useEffect(() => {
+
+  // }, [])
 
   const { data: speclizationListData, isLoading: speclizationListIsLoading } = useGetSpeclizationlist()
-  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, } = useGetDoctorBySpeclization({ specialization: selectedSpecDoctor })
-  // console.log(isPending,doctorBySpeclizationIsLoading,'specilzation HOME');
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, } = useGetDoctorBySpeclization({ specialization: selectedSpecDoctor , type: mediType  })
+  // console.log(speclizationListData?.data?.result[0],'specilzation HOME');
 
 
   // useEffect(() => {
@@ -166,17 +185,18 @@ export default function DoctorSpecialities() {
   // }, [selectedTab]);
 
   const onPressTab = useCallback(
-    async ({ id, specType }: any) => {
-      console.log(specType);
+    async ({ id, specType ,index}: any) => {
+     
 
-      const index = speclizationListData?.data?.result[0]?.specList?.findIndex((item: any) => item.id == id);
+      // const indexx = await speclizationListData?.data?.result[0]?.specList?.findIndex((item: any) => item.id == id);
       setSelectedTab(index);
       setSelectedSpecDoctor(specType)
+      // console.log(specType,index);
 
     }, [selectedTab],);
 
   useEffect(() => {
-    
+    fetchType()
 
     setSelectedTab(0)
   }, []);

@@ -45,6 +45,7 @@ import { Spinner } from '@gluestack-ui/themed';
 import useCreateConsultation from '../../hooks/booking/create-consultation';
 import Loader from '../../components/Loader/Loader';
 import { getAccessToken } from '../../utils/network';
+import useCheckPayment from '../../hooks/booking/verify-payment';
 
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
@@ -66,12 +67,13 @@ export default function SelectTimeSlot({ route, }: Props) {
 
 
   //init
-  const { doctorid, doctorslots,instantconsultation } = route.params;
-  console.log({doctorid});
+  const { doctorid, doctorslots,instantconsultation , doctorfees } = route.params;
+  // console.log({doctorid});
   
   const { data: allSlotsData, isLoading } = useGetDoctorsAllSlots()
   const useCheckCouponCodeMutation = useCheckCouponCode()
   const useCreateConsultationMutation = useCreateConsultation()
+  const useCheckPaymentMutation = useCheckPayment()
 
 
   const toast = useToast()
@@ -91,7 +93,72 @@ export default function SelectTimeSlot({ route, }: Props) {
           onVerify(orderID: string): void {
             console.log('success ', orderID);
             //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-            navigation.navigate(StackNav.AppointmentBooked);
+
+            useCheckPaymentMutation.mutate(orderID, {
+              onSuccess: (data) => {
+                console.log(data?.data,'erfyyy');
+    
+                if(data?.data?.success){
+                  toast.show({
+                    placement: "bottom",
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant="accent" action="success">
+                          <ToastTitle>Appointment booked Succesfully</ToastTitle>
+                        </Toast>
+                      );
+                    },
+                  })
+                  navigation.navigate(StackNav.AppointmentBooked,{appid:data?.data?.result[0]?.detail?.orderId , userinfo : userInfo})
+                //  startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+                }else{
+                  toast.show({
+                    placement: "bottom",
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant="accent" action="warning">
+                          <ToastTitle>{data?.data?.message}</ToastTitle>
+                        </Toast>
+                      );
+                    },
+                  })
+                }
+                // setPayPrice(data?.data?.result[0]?.finalPrice)
+                // setApplyCoupon(true)
+    
+              },
+              onError: (error: any) => {
+                console.log(error,'erfyyy ERROR');
+                toast.show({
+                  placement: "bottom",
+                  render: ({ id }: { id: string }) => {
+                    const toastId = "toast-" + id
+                    return (
+                      <Toast nativeID={toastId} variant="accent" action="error">
+                        <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                      </Toast>
+                    );
+                  },
+                })
+              }
+            })
+
+            // toast.show({
+            //   placement: "bottom",
+            //   render: ({ id }: { id: string }) => {
+            //     const toastId = "toast-" + id
+            //     return (
+            //       <Toast nativeID={toastId} variant="accent" action="success">
+            //         <ToastTitle>Appointment booked Succesfully</ToastTitle>
+            //       </Toast>
+            //     );
+            //   },
+            // })
+
+            // navigation.navigate(StackNav.AppointmentBooked,{appid:orderID});
+
           },
           onError(error: CFErrorResponse, orderID: string): void {
             console.log('failed ', orderID);
@@ -209,18 +276,19 @@ export default function SelectTimeSlot({ route, }: Props) {
               console.log(data?.data,'susuuscc');
   
               if(data?.data?.success){
-                toast.show({
-                  placement: "bottom",
-                  render: ({ id }: { id: string }) => {
-                    const toastId = "toast-" + id
-                    return (
-                      <Toast nativeID={toastId} variant="accent" action="success">
-                        <ToastTitle>Submit Succesfully</ToastTitle>
-                      </Toast>
-                    );
-                  },
-                })
+                // toast.show({
+                //   placement: "bottom",
+                //   render: ({ id }: { id: string }) => {
+                //     const toastId = "toast-" + id
+                //     return (
+                //       <Toast nativeID={toastId} variant="accent" action="success">
+                //         <ToastTitle>Submit Succesfully</ToastTitle>
+                //       </Toast>
+                //     );
+                //   },
+                // })
                startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+              //  formik.resetForm()
               }else{
                 toast.show({
                   placement: "bottom",
@@ -269,10 +337,7 @@ export default function SelectTimeSlot({ route, }: Props) {
         })
       }
 
-     
-
-
-
+    
     },
 
   });
@@ -297,7 +362,7 @@ export default function SelectTimeSlot({ route, }: Props) {
       type: "APPOINTMENT",
       userid: '',
       displayMode: "NATIVEAPP",
-      Totalmrp: '715'
+      Totalmrp: doctorfees
     }
 
     useCheckCouponCodeMutation.mutate(payload, {
@@ -718,7 +783,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             <Button borderRadius={6} disabled={useCreateConsultationMutation.isPending} backgroundColor={useCreateConsultationMutation.isPending ? 'gray' : colors.success} height={42} onPress={formik.handleSubmit} >
 
               <ButtonText fontSize={14} fontFamily='$InterRegular' color={colors.white} >{strings.pay} </ButtonText>
-              <ButtonText fontSize={14} fontFamily='$InterSemiBold' color={colors.white}>{!!payPrice ? `${payPrice} ` : '715'}</ButtonText>
+              <ButtonText fontSize={14} fontFamily='$InterSemiBold' color={colors.white}>{!!payPrice ? `${payPrice} ` : doctorfees}</ButtonText>
               {!!payPrice && <ButtonText fontSize={12} fontFamily='$InterRegula' textDecorationLine='line-through' color={colors.white} >{'715'}</ButtonText>}
               {useCreateConsultationMutation.isPending && <Spinner color="white" size={20} ml={7} />}
             </Button>
@@ -766,6 +831,29 @@ export default function SelectTimeSlot({ route, }: Props) {
         </View>
 
       </Body>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={useCheckPaymentMutation.isPending}
+      // onRequestClose={() => setModalVisible(false)}
+      >
+        <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' justifyContent='center' elevation={5} w={'55%'} h={'15%'} gap={10} >
+            {/* <Box alignItems='center' gap={5} >
+              <OppsIcon />
+              <Text style={{ color: colors.white, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Done</Text>
+              <Text fontFamily='$InterSemiBold' color={colors.black} textAlign='center' fontSize={18} mt={3} >Oops!</Text>
+              <Text fontFamily='$InterRegular' color={'#767474'} textAlign='center' fontSize={13} >MeetID Not Found</Text>
+
+              <PrimaryButton onPress={() => { navigation.goBack() }} buttonText='Try again' height={35} />
+            </Box> */}
+            <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Please wait</Text>
+
+            {/* <Button title="Close" onPress={() => setModalVisible(false)} /> */}
+            <Spinner size={'large'} color={colors.primary} />
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 }

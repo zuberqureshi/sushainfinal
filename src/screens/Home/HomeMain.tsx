@@ -1,9 +1,10 @@
 // library imports
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useContext} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {FlashList} from '@shopify/flash-list';
+import RNRestart from 'react-native-restart'
 
 // local imports
 import {colors, styles} from '../../themes';
@@ -49,7 +50,7 @@ import { Box, Pressable,Text } from '@gluestack-ui/themed';
 // import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
-
+import {  AuthContext } from '../../context/AuthContext'
 type Props = {
   icon: React.JSX.Element;
   onPress: () => void;
@@ -62,7 +63,9 @@ const HomeMain = () => {
 
   const [resultData, setResultData] = useState<any>({});
   const [searchResult, setSearchResult] = useState([]);
+  const authContext:any = useContext(AuthContext );
 
+  // console.log( 'authContext', authContext.userInfo )
 
   const [userLocation, setUserLocation] = useState('')
    // const [homeBannerData, setResultData] = useState<any>([]);
@@ -85,12 +88,11 @@ const HomeMain = () => {
 
 //   }
 
-
 async function load (){
-  await  setSlectedTypeNeed( await getAccessToken('medType') );
-    setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+  await setSlectedTypeNeed( await getAccessToken('medType') );
+    // setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
 
-    console.log( 'slectedTypeNeed', slectedTypeNeed)
+    // console.log( 'slectedTypeNeed', slectedTypeNeed)
  }
 
 useEffect(() => {
@@ -172,7 +174,7 @@ const locationSet = async() => {
             <Location />
             <View>
               <CText type={'s12'} style={{textTransform:'capitalize'}} >
-                {strings.hi} { userInfo?.userName }
+                {strings.hi} { authContext?.userInfo?.userName }
                 {/* {global.userDetail?.first_name || strings.firstName} */}
               </CText>
               <Pressable onPress={()=>{getLocation()}} style={localStyles.locationContainer}>
@@ -201,7 +203,7 @@ const locationSet = async() => {
             inputContainerStyle={localStyles.inputContainerStyle}
             inputBoxStyle={localStyles.inputBoxStyle}
             insideLeftIcon={searchIcon}
-            rightAccessory={rightAccessory}
+            // rightAccessory={rightAccessory}
             inputStyle={localStyles.inputStyle}
           />
           <TouchableOpacity style={localStyles.cartBtnStyle}>
@@ -221,14 +223,22 @@ const locationSet = async() => {
           )}
         </View>
         <Box alignSelf='flex-end' flexDirection='row' gap={10} mr={20} >
-            <Pressable onPress={ async ()=>{ await setAccessToken('medType','ayurvedic'); setSlectedTypeNeed('ayurvedic')}} >
+            <Pressable onPress={ async ()=>{
+                await setAccessToken('medType','ayurvedic');
+                setSlectedTypeNeed('ayurvedic')
+                RNRestart.Restart()
+                }} >
             <Box backgroundColor={slectedTypeNeed === 'ayurvedic' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'ayurvedic' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'ayurvedic' && 5} px={slectedTypeNeed === 'ayurvedic' ? 0 : 5}  h={26} borderRadius={5} flexDirection='row' alignItems='center'  >
             <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} >Ayurvedic</Text>
             { slectedTypeNeed === 'ayurvedic' && <CrossIconBlack />}
             </Box>   
             </Pressable>
 
-            <Pressable onPress={ async ()=>{ await setAccessToken('medType','homeopathy');   setSlectedTypeNeed('homeopathy')}} >
+            <Pressable onPress={ async ()=>{
+               await setAccessToken('medType','homeopathy');
+               setSlectedTypeNeed('homeopathy')
+               RNRestart.Restart()
+               }} >
             <Box backgroundColor={slectedTypeNeed === 'homeopathy' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'homeopathy' ? '#149C5C' :'#E5DFDF'} pl={slectedTypeNeed === 'homeopathy' && 5 } px={slectedTypeNeed === 'homeopathy' ? 0 : 5}     h={26} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' >
             <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} textAlign='center' >Homeopathy</Text>
             { slectedTypeNeed === 'homeopathy' && <CrossIconBlack />}

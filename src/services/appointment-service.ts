@@ -10,9 +10,21 @@ class AppointmentsService {
     getAppointmentDetail : 'getAppointmentDetail',
     rescheduleConsultation : 'rescheduleConsultation',
     deleteReportById : 'deleteReportById',
+    getTodayAppointments : 'getTodayAppointments',
+    cancelAppointment : 'cancelAppointment' ,
 
     
   };
+
+  getTodayAppointments = async (data:{userid:number}) => {
+
+    const {userid} = data
+
+    return fetcher({
+      url: `/video/todayconsultation?userId=${userid}`,
+      method: 'GET',
+    });
+  }
 
   getUpcomingAppointments = async (data:{userid:number}) => {
 
@@ -65,6 +77,16 @@ class AppointmentsService {
     return fetcher({
       url: `video/rescheduleconsultation`,
       method: 'POST',
+      data
+    });
+  }
+
+  cancelAppointment = async (data:any) => {
+
+    return fetcher({
+      url: `video/cancelconsultation`,
+      method: 'POST',
+      data
     });
   }
 

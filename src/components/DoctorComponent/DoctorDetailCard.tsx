@@ -1,5 +1,5 @@
 import { Image, StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Spinner } from '@gluestack-ui/themed';
@@ -19,15 +19,33 @@ import typography from '../../themes/typography';
 import Loader from '../../components/Loader/Loader';
 import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 import moment from 'moment';
+import { getAccessToken } from '../../utils/network';
 
-export default function DoctorDetailCard({ title='diabetes' }: any) {
+export default function DoctorDetailCard({ title = 'diabetes' }: any) {
 
   //init
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const [mediType, setMediType] = useState<string>('')
+
+//  console.log({title});
+ 
+
+
+  const fetchType = async () => {
+    let medType = await getAccessToken('medType')
+    console.log({ medType });
+    setMediType(medType)
+    return medType;
+
+  }
+
+  useEffect(() => {
+    fetchType()
+  }, [])
 
   //api call
-  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title })
-  // console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
+  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title, type: mediType })
+   // console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
 
   //Loader
   if (doctorBySpeclizationIsLoading) {
@@ -36,15 +54,15 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
     )
   }
 
-
   const onPressDoctorProfile = (id: any) =>
     navigation.navigate(StackNav.DoctorProfile, { id });
 
   const renderItem = ({ item, index }: any) => {
-    // console.log(item?.slots);
+    // console.log(item?.id);
 
     const practicingDate = moment(moment(item?.practicing_since).format('YYYY-MM-DD'));
     const yearsOfEXP = moment().diff(practicingDate, 'years');
+    
 
     return (
       <View style={localStyles.cardMainContainer}>
@@ -71,7 +89,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
             </View>
           </View>
           <View>
-            <View style={{alignSelf:'flex-end'}}>
+            <View style={{ alignSelf: 'flex-end' }}>
               <TouchableOpacity style={styles.ph5}>
                 <ShareIcon />
               </TouchableOpacity>
@@ -83,8 +101,8 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
               <CText type="s12" numberOfLines={2} color={colors.black}>
                 {'₹ ' + item?.vc_fees}
               </CText>
-             { item?.vc_fees !== item?.vc_fees_dummy && <View style={styles.ph5}>
-                <CText type="r12" numberOfLines={2} style={{textDecorationLine:'line-through'}} color={colors.black}>
+              {item?.vc_fees !== item?.vc_fees_dummy && <View style={styles.ph5}>
+                <CText type="r12" numberOfLines={2} style={{ textDecorationLine: 'line-through' }} color={colors.black}>
                   {item?.vc_fees_dummy}
                 </CText>
                 {/* <View style={localStyles.upperLineStyle} /> */}
@@ -117,7 +135,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
             <CButton
               title={strings.bookNow}
               containerStyle={localStyles.bookNowBtnStyle}
-              onPress={() => {navigation.navigate(StackNav.SelectTimeSlot, { id:item?.id,doctorslots:item?.slots }) }}
+              onPress={() => { navigation.navigate(StackNav.SelectTimeSlot, { doctorid: item?.id, doctorslots: item?.slots , instantconsultation:'NO' ,doctorfees:item?.vc_fees }) }}
               bgColor={colors.success}
               color={colors.white}
               type="b12"
@@ -135,7 +153,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
       <View style={localStyles.notAvailableWrappeer} >
         <Text style={localStyles.bareillSoonText} >{strings.wewillbeinBareillSoon}</Text>
 
-        <Text style={localStyles.globalExpertsOnlineText}  >{strings.connectWithOurGlobalExpertsOnline}</Text>
+        <Text style={localStyles.globalExpertsOnlineText}  >{'Doctors not found '}</Text>
 
         <Image source={images.doctorNotAvailable} style={localStyles.notAvailableImg} />
 
@@ -143,7 +161,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
            <Text style={localStyles.forVideoConsultationButtonText}  >{strings.forVideoConsultationClickHere}</Text>{}
          </TouchableOpacity> */}
 
-        <Spinner size='large' />
+        {/* <Spinner size='large'  /> */}
       </View>
 
     )
@@ -217,7 +235,7 @@ export default function DoctorDetailCard({ title='diabetes' }: any) {
         // estimatedItemSize={100}
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={() => { return (<View style={{ height: responsiveHeight(10) }} />) }}
-      // ListEmptyComponent={EmptyListMessage}
+        ListEmptyComponent={EmptyListMessage}
 
 
       /> : <Loader />}

@@ -19,11 +19,11 @@ class DoctorService {
     });
   }
 
-  getDoctorsBySpeclization = async (data:{specialization:string}) => {
-    const { specialization } = data
-
+  getDoctorsBySpeclization = async (data:{specialization:string,type:string}) => {
+    const { specialization , type } = data
+    
     return fetcher({
-      url: `booking/doclistingspec?specialization=${specialization}`,
+      url: `booking/doclistingspec?specialization=${specialization}&type=${type}`,
       method: 'GET',
     });
   }

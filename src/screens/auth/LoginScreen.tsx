@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView, ActivityIndicator } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Image, TextInput, SafeAreaView, ActivityIndicator, Keyboard } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import { Modal, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
@@ -37,7 +37,7 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
   const [skipLoader, setSkipLoader] = useState(true)
-  const authContext = useContext(AuthContext);
+  const authContext:any = useContext(AuthContext);
 
   async function load() {
     const localUserInfo = JSON.parse(await getAccessToken('userInfo'));
@@ -76,6 +76,7 @@ const LoginScreen = () => {
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
       // console.warn('formsubmit', values);
+      Keyboard.dismiss()
       setLoading(true)
       var body = {
         mobile: values.userid,
@@ -93,6 +94,7 @@ const LoginScreen = () => {
           if(data?.data?.success){
 
                   if(data?.data?.success==true  ){
+
                         await setAccessToken('AccessTokenInfo',
                           JSON.stringify({
                             accessToken: data?.data?.result[0]?.token,
@@ -107,6 +109,15 @@ const LoginScreen = () => {
                             userName: data?.data?.result[0]?.user.first_name,
                             userMobile: data?.data?.result[0]?.user.mobile,
                           }))
+
+                            authContext.setUserInfo({
+                              
+                              userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+                              userId: data?.data?.result[0]?.user.id,
+                              userName: `${data?.data?.result[0]?.user.first_name} ${data?.data?.result[0]?.user.last_name}`,
+                              userMobile: data?.data?.result[0]?.user.mobile,
+                  
+                            });
 
                         toast.show({
                           placement: "bottom",
@@ -241,26 +252,45 @@ const LoginScreen = () => {
     useUserRegisterMutation.mutate(payload, {
       onSuccess: (data) => {
 
-        console.log('SUGNUPP DATA',data?.data);
-        let otp = data?.data?.result[0].otpValue
+        console.log('SUGNUPP DATA',data?.data?.result[0]);
 
-        toast.show({
-          placement: "bottom",
-          render: ({ id }: { id: string }) => {
-            const toastId = "toast-" + id
-            return (
-              <Toast nativeID={toastId} variant="accent" action="success" >
-                <ToastTitle>OTP Sent </ToastTitle>
-              </Toast>
-            );
-          },
-        })
+        if(data?.data?.success){
+       
 
-        navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp',otp})
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success" >
+                  <ToastTitle>OTP Sent </ToastTitle>
+                </Toast>
+              );
+            },
+          })
+  
+          navigation.navigate(StackNav.VerifyLoginOtp,{mobile:formik?.values?.userid,screenType:'signinwithotp'})
+        }else{
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="warning">
+                  <ToastTitle>{data?.data?.message}</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+        }
+
+        
 
       },
       onError: (error) => {
-     
+      
+        console.log(error,'OTP SIGNIN');
+        
         
         toast.show({
           placement: "top",
