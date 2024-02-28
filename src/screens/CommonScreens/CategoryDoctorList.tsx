@@ -1,5 +1,5 @@
 import { FlatList, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View, } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // local imports
 const CSafeAreaView = React.lazy(() => import('../../components/common/CSafeAreaView'))
@@ -26,6 +26,7 @@ import typography from '../../themes/typography';
 import { FlashList } from '@shopify/flash-list';
 import useGetSpeclizationlist from '../../hooks/home/get-speclization-list';
 import { Box } from '@gluestack-ui/themed';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 interface Props {
@@ -94,7 +95,15 @@ export default function CategoryDoctorList(props: Props) {
     // setLoading(true);
     debouncedSearch(text);
   };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      // console.log('fouuuuuu')
+      setSearchResult(itm)
 
+      // return () => unsubscribe();
+    }, [itm])
+  );
 
 
   const renderSearchResult = ({ item }: any) => {

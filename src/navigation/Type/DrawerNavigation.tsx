@@ -1,5 +1,5 @@
 import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React,{useEffect} from 'react';
+import React,{useContext, useEffect} from 'react';
 import {
   DrawerContentScrollView,
   createDrawerNavigator,
@@ -8,7 +8,7 @@ import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import RNRestart from 'react-native-restart'
 // local import
-import {StackNav} from '../NavigationKeys';
+import {StackNav, TabNav} from '../NavigationKeys';
 import {StackRoute} from '../NavigationRoutes';
 import {colors, styles} from '../../themes';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -41,18 +41,14 @@ import strings from '../../i18n/strings';
 // } from '../../utils/asyncstorage';
 import { setLng } from '../../i18n/changeLng';
 import { removeAccessToken } from '../../utils/network';
-
+import {  AuthContext } from '../../context/AuthContext'
 
 
 const DrawerContentComponent = (props: any) => {
-
  
-
- 
-
 
   const {icon, title, isNew = false,onPress} = props;
-
+  
   
   return (
     <TouchableOpacity onPress={onPress} style={localStyles.drawerContentStyle}>
@@ -153,7 +149,7 @@ const InnerDrawerComponent = (props: any) => {
 const DrawerView = () => {
    
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-
+  const authContext:any = useContext(AuthContext );
   const onPressLogOut = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       {
@@ -203,14 +199,14 @@ const DrawerView = () => {
               style={localStyles.userProfileStyle}
             />
             <View style={styles.ph10}>
-              <CText type="r20" color={colors.primary}>
-                John Doe
+              <CText type="r20" color={colors.primary} style={{textTransform:'capitalize'}} >
+                {authContext?.userInfo?.userName}
               </CText>
               <CText type="r12" style={styles.mv5} color={colors.textColor2}>
                 jeffkumar@gmail.com
               </CText>
               <CText type="r12" color={colors.textColor2}>
-                +917089654356
+                +91 {authContext?.userInfo?.userMobile}
               </CText>
             </View>
           </View>
@@ -225,14 +221,19 @@ const DrawerView = () => {
           <DrawerContentComponent
             icon={<HomeDrawerIcon />}
             title={strings.home}
+            onPress={()=>{
+              navigation.
+              navigation.navigate(TabNav.Home)}}
           />
           <DrawerContentComponent
             icon={<VideoCallDrawerIcon />}
             title={strings.bookVideoConsultation}
+            onPress={()=>{navigation.navigate(TabNav.FindADoctorHome)}}
           />
           <DrawerContentComponent
             icon={<BuyDrawerIcon />}
             title={strings.buyMedicine}
+            onPress={()=>{navigation.navigate(TabNav.Medicines)}}
           />
           <DrawerContentComponent
             icon={<CareDrawerIcon />}
@@ -294,7 +295,7 @@ const DrawerView = () => {
             {strings.support}
           </CText>
           <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.AppointmentBooked)
+            navigation.navigate(StackNav.Address)
             }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}

@@ -30,6 +30,7 @@ export default function Splash() {
     await setAccessToken('medType','ayurvedic');
   
     let v =  JSON.parse( await getAccessToken('AccessTokenInfo') ); 
+    let userD = JSON.parse(await getAccessToken('userInfo'))
 
     if(  v?.accessToken){
       loginstatus =true
@@ -44,6 +45,15 @@ export default function Splash() {
           refreshToken: v?.refreshToken,
           expirationTime: v?.expirationTime,
           authenticated: true,
+        });
+
+        authContext.setUserInfo({
+                              
+          userUniqueId: userD?.userUniqueId,
+          userId: userD?.userId,
+          userName: userD?.userName,
+          userMobile: userD.userMobile,
+
         });
 
  
@@ -73,10 +83,18 @@ export default function Splash() {
             authenticated: true,
 
           });
+
+          authContext.setUserInfo({
+                              
+            userUniqueId: userD?.userUniqueId,
+            userId: userD?.userId,
+            userName: userD?.userName,
+            userMobile: userD.userMobile,
+  
+          });
+
           loginstatus =true
 
-
- 
         }else{
           loginstatus =false
           console.log('redirect to login ');

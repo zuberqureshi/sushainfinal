@@ -17,11 +17,11 @@ class InstantDoctorService {
     });
   }
 
-  getInstantDoctorsBySpeclization = async (data:{specialization:string}) => {
-    const { specialization } = data
-
+  getInstantDoctorsBySpeclization = async (data:{specialization:string , type:string}) => {
+    const { specialization , type } = data
+ 
     return fetcher({
-      url: `booking/instantdoclist?disease=${specialization}`,
+      url: `booking/instantdoclist?disease=${specialization}&type=${type}`,
       method: 'GET',
     });
   }

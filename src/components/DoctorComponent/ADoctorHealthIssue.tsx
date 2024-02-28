@@ -21,6 +21,7 @@ import CButton from '../common/CButton';
 import {StackNav} from '../../navigation/NavigationKeys';
 // import {DoctorSpecListAPI} from '../../api/homeApis';
 import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
+import { Spinner } from '@gluestack-ui/themed';
 
 const RenderDSpecialities = memo(({item, onPressDoctorSpeciality}: any) => {
   return (
@@ -75,14 +76,14 @@ export default function ADoctorHealthIssue({data}:any) {
         title={strings.ayurvedicDoctorsHealthIssues}
         isViewHide={false}
       />
-      <FlatList
+    { data?.length >=1 ?  <FlatList
         data={data?.splice(0, 16)}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}
         numColumns={4}
         scrollEnabled={false}
-      />
+      /> : <Spinner size={'small'} color={colors.primary} />}
       <CButton
         title={strings.viewAllSymptoms}
         onPress={() => {}}

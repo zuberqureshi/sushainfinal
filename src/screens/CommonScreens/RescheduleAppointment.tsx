@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View, Text, Modal, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import typography from '../../themes/typography';
 import { colors, styles } from '../../themes';
 import strings from '../../i18n/strings';
@@ -24,6 +24,10 @@ import useGetDoctorsProfile from '../../hooks/doctor/get-doctor-profile';
 import { Spinner, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
 import Body from '../../components/Body/Body';
 import useRescheduleConsultation from '../../hooks/appointment/reschedule-consultation';
+import { queryClient } from '../../react-query/client';
+import appointmentService from '../../services/appointment-service';
+import { AuthContext } from '../../context/AuthContext'
+import { StackNav } from '../../navigation/NavigationKeys';
 
 const RescheduleAppointment = ({route}) => {
 
@@ -36,6 +40,7 @@ const RescheduleAppointment = ({route}) => {
 
   const [datePickerModel, setDatePickerModel] = useState(false)
   const [selectedDateOption, setSelectedDateOption] = useState(0)
+  const authContext: any = useContext(AuthContext);
 
   //api call
   const { data : doctorsProfileData, isLoading : doctorsProfileIsLoading } = useGetDoctorsProfile(181) //doctorId
@@ -54,43 +59,58 @@ const RescheduleAppointment = ({route}) => {
     // validationSchema: patientBookingValidationSchema,
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
-      console.log('update', values);
+ 
       // action.resetForm()
       // loadUserInfo();
 
       const payload ={
-         type: formik.values.type,
+     
          appId : formik.values.appid,
-         slot_it : formik.values.slottimeid,
+         slot_id : Number(formik.values.slottimeid),
          date : formik.values.slotdateday,
+         type: formik.values.type,
       }
 
-      
+      console.log('update', payload);
 
       useRescheduleConsultationMutation.mutate(payload, {
       onSuccess: (data) => {
 
-        // console.log('SUGNUPP DATA',data?.data);
+        console.log('resssshdule DATA',data?.data);
+        
+        if (data?.data?.success) {
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>Appointment reschedule successfully</ToastTitle>
+                </Toast>
+              );
+            },
+          })
 
-        toast.show({
-          placement: "bottom",
-          render: ({ id }: { id: string }) => {
-            const toastId = "toast-" + id
-            return (
-              <Toast nativeID={toastId} variant="accent" action="success">
-                <ToastTitle>Appointment rescheduled</ToastTitle>
-              </Toast>
-            );
-          },
-        })
+          queryClient.invalidateQueries({
+            queryKey: [appointmentService.queryKeys.getUpcomingAppointments + authContext?.userInfo?.userId]
+          })
 
-
-
-        // queryClient.invalidateQueries({
-        //   queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
-        // })
-
-        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+          // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+          navigation.navigate(StackNav.Appointments)
+        } else {
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action='warning'>
+                  <ToastTitle>{data?.data?.message}</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+        }
+       
         // formik.resetForm()
         // setAddNewAddress(true)
       },
