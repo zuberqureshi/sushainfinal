@@ -8,7 +8,7 @@ import CHeader from '../../components/common/CHeader'
 import SearchWithLikeComponent from '../../components/common/CommonComponent/SearchWithLikeComponent'
 import { Box, Pressable, Spinner, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { Text } from '@gluestack-ui/themed'
-import { AppointmentBeautyIcon, AppointmentMedicinesIcon, AppointmentOrderIcon, BuyPrescription, CalenderIcon, ClockSmallColorIcon, CloseIcon, DiscountGreenIcon, DownloadWhiteIcon, GreaterThanBlack, GreaterThanIcon, PrescriptionDrawerIconFilled, ReportDeleteIcon, ReportTick, ShakeHand, StarFilledPrimaryColor, StarUnFilledPrimaryColor, UploadDocIcon, VideoCallIcon, ViewBlackEyeIcon, WatchIcon } from '../../assets/svgs'
+import { AppointmentBeautyIcon, AppointmentMedicinesIcon, AppointmentOrderIcon, BuyPrescription, CalenderIcon, ClockSmallColorIcon, CloseIcon, DiscountGreenIcon, DownloadWhiteIcon, GreaterThanBlack, GreaterThanIcon, OppsIcon, PlusCircleIcon, PrescriptionDrawerIconFilled, ReportDeleteIcon, ReportTick, ShakeHand, StarFilledPrimaryColor, StarUnFilledPrimaryColor, UploadDocIcon, VideoCallIcon, ViewBlackEyeIcon, WatchIcon } from '../../assets/svgs'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { colors, styles } from '../../themes'
 import { Api_Image_Base_Url, getHeight, moderateScale } from '../../common/constants'
@@ -34,6 +34,10 @@ import useGetReportByAppointmentId from '../../hooks/appointment/get-report-by-a
 import { ProgressView } from '@react-native-community/progress-view';
 import typography from '../../themes/typography';
 import useDeleteReportById from '../../hooks/appointment/delete-report';
+import useRatingAndReviewAppointment from '../../hooks/appointment/submit-rating-review-appointment';
+
+
+
 
 const Appointments = ({ navigation }) => {
 
@@ -42,7 +46,7 @@ const Appointments = ({ navigation }) => {
 
   const [status, setStatus] = useState(false)
   const [selectedAppointmentView, setselectedAppointmentView] = useState('upcoming')
-  const [selectedReviewStar, setSelectedReviewStar] = useState<number>(0)
+  const [selectedReviewStar, setSelectedReviewStar] = useState({ id: '', star: '' })
   const [modalReportUploadVisible, setModalReportUploadVisible] = useState(false)
   const [reportUploadIsLoading, setReportUploadIsLoading] = useState(false)
   const [modalReportViewVisible, setModalReportViewVisible] = useState(false)
@@ -56,6 +60,7 @@ const Appointments = ({ navigation }) => {
   const { data: todayAppointmentsData, isLoading: isLoadingTodayAppointments } = useGetTodayAppointments({ userid: authContext?.userInfo?.userId })
   const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(selectedAppId)
   const useDeleteReportMutation = useDeleteReportById()
+  const useRatingAndReviewAppointmentMutation = useRatingAndReviewAppointment()
 
   console.log('TODAY', reportByAppointmentIdData?.data?.result[0]?.reportView?.length);
 
@@ -100,6 +105,67 @@ const Appointments = ({ navigation }) => {
       type: fileType,
       name: fileName
     };
+  }
+
+
+  const submitRatingAndReview = (id, docid, orderid) => {
+
+    const payload = {
+      id: id,
+      docId: docid,
+      userId: authContext?.userInfo?.userId,
+      orderId: orderid,
+      rating: selectedReviewStar?.star,
+      type: "VIDEO CLINIC"
+    }
+
+    console.log({ payload });
+
+
+
+    useRatingAndReviewAppointmentMutation.mutate(payload, {
+      onSuccess: (data) => {
+
+        // console.log('SUGNUPP DATA',data?.data);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="success">
+                <ToastTitle>Rating & Review Submited Successfully</ToastTitle>
+              </Toast>
+            );
+          },
+        })
+
+
+
+        queryClient.invalidateQueries({
+          queryKey: [appointmentService.queryKeys.getCompletedAppointments + authContext?.userInfo?.userId]
+        })
+
+        // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
+        // formik.resetForm()
+        // setAddNewAddress(true)
+      },
+      onError: (error) => {
+        console.log(error);
+
+        toast.show({
+          placement: "bottom",
+          render: ({ id }: { id: string }) => {
+            const toastId = "toast-" + id
+            return (
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong, please try again later</ToastTitle>
+              </Toast>
+            )
+          }
+        })
+      }
+    })
   }
 
   const selectDoc = async () => {
@@ -159,7 +225,7 @@ const Appointments = ({ navigation }) => {
         name: parseUri(slectedFileData.uri).name,
       });
     }
-    formData.append('report_name', authContext?.userInfo?.userName)
+    formData.append('report_name', `${parseUri(slectedFileData.uri).name.substring(0, parseUri(slectedFileData.uri).name.lastIndexOf('.'))}`)
     formData.append('tab', 'virtual')
 
     const obj = Object.fromEntries(formData?._parts);
@@ -245,7 +311,9 @@ const Appointments = ({ navigation }) => {
     }
   };
 
-  const deleteReport= (id) => {
+  const deleteReport = (id) => {
+
+    setModalReportViewVisible(false)
 
 
 
@@ -267,10 +335,10 @@ const Appointments = ({ navigation }) => {
         })
 
         queryClient.invalidateQueries({
-          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + selectedAppId ]
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + selectedAppId]
         })
 
-     
+
         // formik.resetForm()
         // setAddNewAddress(true)
       },
@@ -349,7 +417,7 @@ const Appointments = ({ navigation }) => {
             <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start' }} />
             <Box flexDirection='column' pt={5} >
               <Text fontFamily='$InikaBold' fontSize={15} color={colors.primary}>{todayAppointmentsData?.data?.result[0]?.consultationDetail?.doc_name}</Text>
-              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={9} color={colors.black} w={228} >Gynae and Fertility, Garbhsanskar, PCOD and UT Fibroid, Pre Conception Care</Text>
+              {/* <Text fontFamily='$InterRegular' lineHeight={13} fontSize={9} color={colors.black} w={228} >Gynae and Fertility, Garbhsanskar, PCOD and UT Fibroid, Pre Conception Care</Text> */}
               <RatingComponent
                 star={5}
                 style={localStyles.straStyle}
@@ -385,7 +453,7 @@ const Appointments = ({ navigation }) => {
                     {status ? 'Buy Prescription' : 'Join Video call'}
                   </CText>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: 'virtual', appid: '86391634831916' }) }} style={localStyles.resheduleBtn}>
+                <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: todayAppointmentsData?.data?.result[0]?.consultationDetail?.type, appid: todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId }) }} style={localStyles.resheduleBtn}>
                   <CText type="r12" color={colors.primary2}>
                     {status ? 'Book Follow Up' : 'Reschedule'}
                   </CText>
@@ -393,13 +461,19 @@ const Appointments = ({ navigation }) => {
               </View>
 
               <View style={[localStyles.btnContainer, { marginVertical: responsiveHeight(1.5) }]}>
-                <TouchableOpacity style={localStyles.uploadBtnStyle}>
+                <TouchableOpacity onPress={async () => {
+                  setModalReportUploadVisible(true)
+                  await setSelectedAppId(todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId)
+                }} style={localStyles.uploadBtnStyle}>
                   <UploadDocIcon />
                   <CText type="m10" style={styles.ml5} color={colors.textColor3}>
                     {status ? 'Buy Prescription' : 'Upload Reports'}
                   </CText>
                 </TouchableOpacity>
-                <TouchableOpacity style={localStyles.docViewStyle}>
+                <TouchableOpacity onPress={async () => {
+                              setModalReportViewVisible(true)
+                              await setSelectedAppId(todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId)
+                            }} style={localStyles.docViewStyle}>
                   <CText type="m10" color={colors.textColor4}>
                     {'View'}
                   </CText>
@@ -451,13 +525,13 @@ const Appointments = ({ navigation }) => {
 
                   return (
                     <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{ ...styles.shadowStyle }} >
-                      <Box flexDirection='row' alignItems='center' gap={14} py={10}>
+                      <Box flex={1} flexDirection='row' alignItems='center' gap={14} py={10}>
                         <Image source={require('../../assets/images/constantImg4.png')} style={{ resizeMode: 'cover', width: responsiveWidth(13), height: responsiveHeight(6.5), borderRadius: responsiveWidth(15), alignSelf: 'flex-start', }} />
                         <Box flexDirection='column' gap={9} >
                           <Box flexDirection='row' alignItems='center' gap={5} >
                             <Box gap={3} >
-                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
-                              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} >Appointment Id: {item?.orderId}</Text>
+                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary} numberOfLines={1} >{item?.doc_name}</Text>
+                              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} numberOfLines={1} >Appointment Id: {item?.orderId}</Text>
                             </Box>
                             <Box flexDirection='row' alignItems='center' alignSelf='flex-start' gap={2} >
                               <ClockSmallColorIcon />
@@ -511,7 +585,7 @@ const Appointments = ({ navigation }) => {
 
                         </Box>
                       </Box>
-                      <Box w={36} h={'100%'} backgroundColor='#EAE5E566' pt={40} gap={4} >
+                      <Box flex={0.1} h={'100%'} backgroundColor='#EAE5E566' pt={40} gap={4} >
                         <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={12} color={colors.black} textAlign='center' alignSelf='center' mt={32} >{moment(item?.date).format('DD')}</Text>
                         <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={12} numberOfLines={1} color={colors.black} textAlign='center' alignSelf='center' >{moment(item?.date).format('MMM')}</Text>
                       </Box>
@@ -565,7 +639,7 @@ const Appointments = ({ navigation }) => {
             <Box backgroundColor='#F7F7F7' pb={25} mb={10} mt={10} >
               <Text fontFamily='$InikaRegular' fontSize={13} color={'#696767'} my={8} mx={16} >Don’t forget to take Follow up</Text>
 
-              {completedAppointmentData?.data?.result[0]?.completedAppointmentList?.slice(0, 2)?.map((item, index) => {
+              {completedAppointmentData?.data?.result[0]?.completedAppointmentList?.map((item, index) => {
 
 
                 return (
@@ -576,8 +650,9 @@ const Appointments = ({ navigation }) => {
                         <Box flexDirection='column' gap={9} >
                           <Box flexDirection='row' alignItems='center' >
                             <Box gap={3} >
-                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary}>{item?.doc_name}</Text>
-                              <Text fontFamily='$InterRegular' w={254} lineHeight={13} fontSize={10} numberOfLines={3} color={colors.black} >Gynae and Fertility, Neuro, Hormonal Imbalances, PCOD and UT Fibroid, Pre Conception Care, Pre and Post Natal Care, Hypertension</Text>
+                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary} numberOfLines={1} >{item?.doc_name}</Text>
+                              {/* <Text fontFamily='$InterRegular' w={254} lineHeight={13} fontSize={10} numberOfLines={3} color={colors.black} >Gynae and Fertility, Neuro, Hormonal Imbalances, PCOD and UT Fibroid, Pre Conception Care, Pre and Post Natal Care, Hypertension</Text> */}
+                              <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} numberOfLines={1} >Appointment Id: {item?.orderId}</Text>
                             </Box>
 
 
@@ -603,7 +678,10 @@ const Appointments = ({ navigation }) => {
 
 
                           <View style={[localStyles.btnContainer, { marginVertical: responsiveHeight(1.5) }]}>
-                            <TouchableOpacity style={localStyles.uploadBtnStyle}>
+                            <TouchableOpacity onPress={async () => {
+                              setModalReportViewVisible(true)
+                              await setSelectedAppId(item?.orderId)
+                            }}style={localStyles.uploadBtnStyle}>
                               <ViewBlackEyeIcon
                                 width={moderateScale(16)}
                                 height={moderateScale(16)}
@@ -622,15 +700,15 @@ const Appointments = ({ navigation }) => {
 
                     </Box>
 
-                    {!!item?.rating && <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{ ...styles.shadowStyle }} >
-                      <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : Dr. Anshu Sharma</Text>
+                    {item?.rating === null && <Box backgroundColor='#FCFFFF' mx={16} gap={18} mt={20} borderRadius={10} overflow='hidden' px={12} py={16} style={{ ...styles.shadowStyle }} >
+                      <Text fontFamily='$InterRegular' fontSize={11} lineHeight={13} color={colors.black} >Please review your experience with the last doctor : {item?.doc_name}</Text>
 
                       <Box flexDirection='row' gap={5} >
 
-                        {['1', '2', '3', '4', '5'].map((item, index): any => {
+                        {['1', '2', '3', '4', '5'].map((itemStar, indexStar): any => {
                           return (
-                            <TouchableOpacity key={index.toString()} onPress={() => { setSelectedReviewStar(index + 1) }} activeOpacity={0.6} >
-                              {item < (selectedReviewStar + 1) ? <StarFilledPrimaryColor /> : <StarUnFilledPrimaryColor />}
+                            <TouchableOpacity key={indexStar.toString()} onPress={() => { setSelectedReviewStar({ id: item?.id, star: indexStar + 1 }) }} activeOpacity={0.6} >
+                              {itemStar < (item?.id == selectedReviewStar?.id ? selectedReviewStar.star + 1 : 1) ? <StarFilledPrimaryColor /> : <StarUnFilledPrimaryColor />}
                             </TouchableOpacity>
 
                           )
@@ -643,9 +721,9 @@ const Appointments = ({ navigation }) => {
                           placeholderTextColor={colors.black}
                           multiline={true}
                           numberOfLines={10}
-                          style={{ height: responsiveHeight(16), width: '87%', textAlignVertical: 'top', }}
+                          style={{ height: responsiveHeight(16), width: '87%', textAlignVertical: 'top', color: colors.black }}
                         />
-                        <TouchableOpacity activeOpacity={0.6} style={{ alignSelf: 'flex-start' }} >
+                        <TouchableOpacity onPress={() => { submitRatingAndReview(item?.id, item?.doc_id, item?.orderId) }} activeOpacity={0.6} style={{ alignSelf: 'flex-start' }} >
                           <Text fontFamily='$InterMedium' fontSize={11} lineHeight={13} color={'#858181'} mt={8} >Submit</Text>
                         </TouchableOpacity>
 
@@ -764,40 +842,29 @@ const Appointments = ({ navigation }) => {
         onRequestClose={() => setModalReportUploadVisible(false)}
       >
         <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
-          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5} w={'80%'} h={'27%'} >
-            <Pressable onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5} w={300} h={220} p={5} >
+            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
               <CloseIcon />
-            </Pressable>
-            {/* <Box alignItems='center' gap={5} >
-              
-              <Text fontFamily='$InterSemiBold' color={colors.black} textAlign='center' fontSize={18} mt={3} >Oops!</Text>
-              <Text fontFamily='$InterRegular' color={'#767474'} textAlign='center' fontSize={13} >MeetID Not Found</Text>
+            </TouchableOpacity>
 
-              <PrimaryButton onPress={() => {}} buttonText='Try again' height={35} />
-            </Box> */}
             <View
               style={{
                 borderWidth: 1,
                 borderStyle: 'dotted',
-
-
                 borderColor: colors.gray7,
                 marginVertical: responsiveHeight(1.5),
                 justifyContent: 'center',
                 alignItems: 'center',
                 paddingVertical: responsiveHeight(3),
                 borderRadius: responsiveWidth(1),
-                paddingHorizontal: responsiveWidth(1)
+                paddingHorizontal: responsiveWidth(1),
+                width: responsiveWidth(70),
+                height: responsiveHeight(17)
               }}>
-              {/* <Ionicons
-                  name="add-circle-outline"
-                  size={30}
-                  color={colors.black}
-                /> */}
 
-              {slectedFileData?.uri === '' && <TouchableOpacity activeOpacity={0.6} onPress={selectDoc} style={{ borderWidth: 1, borderColor: colors.black, borderRadius: responsiveWidth(6), alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: colors.black, fontSize: responsiveFontSize(2.3), fontWeight: '400', marginHorizontal: responsiveWidth(1.5), alignSelf: 'center' }} >+</Text>
-              </TouchableOpacity>}
+              {slectedFileData?.uri === '' && <TouchableOpacity style={{ alignSelf: 'center' }} activeOpacity={0.6} onPress={selectDoc} >
+                <PlusCircleIcon width={responsiveWidth(12)} height={responsiveHeight(6)} /></TouchableOpacity>}
+
               {slectedFileData?.uri === '' ? <CText
                 type="b12"
                 numberOfLines={1}
@@ -815,6 +882,7 @@ const Appointments = ({ navigation }) => {
                 <CText
                   suppressHighlighting={true}
                   type="m10"
+                  numberOfLines={1}
                   style={[
                     localStyles.underLineStyle,
                     {
@@ -842,72 +910,92 @@ const Appointments = ({ navigation }) => {
       >
         <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
           <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5} w={'85%'} h={'40%'} >
-            <Pressable onPress={() => setModalReportViewVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
+            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportViewVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
               <CloseIcon />
-            </Pressable>
+            </TouchableOpacity>
+            
+            {
+              reportByAppointmentIdData?.data?.result[0]?.reportView?.length !== 0 ?    <FlatList
+              data={reportByAppointmentIdData?.data?.result[0]?.reportView}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                return (
 
-            <FlatList
-      data={ reportByAppointmentIdData?.data?.result[0]?.reportView}
-      showsVerticalScrollIndicator={false}
-      renderItem={({item,index})=>{
-        return(
-         
-              <View key={index.toString()} style={localStyles.reportWrapper} >
-                <PrescriptionDrawerIconFilled />
-                <View style={{ marginLeft: responsiveWidth(1) }} >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between'}} >
-                    <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} >{item?.report_name}</Text>
-                    <ReportTick />
-                  </View>
+                  <View key={index.toString()} style={localStyles.reportWrapper} >
+                    <PrescriptionDrawerIconFilled />
+                    <View style={{ marginLeft: responsiveWidth(1) }} >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} w={150} numberOfLines={1} >{item?.report_name}</Text>
+                        <ReportTick />
+                      </View>
 
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between'}} >
-                    <ProgressView
-                      progressTintColor={colors.primary}
-                      // trackTintColor="blue"
-                      progress={1}
-                      style={{ width: responsiveWidth(60) }}
-                    />
-                    <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <ProgressView
+                          progressTintColor={colors.primary}
+                          // trackTintColor="blue"
+                          progress={1}
+                          style={{ width: responsiveWidth(60) }}
+                        />
+                        <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
 
-                    <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
+                        <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
 
-                      <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
-                        <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
-                      </TouchableOpacity>
+                          <TouchableOpacity onPress={() => { openPdfInBrowser(item?.report) }} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
+                            <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
+                          </TouchableOpacity>
 
-                      {/* <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
-        <Text style={{ color: '#9DA3A4', ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >View</Text>
-      </TouchableOpacity> */}
+
+
+                        </View>
+
+                        <TouchableOpacity onPress={() => { deleteReport(item?.id) }} activeOpacity={0.6} >
+                          <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
+                        </TouchableOpacity>
+
+
+                      </View>
+
 
                     </View>
-
-                    <TouchableOpacity onPress={()=>{deleteReport(item?.id)}} activeOpacity={0.6} >
-                      <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
-                    </TouchableOpacity>
-
-
                   </View>
 
+                )
+              }}
+              keyExtractor={({ item, index }) => index?.toString()}
+            /> :
 
-                </View>
-              </View>
-          
-        )
-      }}
-      keyExtractor={({item,index}) => item?.id?.toString()}
-    />
-
-            {
-              reportByAppointmentIdData?.data?.result[0]?.reportView?.length == 0 && <Box flex={1} justifyContent='center' >
-                <CText type='m12' >No Found Data</CText>
-                <Spinner alignSelf='center' size={'small'} color={colors.primary} />
+           <Box flex={1} justifyContent='center' alignItems='center' >
+                 <OppsIcon/>
+                <CText type='m14' >No Found Data</CText>
+                {/* <Spinner alignSelf='center' size={'small'} color={colors.primary} /> */}
               </Box>
             }
 
+            {isLoadingReportByAppointmentId &&   <Box flex={1} justifyContent='center' alignItems='center' >
+            <Spinner size={'small'} color={colors.primary} />
+              </Box> }
 
 
+
+          </Box>
+        </Box>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={useDeleteReportMutation.isPending}
+      // onRequestClose={() => setModalVisible(false)}
+      >
+        <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' justifyContent='center' elevation={5} w={'55%'} h={'15%'} gap={10} >
+        
+            <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Please wait</Text>
+
+   
+            <Spinner size={'large'} color={colors.primary} />
           </Box>
         </Box>
       </Modal>

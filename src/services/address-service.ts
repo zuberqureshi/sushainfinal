@@ -25,7 +25,7 @@ class AddressService {
 
   getStateByCountry = async (data:{countryId:string}) => {
     const { countryId } = data
-    console.log({countryId});
+
     return fetcher({
       url: `/order/statesbycountryid?countryId=${countryId}`,
       method: 'GET',
@@ -34,7 +34,6 @@ class AddressService {
 
   getCitiesByState = async (data:{stateId:string}) => {
     const { stateId } = data
-     console.log({stateId});
      
     return fetcher({
       url: `/order/citiesbystateid?stateId=${stateId}`,
@@ -52,7 +51,6 @@ class AddressService {
   }
 
   addNewAddress = async (data:any) => {
-   console.log(data,'ttt');
    
     return fetcher({
       url: 'order/createuseraddress',

@@ -192,7 +192,7 @@ export default {
    submit:'Submit',
    Upload:'Upload',
    Continue:'Continue',
-   fromyourdevice:' from your device in the form of jpeg, pdf',
+   fromyourdevice:' from your device in the form of jpeg',
    Dragyourfileshere:'Drag your files here',
    AppointmentCancellation:'Appointment Cancellation',
    RescheduleAppointment:'Reschedule Appointment',

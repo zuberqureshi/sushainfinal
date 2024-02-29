@@ -9,7 +9,7 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import React, { useState, useRef ,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CSafeAreaView from '../../components/common/CSafeAreaView';
 import KeyBoardAvoidWrapper from '../../components/common/KeyBoardAvoidWrapper';
 import CHeader from '../../components/common/CHeader';
@@ -18,7 +18,7 @@ import images from '../../assets/images';
 import { API_IMAGE_BASE_URL, Api_Image_Base_Url, getHeight, moderateScale } from '../../common/constants';
 import { colors, styles } from '../../themes';
 import CText from '../../components/common/CText';
-import { BottomIconWhite, PrescriptionDrawerIcon, PrescriptionDrawerIconFilled, ReportDeleteIcon, ReportTick, RightArrow } from '../../assets/svgs';
+import { BottomIconWhite, PlusCircleIcon, PrescriptionDrawerIcon, PrescriptionDrawerIconFilled, ReportDeleteIcon, ReportTick, RightArrow } from '../../assets/svgs';
 import DocumentPicker from 'react-native-document-picker';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -28,7 +28,7 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-nat
 import { ProgressView } from "@react-native-community/progress-view";
 import typography from '../../themes/typography';
 import RBSheet from "react-native-raw-bottom-sheet";
-import { Toast, ToastTitle, useToast , Spinner } from '@gluestack-ui/themed';
+import { Toast, ToastTitle, useToast, Spinner } from '@gluestack-ui/themed';
 import { getAccessToken } from '../../utils/network';
 import useGetReportByAppointmentId from '../../hooks/appointment/get-report-by-appointment';
 import { Container } from '../../components/Container';
@@ -41,12 +41,13 @@ import useDeleteReportById from '../../hooks/appointment/delete-report';
 import useGetAppointmentDetail from '../../hooks/appointment/get-appointment-detail';
 import moment from 'moment';
 import Body from '../../components/Body/Body';
+import { useBackHandler } from '@react-native-community/hooks';
 
 
 
-const AppointmentBooked = ({route}) => {
+const AppointmentBooked = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { appid , userinfo } = route.params;
+  const { appid, userinfo } = route.params;
 
   const refRBSheet = useRef();
   const toast = useToast()
@@ -64,7 +65,7 @@ const AppointmentBooked = ({route}) => {
   const [reportUploadIsLoading, setReportUploadIsLoading] = useState(false)
 
   const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(appid)
-  const {data:appointmentDetailData , isLoading:appointmentDetailIsLoading} = useGetAppointmentDetail({type:'virtual',appId:appid})
+  const { data: appointmentDetailData, isLoading: appointmentDetailIsLoading } = useGetAppointmentDetail({ type: 'virtual', appId: appid })
   const useDeleteReportMutation = useDeleteReportById()
   console.log('repoooo datt', userinfo);
 
@@ -78,16 +79,33 @@ const AppointmentBooked = ({route}) => {
     )
   }
 
-//  const fetchUserData = async() => {
-//   setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
- 
-  
-//  }
+  // const backHandle = () => {
+  //   // Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+  //   //   {
+  //   //     text: 'Cancel',
+  //   //     onPress: () => null,
+  //   //     style: 'cancel',
+  //   //   },
+  //   //   {text: 'YES', onPress: () => BackHandler.exitApp()},
+  //   // ]);
+  //   // console.log('backHANDDD');
+    
+  //   navigation.navigate(StackNav.FindADoctor)
+  //   return true;
+  // };
+
+  // useBackHandler(backHandle)
+
+  //  const fetchUserData = async() => {
+  //   setUserInfo(JSON.parse( await getAccessToken('userInfo') ) ) ;
+
+
+  //  }
 
   // useEffect(() => {
   //   fetchUserData()
   // }, [])
-  
+
 
   const parseUri = (uri: any) => {
     // Extract the file name from the URI
@@ -169,18 +187,18 @@ const AppointmentBooked = ({route}) => {
       // })
       const permissionStatus = await androidCameraPermission()
 
-      if(permissionStatus || Platform.OS == 'ios'){
-  
+      if (permissionStatus || Platform.OS == 'ios') {
+
         ImagePicker.openPicker({
           width: 300,
           height: 400,
           cropping: true
         }).then(image => {
           console.log('Selected DOc', image);
-           setSlectedFileData({
-          uri: image?.path,
-          type: image?.mime as string
-        })
+          setSlectedFileData({
+            uri: image?.path,
+            type: image?.mime as string
+          })
         });
       }
 
@@ -208,13 +226,13 @@ const AppointmentBooked = ({route}) => {
 
 
 
-  const onSubmitReport = async() => {
-    
+  const onSubmitReport = async () => {
+
     setReportUploadIsLoading(true)
-    const formData  = new FormData()
+    const formData = new FormData()
 
 
-    formData.append('app_id',appid)
+    formData.append('app_id', appid)
     if (slectedFileData?.uri !== '') {
       formData.append('images', {
         uri: slectedFileData.uri as string,
@@ -222,9 +240,9 @@ const AppointmentBooked = ({route}) => {
         name: parseUri(slectedFileData.uri).name,
       });
     }
-    formData.append('report_name',userinfo?.userName)
-    formData.append('tab','virtual')
-   
+    formData.append('report_name', `${parseUri(slectedFileData.uri).name.substring(0, parseUri(slectedFileData.uri).name.lastIndexOf('.'))}`)
+    formData.append('tab', 'virtual')
+
     const obj = Object.fromEntries(formData?._parts);
 
     console.log('Submit File', obj);
@@ -238,26 +256,26 @@ const AppointmentBooked = ({route}) => {
       },
     }
 
-      try {
-        const response =  await fetch('http://13.232.170.16:3006/api/v1/video/reportupload', updateReportPayload);
-        const responseJson = await response.json()
-        console.log('uplao',responseJson);
+    try {
+      const response = await fetch('http://13.232.170.16:3006/api/v1/video/reportupload', updateReportPayload);
+      const responseJson = await response.json()
+      console.log('uplao', responseJson);
 
-        queryClient.invalidateQueries({
-          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid ]
-        })
-        
-        
-        // queryClient.invalidateQueries({
-        //   queryKey: [ProfileService.queryKeys.completeProfile]
-        // })
+      queryClient.invalidateQueries({
+        queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid]
+      })
 
-        // queryClient.invalidateQueries({
-        //   queryKey: [ProfileService.queryKeys.retrieveRoleProfile]
-        // })
 
-        if(responseJson?.success){
-           toast.show({
+      // queryClient.invalidateQueries({
+      //   queryKey: [ProfileService.queryKeys.completeProfile]
+      // })
+
+      // queryClient.invalidateQueries({
+      //   queryKey: [ProfileService.queryKeys.retrieveRoleProfile]
+      // })
+
+      if (responseJson?.success) {
+        toast.show({
           placement: "bottom",
           render: ({ id }) => {
             const toastId = "toast-" + id
@@ -269,31 +287,31 @@ const AppointmentBooked = ({route}) => {
           },
         })
 
-         setSlectedFileData({ uri: '', type: '' })
+        setSlectedFileData({ uri: '', type: '' })
 
-        }
-
-       
-        setReportUploadIsLoading(false)
-      } catch (error) {
-        console.log('err',error);
-        setReportUploadIsLoading(false)
-        toast.show({
-          placement: "bottom",
-          render: ({ id }) => {
-            const toastId = "toast-" + id
-            return (
-              <Toast nativeID={toastId} variant="accent" action="error">
-                <ToastTitle>Something went wrong please try again later.</ToastTitle>
-              </Toast>
-            );
-          },
-        })
       }
+
+
+      setReportUploadIsLoading(false)
+    } catch (error) {
+      console.log('err', error);
+      setReportUploadIsLoading(false)
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          const toastId = "toast-" + id
+          return (
+            <Toast nativeID={toastId} variant="accent" action="error">
+              <ToastTitle>Something went wrong please try again later.</ToastTitle>
+            </Toast>
+          );
+        },
+      })
+    }
 
   }
 
-  const deleteReport= (id) => {
+  const deleteReport = (id) => {
 
 
 
@@ -315,7 +333,7 @@ const AppointmentBooked = ({route}) => {
         })
 
         queryClient.invalidateQueries({
-          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid ]
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + appid]
         })
 
         // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
@@ -362,7 +380,7 @@ const AppointmentBooked = ({route}) => {
   return (
     <Container statusBarStyle='dark-content' >
       <Body>
-        <CHeader title={''} />
+        <CHeader title={''} onPressBack={()=>{navigation.navigate(StackNav.TabBar)}} />
         <View style={localStyles.headerSection}>
           <Image source={images.booking} style={localStyles.videoIcon} />
           <CText
@@ -398,15 +416,15 @@ const AppointmentBooked = ({route}) => {
                 {strings.Date}
               </CText>
               <CText type="b12" numberOfLines={1} color={colors.black}>
-              {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('DD')} {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('MMM')},{moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('YYYY')}
+                {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('DD')} {moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('MMM')},{moment(appointmentDetailData?.data?.result[0]?.orderDetail?.date).format('YYYY')}
               </CText>
             </View>
             <View style={localStyles.secondSec}>
               <CText type="b12" numberOfLines={1} color={colors.black}>
                 {strings.time}
               </CText>
-              <CText type="b12" numberOfLines={1} color={colors.black} style={{textTransform:'uppercase'}} >
-              {getAppointmentTime()} 
+              <CText type="b12" numberOfLines={1} color={colors.black} style={{ textTransform: 'uppercase' }} >
+                {getAppointmentTime()}
               </CText>
             </View>
             {/* <View style={localStyles.secondSec}>
@@ -457,10 +475,9 @@ const AppointmentBooked = ({route}) => {
                   color={colors.black}
                 /> */}
 
-           { slectedFileData?.uri === '' && <TouchableOpacity activeOpacity={0.6} onPress={selectDoc} style={{ borderWidth: 1, borderColor: colors.black, borderRadius: responsiveWidth(6), alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{ color: colors.black, fontSize: responsiveFontSize(3), fontWeight: '400',marginHorizontal:responsiveWidth(2.5) }} >+</Text>
-            </TouchableOpacity>  }
-          { slectedFileData?.uri === '' ? <CText
+            {slectedFileData?.uri === '' && <TouchableOpacity style={{ alignSelf: 'center' }} activeOpacity={0.6} onPress={selectDoc} >
+              <PlusCircleIcon width={responsiveWidth(12)} height={responsiveHeight(6)} /></TouchableOpacity>}
+            {slectedFileData?.uri === '' ? <CText
               type="b12"
               numberOfLines={1}
               color={colors.black}
@@ -472,7 +489,7 @@ const AppointmentBooked = ({route}) => {
               color={colors.green1}
               style={styles.mv10}>
               {'Image added successfully'}
-            </CText> }
+            </CText>}
             <CText type="m12" color={colors.black} align="center">
               <CText
                 suppressHighlighting={true}
@@ -491,61 +508,61 @@ const AppointmentBooked = ({route}) => {
             </CText>
           </View>
           <View>
-          { reportUploadIsLoading ? <Spinner  size={'small'} color={colors.primary} /> : <TouchableOpacity
+            {reportUploadIsLoading ? <Spinner size={'small'} color={colors.primary} /> : <TouchableOpacity
               style={localStyles.uplodeBtn}
               onPress={onSubmitReport}>
               <CText type="m12" numberOfLines={1} color={colors.primary}>
                 {strings.submit}
               </CText>
-            </TouchableOpacity> }
+            </TouchableOpacity>}
           </View>
 
-         {reportByAppointmentIdData?.data?.result[0]?.reportView?.map((item,index)=>{
+          {reportByAppointmentIdData?.data?.result[0]?.reportView?.map((item, index) => {
 
-          return(
-            <View key={index.toString()} style={localStyles.reportWrapper} >
-            <PrescriptionDrawerIconFilled />
-            <View style={{ marginLeft: responsiveWidth(1) }} >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(50) }} >
-                <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} >{item?.report_name}</Text>
-                <ReportTick />
-              </View>
+            return (
+              <View key={index.toString()} style={localStyles.reportWrapper} >
+                <PrescriptionDrawerIconFilled />
+                <View style={{ marginLeft: responsiveWidth(1) }} >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between'}} >
+                    <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold,width:responsiveWidth(40) }}  numberOfLines={1}  >{item?.report_name}</Text>
+                    <ReportTick />
+                  </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                <ProgressView
-                  progressTintColor={colors.primary}
-                  // trackTintColor="blue"
-                  progress={1}
-                  style={{ width: responsiveWidth(65) }}
-                />
-                <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', }} >
+                    <ProgressView
+                      progressTintColor={colors.primary}
+                      // trackTintColor="blue"
+                      progress={1}
+                      style={{ width: responsiveWidth(65) }}
+                    />
+                    <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
 
-                <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
+                    <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
 
-                  <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
-                    <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
-                  </TouchableOpacity>
+                      <TouchableOpacity onPress={() => { openPdfInBrowser(item?.report) }} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
+                        <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
+                      </TouchableOpacity>
 
-                  {/* <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
+                      {/* <TouchableOpacity onPress={()=>{openPdfInBrowser(item?.report)}} style={{ borderBottomWidth: 1, borderBottomColor: '#9DA3A4' }} >
                     <Text style={{ color: '#9DA3A4', ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >View</Text>
                   </TouchableOpacity> */}
 
+                    </View>
+
+                    <TouchableOpacity onPress={() => { deleteReport(item?.id) }} activeOpacity={0.6} >
+                      <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
+                    </TouchableOpacity>
+
+
+                  </View>
+
+
                 </View>
-
-               <TouchableOpacity onPress={()=>{deleteReport(item?.id)}} activeOpacity={0.6} >
-                <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
-                </TouchableOpacity>  
-              
-
               </View>
-
-
-            </View>
-          </View>
-          )
-         })}
+            )
+          })}
 
           {/* <View style={localStyles.reportWrapper} >
             <PrescriptionDrawerIconFilled />
@@ -693,6 +710,7 @@ const AppointmentBooked = ({route}) => {
             ref={refRBSheetReschedule}
             closeOnDragDown={true}
             closeOnPressMask={false}
+            height={responsiveHeight(34)}
             customStyles={{
               wrapper: {
                 backgroundColor: "transparent"
@@ -772,7 +790,7 @@ const AppointmentBooked = ({route}) => {
                     //     setVisibleAppointment(false);
                     //   }}
                     activeOpacity={0.6}
-                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment,{type:'virtual',appid:'86391634831916'}) }}
+                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: 'virtual', appid: '86391634831916' }) }}
                   >
                     <CText
                       type="m14"
@@ -816,6 +834,7 @@ const AppointmentBooked = ({route}) => {
             ref={refRBSheet}
             closeOnDragDown={true}
             closeOnPressMask={false}
+            height={responsiveHeight(34)}
             customStyles={{
               wrapper: {
                 backgroundColor: "transparent"
@@ -895,7 +914,7 @@ const AppointmentBooked = ({route}) => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation,{type:'virtual',appid:'86391634831916'}) }}
+                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation, { type: 'virtual', appid: '86391634831916' }) }}
                 style={[localStyles.btn]}
               //   onPress={() => {
               //     navigation.navigate(StackNav.AppointmentCancellation);
