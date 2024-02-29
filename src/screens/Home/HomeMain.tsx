@@ -51,6 +51,10 @@ import { Box, Pressable,Text } from '@gluestack-ui/themed';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
 import {  AuthContext } from '../../context/AuthContext'
+import CheckInternet from '../../components/common/CommonComponent/CheckInternet';
+import useGetTodayAppointments from '../../hooks/appointment/get-today-appointment';
+
+
 type Props = {
   icon: React.JSX.Element;
   onPress: () => void;
@@ -71,9 +75,12 @@ const HomeMain = () => {
    // const [homeBannerData, setResultData] = useState<any>([]);
   
   const [slectedTypeNeed, setSlectedTypeNeed] = useState<string>('ayurvedic')
- 
+
+     //api call
   const {data,isLoading} = useGetHomeData()
   const {data:homeBannerData,isLoading:homeBannerIsLoading} = useGetHomeBannerData()
+
+    const { data: todayAppointmentsData, isLoading: isLoadingTodayAppointments } = useGetTodayAppointments({ userid: authContext?.userInfo?.userId })
 
   // console.log(homeBannerData?.data?.result,'HOMEEE');
    
@@ -250,10 +257,12 @@ const locationSet = async() => {
         {!!resultData && (
           <View>
             <BannerList bannerData={homeBannerData?.data?.result[0]?.Bannerlist}  />
-            {/* <UpcomingAppointment isFollowUp={false} />
-            <UpcomingAppointment isFollowUp={true} /> */}
+            {/* <UpcomingAppointment isFollowUp={false} /> */}
+            {!!(todayAppointmentsData?.data?.result[0]?.consultationDetail) ? <UpcomingAppointment isFollowUp={true} data={todayAppointmentsData?.data?.result[0]?.consultationDetail} /> :
+             <CategoryList />
+            }
             {/* <FrequentlyBoughtProducts /> */}
-            <CategoryList />
+            
             <DoctorSpecialities />
             <ShopCategory shopCategaryData={shopByategoryData}/>
             <AyurvedicProducts ayurvedicData={resultData?.bestSellingProductList} />
@@ -265,6 +274,7 @@ const locationSet = async() => {
         )}
 
       </Body>
+      <CheckInternet/>
     </Container>
   );
 };

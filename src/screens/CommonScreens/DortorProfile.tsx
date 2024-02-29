@@ -184,7 +184,7 @@ export default function DoctorProfile({ route, navigation }: Props) {
   }
 
   const onPressBookAppointment = () => {
-    navigation.navigate(StackNav.SelectTimeSlot, { doctorid:id,doctorslots:doctorDetail?.slots,instantconsultation:'NO' });
+    navigation.navigate(StackNav.SelectTimeSlot, { doctorid:id,doctorslots:doctorDetail?.slots,instantconsultation:'NO',doctorfees:doctorDetail?.vc_fees });
   }
 
   const renderItem = ({ item ,index}: { item: any}) => {

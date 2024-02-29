@@ -89,10 +89,10 @@ const ProductByCategories = ({ route, navigation }:any) => {
   // console.log(products,products.length,'PREDUXBBB');
 
   const fetchData = () => {
-    console.log(products.length,pageNum,'DATA LEE');
+    console.log(products.length,pageNum,selectedProductCategory,'DATA LEE');
     
    setShowLoad(true)
-    fetch(`http://3.110.107.128:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
+    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
     .then(async(res) =>{ 
       console.log(res?.result[0]?.productList?.length,pageNum,'APIII DATAAA')
       // await dispatch(clearProducts())

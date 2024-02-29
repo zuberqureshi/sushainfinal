@@ -12,6 +12,7 @@ class AppointmentsService {
     deleteReportById : 'deleteReportById',
     getTodayAppointments : 'getTodayAppointments',
     cancelAppointment : 'cancelAppointment' ,
+    ratingAndReviewCompletedAppointment : 'ratingAndReviewCompletedAppointment',
 
     
   };
@@ -46,6 +47,16 @@ class AppointmentsService {
     });
   }
 
+  ratingAndReviewCompletedAppointment = async (data:any) => {
+
+    return fetcher({
+      url: '/booking/ratingandreview',
+      method: 'POST',
+      data
+    });
+
+  }
+
   getReportByAppointmentId = async (data:any) => {
 
     return fetcher({
@@ -53,6 +64,7 @@ class AppointmentsService {
       method: 'GET',
     });
   }
+
 
   deleteReportById = async (data:any) => {
     return fetcher({

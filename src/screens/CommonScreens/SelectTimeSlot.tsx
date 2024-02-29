@@ -85,139 +85,6 @@ export default function SelectTimeSlot({ route, }: Props) {
   const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
   const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Set the callback for CFPaymentGatewayService
-        CFPaymentGatewayService.setCallback({
-          onVerify(orderID: string): void {
-            console.log('success ', orderID);
-            //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
-
-            useCheckPaymentMutation.mutate(orderID, {
-              onSuccess: (data) => {
-                console.log(data?.data,'erfyyy');
-    
-                if(data?.data?.success){
-                  toast.show({
-                    placement: "bottom",
-                    render: ({ id }: { id: string }) => {
-                      const toastId = "toast-" + id
-                      return (
-                        <Toast nativeID={toastId} variant="accent" action="success">
-                          <ToastTitle>Appointment booked Succesfully</ToastTitle>
-                        </Toast>
-                      );
-                    },
-                  })
-                  navigation.navigate(StackNav.AppointmentBooked,{appid:data?.data?.result[0]?.detail?.orderId , userinfo : userInfo})
-                //  startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
-                }else{
-                  toast.show({
-                    placement: "bottom",
-                    render: ({ id }: { id: string }) => {
-                      const toastId = "toast-" + id
-                      return (
-                        <Toast nativeID={toastId} variant="accent" action="warning">
-                          <ToastTitle>{data?.data?.message}</ToastTitle>
-                        </Toast>
-                      );
-                    },
-                  })
-                }
-                // setPayPrice(data?.data?.result[0]?.finalPrice)
-                // setApplyCoupon(true)
-    
-              },
-              onError: (error: any) => {
-                console.log(error,'erfyyy ERROR');
-                toast.show({
-                  placement: "bottom",
-                  render: ({ id }: { id: string }) => {
-                    const toastId = "toast-" + id
-                    return (
-                      <Toast nativeID={toastId} variant="accent" action="error">
-                        <ToastTitle>Something went wrong, please try again later</ToastTitle>
-                      </Toast>
-                    );
-                  },
-                })
-              }
-            })
-
-            // toast.show({
-            //   placement: "bottom",
-            //   render: ({ id }: { id: string }) => {
-            //     const toastId = "toast-" + id
-            //     return (
-            //       <Toast nativeID={toastId} variant="accent" action="success">
-            //         <ToastTitle>Appointment booked Succesfully</ToastTitle>
-            //       </Toast>
-            //     );
-            //   },
-            // })
-
-            // navigation.navigate(StackNav.AppointmentBooked,{appid:orderID});
-
-          },
-          onError(error: CFErrorResponse, orderID: string): void {
-            console.log('failed ', orderID);
-            // navigation.navigate(NAVIGATION.PaymentFailed);
-          },
-        });
-  
-        // Fetch user info
-        const userInfo = await getAccessToken('userInfo');
-        setUserInfo(JSON.parse(userInfo));
-      } catch (error) {
-        console.error('Error in fetching data:', error);
-      }
-    };
-  
-    fetchData();
-  
-    return () => {
-      // Remove the callback for CFPaymentGatewayService
-      CFPaymentGatewayService?.removeCallback();
-    };
-  }, []);
-  
-
-  
-
-  const startCheckout = (sessionId,orderId) => {
-    try {
-      const session = new CFSession(
-        sessionId,
-        orderId,
-        CFEnvironment.SANDBOX
-      );
-      const paymentModes = new CFPaymentComponentBuilder()
-        .add(CFPaymentModes.CARD)
-        .add(CFPaymentModes.UPI)
-        .add(CFPaymentModes.NB)
-        .add(CFPaymentModes.WALLET)
-        .add(CFPaymentModes.PAY_LATER)
-        .build();
-      const theme = new CFThemeBuilder()
-        .setNavigationBarBackgroundColor('#49b0c5')
-        .setNavigationBarTextColor('#FFFFFF')
-        .setButtonBackgroundColor('#80b841')
-        .setButtonTextColor('#FFFFFF')
-        .setPrimaryTextColor('#212121')
-        .setSecondaryTextColor('#757575')
-        .build();
-      const dropPayment = new CFDropCheckoutPayment(
-        session,
-        paymentModes,
-        theme
-      );
-      CFPaymentGatewayService.doPayment(dropPayment);
-    } catch (e: any) {
-      console.log('startcheckout eeror ', e.message);
-    }
-  }
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" },
@@ -341,6 +208,142 @@ export default function SelectTimeSlot({ route, }: Props) {
     },
 
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Set the callback for CFPaymentGatewayService
+        CFPaymentGatewayService.setCallback({
+          onVerify(orderID: string): void {
+            console.log('success ', orderID);
+            //  mstStore.cartStore.emptyCart(mstStore.otpStore.userId);
+
+            useCheckPaymentMutation.mutate(orderID, {
+              onSuccess: (data) => {
+                console.log(data?.data,'erfyyy');
+    
+                if(data?.data?.success){
+                  toast.show({
+                    placement: "bottom",
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant="accent" action="success">
+                          <ToastTitle>Appointment booked Succesfully</ToastTitle>
+                        </Toast>
+                      );
+                    },
+                  })
+                  formik.resetForm()
+                  navigation.navigate(StackNav.AppointmentBooked,{appid:data?.data?.result[0]?.detail?.orderId , userinfo : userInfo})
+                //  startCheckout(data?.data?.result[0]?.paymentCreatedData?.payment_session_id,data?.data?.result[0]?.paymentCreatedData?.order_id)
+                }else{
+                  toast.show({
+                    placement: "bottom",
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant="accent" action="warning">
+                          <ToastTitle>{data?.data?.message}</ToastTitle>
+                        </Toast>
+                      );
+                    },
+                  })
+                }
+                // setPayPrice(data?.data?.result[0]?.finalPrice)
+                // setApplyCoupon(true)
+    
+              },
+              onError: (error: any) => {
+                console.log(error,'erfyyy ERROR');
+                toast.show({
+                  placement: "bottom",
+                  render: ({ id }: { id: string }) => {
+                    const toastId = "toast-" + id
+                    return (
+                      <Toast nativeID={toastId} variant="accent" action="error">
+                        <ToastTitle>Something went wrong, please try again later</ToastTitle>
+                      </Toast>
+                    );
+                  },
+                })
+              }
+            })
+
+            // toast.show({
+            //   placement: "bottom",
+            //   render: ({ id }: { id: string }) => {
+            //     const toastId = "toast-" + id
+            //     return (
+            //       <Toast nativeID={toastId} variant="accent" action="success">
+            //         <ToastTitle>Appointment booked Succesfully</ToastTitle>
+            //       </Toast>
+            //     );
+            //   },
+            // })
+
+            // navigation.navigate(StackNav.AppointmentBooked,{appid:orderID});
+
+          },
+          onError(error: CFErrorResponse, orderID: string): void {
+            console.log('failed ', orderID);
+            // navigation.navigate(NAVIGATION.PaymentFailed);
+          },
+        });
+  
+        // Fetch user info
+        const userInfo = await getAccessToken('userInfo');
+        setUserInfo(JSON.parse(userInfo));
+      } catch (error) {
+        console.error('Error in fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  
+    return () => {
+      // Remove the callback for CFPaymentGatewayService
+      CFPaymentGatewayService?.removeCallback();
+    };
+  }, []);
+  
+
+  
+
+  const startCheckout = (sessionId,orderId) => {
+    try {
+      const session = new CFSession(
+        sessionId,
+        orderId,
+        CFEnvironment.SANDBOX
+      );
+      const paymentModes = new CFPaymentComponentBuilder()
+        .add(CFPaymentModes.CARD)
+        .add(CFPaymentModes.UPI)
+        .add(CFPaymentModes.NB)
+        .add(CFPaymentModes.WALLET)
+        .add(CFPaymentModes.PAY_LATER)
+        .build();
+      const theme = new CFThemeBuilder()
+        .setNavigationBarBackgroundColor('#49b0c5')
+        .setNavigationBarTextColor('#FFFFFF')
+        .setButtonBackgroundColor('#80b841')
+        .setButtonTextColor('#FFFFFF')
+        .setPrimaryTextColor('#212121')
+        .setSecondaryTextColor('#757575')
+        .build();
+      const dropPayment = new CFDropCheckoutPayment(
+        session,
+        paymentModes,
+        theme
+      );
+      CFPaymentGatewayService.doPayment(dropPayment);
+    } catch (e: any) {
+      console.log('startcheckout eeror ', e.message);
+    }
+  }
+
+
 
   const onClickCheckCoupon = () => {
  if(formik.values.couponcode.length<=0 || formik.values.couponcode === '' ){
@@ -783,7 +786,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             <Button borderRadius={6} disabled={useCreateConsultationMutation.isPending} backgroundColor={useCreateConsultationMutation.isPending ? 'gray' : colors.success} height={42} onPress={formik.handleSubmit} >
 
               <ButtonText fontSize={14} fontFamily='$InterRegular' color={colors.white} >{strings.pay} </ButtonText>
-              <ButtonText fontSize={14} fontFamily='$InterSemiBold' color={colors.white}>{!!payPrice ? `${payPrice} ` : doctorfees}</ButtonText>
+              <ButtonText fontSize={14} fontFamily='$InterSemiBold' color={colors.white}>{!!payPrice ? `${payPrice} ` : !!doctorfees ? doctorfees : 'N/A' }</ButtonText>
               {!!payPrice && <ButtonText fontSize={12} fontFamily='$InterRegula' textDecorationLine='line-through' color={colors.white} >{'715'}</ButtonText>}
               {useCreateConsultationMutation.isPending && <Spinner color="white" size={20} ml={7} />}
             </Button>

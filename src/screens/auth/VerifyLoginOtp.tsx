@@ -1,5 +1,5 @@
 import {Image, Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
+import React, {FunctionComponent, useContext, useEffect, useRef, useState} from 'react';
 // import CountDown from 'react-native-countdown-component';
 import {ParamListBase} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -36,6 +36,8 @@ import { responsiveHeight } from 'react-native-responsive-dimensions';
 import useLoginOtpVerify from '../../hooks/auth/login-otp-verify';
 import useResendOtp from '../../hooks/auth/resend-otp';
 import { setAccessToken, getAccessToken }  from '../../utils/network'
+import { AuthContext } from '../../context/AuthContext'
+
 type Props = {
   route: any;
   navigation: NativeStackNavigationProp<ParamListBase>;
@@ -45,6 +47,7 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
   const {mobile,screenType} = route.params;
   const input = useRef(null)
   const toast = useToast()
+  const authContext:any = useContext(AuthContext);
 
   const [otpInput, setOtpInput] = useState<string>('');
   const [loader, setLoader] = useState(false)
@@ -126,6 +129,15 @@ const VerifyLoginOtp = ({route, navigation}:Props) => {
                 userMobile: data?.data?.result[0]?.user.mobile,
                 
               }))
+
+              authContext.setUserInfo({
+                              
+                userUniqueId: data?.data?.result[0]?.user.user_unique_id,
+                userId: data?.data?.result[0]?.user.id,
+                userName: `${data?.data?.result[0]?.user.first_name} ${data?.data?.result[0]?.user.last_name}`,
+                userMobile: data?.data?.result[0]?.user.mobile,
+    
+              });
   
             
            
