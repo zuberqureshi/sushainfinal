@@ -1086,6 +1086,8 @@ PODS:
     - React-Core
   - react-native-document-picker (9.1.0):
     - React-Core
+  - react-native-netinfo (11.3.1):
+    - React-Core
   - react-native-progress-view (1.4.2):
     - React-Core
   - react-native-render-html (6.3.4):
@@ -1384,6 +1386,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - react-native-cashfree-pg-sdk (from `../node_modules/react-native-cashfree-pg-sdk`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - "react-native-progress-view (from `../node_modules/@react-native-community/progress-view`)"
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-restart (from `../node_modules/react-native-restart`)
@@ -1528,6 +1531,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-cashfree-pg-sdk"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-progress-view:
     :path: "../node_modules/@react-native-community/progress-view"
   react-native-render-html:
@@ -1681,6 +1686,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 9ee041e1d7be96da6d76a251f92e72b711c651d6
   react-native-cashfree-pg-sdk: a1a2e54798b14a1666f2c2842a37c159aede7b87
   react-native-document-picker: b4f4a23b73f864ce17965b284c0757648993805b
+  react-native-netinfo: bdb108d340cdb41875c9ced535977cac6d2ff321
   react-native-progress-view: fda23a769e325dd94f08439f6cfca5867fca32c0
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162

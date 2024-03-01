@@ -380,7 +380,7 @@ const AppointmentBooked = ({ route }) => {
   return (
     <Container statusBarStyle='dark-content' >
       <Body>
-        <CHeader title={''} onPressBack={()=>{navigation.navigate(StackNav.TabBar)}} />
+        <CHeader title={''} onPressBack={()=>{navigation.navigate(StackNav.DrawerNavigation)}} />
         <View style={localStyles.headerSection}>
           <Image source={images.booking} style={localStyles.videoIcon} />
           <CText

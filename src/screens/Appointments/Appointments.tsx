@@ -434,7 +434,9 @@ const Appointments = ({ navigation }) => {
               </Box>
 
               <View style={localStyles.btnContainer}>
-                <TouchableOpacity style={localStyles.videoCallBtn}>
+                <TouchableOpacity onPress={()=>{
+            navigation.navigate(StackNav.VideoCall)
+            }} style={localStyles.videoCallBtn}>
                   {status ? (
                     <BuyPrescription
                       width={moderateScale(14)}
@@ -540,7 +542,9 @@ const Appointments = ({ navigation }) => {
 
                           </Box>
 
-                          <TouchableOpacity>
+                          <TouchableOpacity onPress={()=>{
+            navigation.navigate(StackNav.VideoCall)
+            }} >
                             <Box backgroundColor={colors.success} w={175} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} >
                               <VideoCallIcon
                                 width={moderateScale(15)}
