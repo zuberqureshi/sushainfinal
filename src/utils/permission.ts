@@ -38,8 +38,8 @@ export const androidCameraAudioPermission = () => new Promise(async (resolve,rej
         if(Platform.OS === 'android' && Platform.Version > 22 ){
             const granted = await PermissionsAndroid.requestMultiple([
                 PermissionsAndroid.PERMISSIONS.CAMERA,
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE 
+                PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+         
             ]);
 
             console.log(granted, 'granted response');

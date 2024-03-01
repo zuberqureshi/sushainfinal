@@ -233,13 +233,24 @@ function MeetingView() {
 const VideoCall = ({navigation}) => {
   const [userInfo, setUserInfo] = useState();
   const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
+  const [permissionGet, setpermissionGet] = useState<Boolean>(false)
 
   // const { end } = useMeeting({});
 
   async function load() {
     setUserInfo(JSON.parse(await getAccessToken('userInfo')));
-    await androidCameraAudioPermission()
+    try{
+      const permissionStatus = await androidCameraAudioPermission()
+      setpermissionGet(permissionStatus)
+      console.log(permissionStatus,'tryy videocall');
+      
+    }catch(err){
+      console.log(err);
+      
+    }
+
   }
+    
 
   const backAction = () => {
     console.log('ddddddddddddddddddd');
@@ -266,12 +277,23 @@ const VideoCall = ({navigation}) => {
     load();
  
   }, []);
-  console.log('TEST....', userInfo);
+  // console.log('TEST....', userInfo);
+
+  if(permissionGet){
+    return(
+      <Container>
+        <CHeader title='Meeting Room' />
+
+        <Text>Permission required</Text>
+
+      </Container>
+    )
+  }
 
   return meetingId ? (
     <Container statusBarStyle='dark-content' >
       <CHeader title='Meeting Room' />
-      <MeetingProvider
+   <MeetingProvider
         config={{
           meetingId,
           micEnabled: true,
@@ -280,7 +302,7 @@ const VideoCall = ({navigation}) => {
         }}
         token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIyYzgyMGVkZi1jOTg3LTQ2MDItYjJhNy01Y2VhZDI4ZTQ0YjciLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcwODM0NTgzOCwiZXhwIjoxODY2MTMzODM4fQ.0PJziz8wk472-GHp-ZCrjoxAHxWH-jw2V6nP39m1rFo`}>
         <MeetingView />
-      </MeetingProvider>
+      </MeetingProvider> 
     </Container>
   ) : (
     <NotFoundScreen />

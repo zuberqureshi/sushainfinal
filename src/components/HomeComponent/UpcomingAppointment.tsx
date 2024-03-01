@@ -489,8 +489,8 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
         onRequestClose={() => setModalReportUploadVisible(false)}
       >
         <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
-          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5} w={300} h={220} p={5} >
-            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5}  p={5} >
+            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end', marginTop: responsiveHeight(1) }} >
               <CloseIcon />
             </TouchableOpacity>
 
@@ -506,7 +506,8 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
                 borderRadius: responsiveWidth(1),
                 paddingHorizontal: responsiveWidth(1),
                 width: responsiveWidth(70),
-                height: responsiveHeight(17)
+                height: responsiveHeight(17),
+                marginHorizontal:responsiveWidth(1.5)
               }}>
 
               {slectedFileData?.uri === '' && <TouchableOpacity style={{ alignSelf: 'center' }} activeOpacity={0.6} onPress={selectDoc} >
