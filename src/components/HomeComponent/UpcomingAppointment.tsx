@@ -37,7 +37,7 @@ import { queryClient } from '../../react-query/client';
 import appointmentService from '../../services/appointment-service';
 import useDeleteReportById from '../../hooks/appointment/delete-report';
 import PrimaryButton from '../common/Button/PrimaryButton';
-import { androidCameraPermission } from '../../utils/permission';
+import { androidCameraAudioPermission, androidCameraPermission } from '../../utils/permission';
 
 const TimeComponent = ({ icon, time, style }: any) => {
   return (
@@ -323,6 +323,30 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
 
   }
 
+  const onPressJoinVC = async() => {
+
+    try { 
+      const permissionStatus = await androidCameraAudioPermission()
+      // setPermissionGet(permissionStatus)
+      if(permissionStatus || Platform.OS === 'ios' ){
+        console.log('in PERMISSIONSTATUS');
+        
+        setTimeout(() => {
+          navigation.navigate(StackNav.VideoCall)
+
+        }, 500);
+      }else{
+        console.log(permissionStatus, 'Not GRANTED videocall');
+      }
+      console.log(permissionStatus, 'tryy videocall');
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+  }
+
 
   return (
     <View style={styles.mh15}>
@@ -372,7 +396,7 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
             />
           </View>
           <View style={localStyles.btnContainer}>
-            {data?.visited === 1 ? <TouchableOpacity style={localStyles.videoCallBtn}>
+            {data?.visited === 1 ? <TouchableOpacity onPress={()=>{onPressJoinVC()}} style={localStyles.videoCallBtn}>
 
               <VideoCallIcon
                 width={moderateScale(12)}

@@ -176,7 +176,7 @@ const AppointmentCancellation = ({ route }) => {
 
           <View style={{ marginTop: responsiveHeight(1.5) }}>
             <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, textTransform: 'capitalize' }} >{appointmentDetailData?.data?.result[0]?.orderDetail?.doc_name}</Text>
-            <Text style={{ color: colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Regular, }} >clinic Name - Sanjeevani Care</Text>
+            {/* <Text style={{ color: colors.black, ...typography.fontSizes.f12, ...typography.fontWeights.Regular, }} >clinic Name - Sanjeevani Care</Text> */}
           </View>
 
           <View style={localStyles.appointmentDateWrapper} >

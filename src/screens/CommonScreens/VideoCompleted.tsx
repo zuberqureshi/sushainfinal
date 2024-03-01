@@ -14,22 +14,22 @@ import { useBackHandler } from '@react-native-community/hooks'
 
 const VideoCompleted = ({navigation}) => {
 
-    const backHandle = () => {
-        // Alert.alert('Hold on!', 'Are you sure you want to go back?', [
-        //   {
-        //     text: 'Cancel',
-        //     onPress: () => null,
-        //     style: 'cancel',
-        //   },
-        //   {text: 'YES', onPress: () => BackHandler.exitApp()},
-        // ]);
-        // console.log('backHANDDD');
+    // const backHandle = () => {
+    //     // Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+    //     //   {
+    //     //     text: 'Cancel',
+    //     //     onPress: () => null,
+    //     //     style: 'cancel',
+    //     //   },
+    //     //   {text: 'YES', onPress: () => BackHandler.exitApp()},
+    //     // ]);
+    //     // console.log('backHANDDD');
         
-        navigation.navigate(StackNav.DrawerNavigation)
-        return true;
-      };
+    //     navigation.navigate(StackNav.DrawerNavigation)
+    //     return true;
+    //   };
 
-      useBackHandler(backHandle)
+      // useBackHandler(backHandle)
       
   return (
      <Container statusBarStyle='dark-content' >

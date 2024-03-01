@@ -77,13 +77,26 @@ export default function SelectTimeSlot({ route, }: Props) {
 
 
   const toast = useToast()
+  const currentDate = moment();
 
   const doctorSlotsArray = doctorslots.split(',').map(Number)
   const today = new Date()
   const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
 
-  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
-  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item);
+  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
+    const startTime = moment(appointment.slot_start_time);
+    const appointmentHour = startTime.hours();
+
+    // Compare the hours
+    return appointmentHour > currentDate.hours();
+  })
+  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
+    const startTime = moment(appointment.slot_start_time);
+    const appointmentHour = startTime.hours();
+
+    // Compare the hours
+    return appointmentHour > currentDate.hours();
+  });
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -414,7 +427,7 @@ export default function SelectTimeSlot({ route, }: Props) {
   // console.log('date see ',selectedDate);
 
   // Get the current date
-  const currentDate = moment();
+
 
   // Array to store the next five dates
   const nextFiveDates:any = [];

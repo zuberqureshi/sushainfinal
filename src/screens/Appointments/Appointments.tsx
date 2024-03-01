@@ -27,7 +27,7 @@ import useGetTodayAppointments from '../../hooks/appointment/get-today-appointme
 import { AuthContext } from '../../context/AuthContext'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import strings from '../../i18n/strings'
-import { androidCameraPermission } from '../../utils/permission';
+import { androidCameraAudioPermission, androidCameraPermission } from '../../utils/permission';
 import { queryClient } from '../../react-query/client';
 import appointmentService from '../../services/appointment-service';
 import useGetReportByAppointmentId from '../../hooks/appointment/get-report-by-appointment';
@@ -360,6 +360,29 @@ const Appointments = ({ navigation }) => {
     })
   }
 
+  const onPressJoinVC = async() => {
+
+    try { 
+      const permissionStatus = await androidCameraAudioPermission()
+      // setPermissionGet(permissionStatus)
+      if(permissionStatus || Platform.OS === 'ios' ){
+        console.log('in PERMISSIONSTATUS');
+        
+        setTimeout(() => {
+          navigation.navigate(StackNav.VideoCall)
+
+        }, 500);
+      }else{
+        console.log(permissionStatus, 'Not GRANTED videocall');
+      }
+      console.log(permissionStatus, 'tryy videocall');
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+  }
 
 
 
@@ -434,9 +457,7 @@ const Appointments = ({ navigation }) => {
               </Box>
 
               <View style={localStyles.btnContainer}>
-                <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.VideoCall)
-            }} style={localStyles.videoCallBtn}>
+                <TouchableOpacity onPress={()=>{onPressJoinVC() }} style={localStyles.videoCallBtn}>
                   {status ? (
                     <BuyPrescription
                       width={moderateScale(14)}
@@ -532,7 +553,7 @@ const Appointments = ({ navigation }) => {
                         <Box flexDirection='column' gap={9} >
                           <Box flexDirection='row' alignItems='center' gap={5} >
                             <Box gap={3} >
-                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary} numberOfLines={1} >{item?.doc_name}</Text>
+                              <Text fontFamily='$InikaBold' fontSize={14} color={colors.primary} numberOfLines={1} w={170} >{item?.doc_name}</Text>
                               <Text fontFamily='$InterRegular' lineHeight={13} fontSize={10} color={colors.black} numberOfLines={1} >Appointment Id: {item?.orderId}</Text>
                             </Box>
                             <Box flexDirection='row' alignItems='center' alignSelf='flex-start' gap={2} >
@@ -542,9 +563,7 @@ const Appointments = ({ navigation }) => {
 
                           </Box>
 
-                          <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.VideoCall)
-            }} >
+                          <TouchableOpacity onPress={()=>{ onPressJoinVC() }} >
                             <Box backgroundColor={colors.success} w={175} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} >
                               <VideoCallIcon
                                 width={moderateScale(15)}

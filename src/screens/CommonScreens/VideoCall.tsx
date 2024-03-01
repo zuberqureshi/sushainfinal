@@ -11,7 +11,7 @@ import {
   FlatList,
   Modal,
   Image,
-  PermissionsAndroid,BackHandler, Alert
+  PermissionsAndroid, Alert
 } from 'react-native';
 import {
   MeetingProvider,
@@ -39,7 +39,7 @@ const NotFoundScreen = () => {
   const [modalVisible, setModalVisible] = useState(true)
 
   const navigation = useNavigation()
-  
+
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -73,83 +73,99 @@ const NotFoundScreen = () => {
 }
 
 
-function ControlsContainer({ join, leave, toggleWebcam, toggleMic,end }) {
+function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end }) {
   const navigation = useNavigation()
   return (
     <View
       style={{
         paddingHorizontal: responsiveWidth(5),
-        paddingVertical:responsiveHeight(2.5),
+        paddingVertical: responsiveHeight(2.5),
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-    
-      
-      <TouchableOpacity onPress={()=>{ toggleWebcam()}}  activeOpacity={0.6} >
-      <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-        <NoVideoIcon width={24} height={24} />
-      </Box>
+
+
+      <TouchableOpacity onPress={() => { toggleWebcam() }} activeOpacity={0.6} >
+        <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
+          <NoVideoIcon width={24} height={24} />
+        </Box>
 
       </TouchableOpacity>
 
-        
-      <TouchableOpacity onPress={()=>{ toggleMic()}}  activeOpacity={0.6} >
-      <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-        <MuteIcon width={24} height={24} />
-      </Box>
+
+      <TouchableOpacity onPress={() => { toggleMic() }} activeOpacity={0.6} >
+        <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
+          <MuteIcon width={24} height={24} />
+        </Box>
 
       </TouchableOpacity>
 
-        
-      <TouchableOpacity onPress={async()=>{
-        
+
+      <TouchableOpacity onPress={async () => {
+
         await end()
         navigation.navigate(StackNav.VideoCompleted)
-        }}  activeOpacity={0.6} >
-      <Box backgroundColor='#FF0000' px={20} py={8} borderRadius={8} >
-        <CallEndIcon width={24} height={24} />
-      </Box>
+      }} activeOpacity={0.6} >
+        <Box backgroundColor='#FF0000' px={20} py={8} borderRadius={8} >
+          <CallEndIcon width={24} height={24} />
+        </Box>
 
       </TouchableOpacity>
-  
+
     </View>
   );
 }
 function ParticipantView({ participantId }) {
-  console.log('participantId', participantId)
-  const { webcamStream, webcamOn } = useParticipant(participantId);
+  
+  const { webcamStream, webcamOn , enableWebcam , } = useParticipant(participantId);
+  console.log('participantId', participantId,webcamOn)
+
+  // console.log(enableWebcam(),'Enable wencam');
+
+  useEffect(() => {
+    if (webcamOn === false) {
+          enableWebcam()
+      console.log('Enable wencam');
+
+    }
+ }, [webcamOn])
+
+//  androidCameraAudioPermission().then(r=>  console.log(r,'participantStttttt'))
+
+  
+  
+
   return webcamOn && webcamStream ? (
-   
+
     <Box h={250} w={'95%'} alignSelf='center' my={8} borderRadius={10} overflow='hidden' >
-     <RTCView
-      streamURL={new MediaStream([webcamStream.track]).toURL()}
-      objectFit={'cover'}
-      style={{
-        height: '100%',
-        width: '100%',
-        // marginVertical: 8,
-        // marginHorizontal: 8,
-      
-      }}
-    />
+      <RTCView
+        streamURL={new MediaStream([webcamStream.track]).toURL()}
+        objectFit={'cover'}
+        style={{
+          height: '100%',
+          width: '100%',
+          // marginVertical: 8,
+          // marginHorizontal: 8,
+
+        }}
+      />
     </Box>
- 
+
 
 
 
   ) : (
- 
-      <Box h={250} w={'95%'} alignSelf='center' my={8} borderRadius={10} overflow='hidden' backgroundColor='grey' justifyContent='center' alignItems='center' >
-      
-      <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={16} >NO MEDIA</Text>
-      </Box>
 
-    
+    <Box h={250} w={'95%'} alignSelf='center' my={8} borderRadius={10} overflow='hidden' backgroundColor='grey' justifyContent='center' alignItems='center' >
+
+      <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={16} >NO MEDIA</Text>
+    </Box>
+
+
   );
 }
 
 function ParticipantList({ participants }) {
-
 
 
   return participants.length > 0 ? (
@@ -175,24 +191,26 @@ function ParticipantList({ participants }) {
 function MeetingView() {
   // Get `participants` from useMeeting Hook
   const navigation = useNavigation()
-  const { join, leave, toggleWebcam, toggleMic, participants, meetingId,end } = useMeeting({});
+  const { join, leave, toggleWebcam, toggleMic, participants, meetingId, end , enableWebcam } = useMeeting({});
   const participantsArrId = [...participants.keys()];
 
   const backAction = () => {
+    // console.log('ddddddddddddddddddd');
 
-    
-    Alert.alert('Hold on!', 'Are you sure you want to end a call', [
-          {
-            text: 'Cancel',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          {text: 'YES', onPress: async() => {
-            await end()
-            navigation.navigate(StackNav.VideoCompleted)
+    Alert.alert('Hold on!', 'Are you sure you want to exit', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'YES', onPress: async () => {
+          // await end()
+          navigation.navigate(StackNav.VideoCompleted)
 
-          }},
-        ]);
+        }
+      },
+    ]);
     return true;
   };
 
@@ -201,21 +219,21 @@ function MeetingView() {
   useEffect(
 
     () => {
-
+      enableWebcam()
       join()
 
     }, []
 
   )
   return (
-    <Box flex={1} backgroundColor={colors.white}  >
+    <Box flex={1} backgroundColor={colors.white} >
       {meetingId ? (
         <Box flexDirection='row' alignItems='center' ml={10} gap={5}>
-           <Image source={require('../../assets/images/sushainLogo.png')} style={{width:responsiveWidth(15),height:responsiveHeight(8),resizeMode:'contain' }} />
-           
-           <Text  fontFamily='$InterSemiBold' color={colors.black} fontSize={14}  >Meeting Id :{meetingId}</Text>
+          <Image source={require('../../assets/images/sushainLogo.png')} style={{ width: responsiveWidth(15), height: responsiveHeight(8), resizeMode: 'contain' }} />
+
+          <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={14}  >Meeting Id :{meetingId}</Text>
         </Box>
-        
+
       ) : null}
       <ParticipantList participants={participantsArrId} />
       <ControlsContainer
@@ -230,79 +248,77 @@ function MeetingView() {
 }
 
 
-const VideoCall = ({navigation}) => {
-  const [userInfo, setUserInfo] = useState();
-  const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
-  const [permissionGet, setpermissionGet] = useState<Boolean>(false)
+const VideoCall = ({ navigation }) => {
 
-  // const { end } = useMeeting({});
+  const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
+ 
+
+  // const { enableWebcam } = useMeeting({});
 
   async function load() {
-    setUserInfo(JSON.parse(await getAccessToken('userInfo')));
-    try{
-      const permissionStatus = await androidCameraAudioPermission()
-      setpermissionGet(permissionStatus)
-      console.log(permissionStatus,'tryy videocall');
-      
-    }catch(err){
-      console.log(err);
-      
-    }
+    // setUserInfo(JSON.parse(await getAccessToken('userInfo')));
+    //  await enableWebcam()
+    // // try {
+    //   const permissionStatus = await androidCameraAudioPermission()
+    // //   setPermissionGet(permissionStatus)
+    // //   console.log(permissionStatus, 'tryy videocall');
+
+    // // } catch (err) {
+    // //   console.log(err);
+
+    // // }
 
   }
-    
 
-  const backAction = () => {
-    console.log('ddddddddddddddddddd');
-    
-    Alert.alert('Hold on!', 'Are you sure you want to exit', [
-          {
-            text: 'Cancel',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          {text: 'YES', onPress: async() => {
-            // await end()
-            navigation.navigate(StackNav.VideoCompleted)
 
-          }},
-        ]);
-    return true;
-  };
+  // const backAction = () => {
+  //   // console.log('ddddddddddddddddddd');
+
+  //   Alert.alert('Hold on!', 'Are you sure you want to exit', [
+  //     {
+  //       text: 'Cancel',
+  //       onPress: () => null,
+  //       style: 'cancel',
+  //     },
+  //     {
+  //       text: 'YES', onPress: async () => {
+  //         // await end()
+  //         navigation.navigate(StackNav.VideoCompleted)
+
+  //       }
+  //     },
+  //   ]);
+  //   return true;
+  // };
 
   // useBackHandler(backAction)
 
 
-  useEffect(() => {
-    load();
- 
-  }, []);
+  // useEffect(() => {
+  //   load();
+
+  // }, []);
   // console.log('TEST....', userInfo);
 
-  if(!permissionGet){
-    return(
-      <Container>
-        <CHeader title='Meeting Room' />
 
-        <Text>Permission required</Text>
-
-      </Container>
-    )
-  }
 
   return meetingId ? (
     <Container statusBarStyle='dark-content' >
       <CHeader title='Meeting Room' />
-   <MeetingProvider
+      <MeetingProvider
         config={{
           meetingId,
           micEnabled: true,
           webcamEnabled: true,
           name: 'Zuber User',
+          notification: {
+            title: "Appointment Joined",
+            message: "Meeting is running.",
+          },
         }}
         token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIyYzgyMGVkZi1jOTg3LTQ2MDItYjJhNy01Y2VhZDI4ZTQ0YjciLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcwODM0NTgzOCwiZXhwIjoxODY2MTMzODM4fQ.0PJziz8wk472-GHp-ZCrjoxAHxWH-jw2V6nP39m1rFo`}>
         <MeetingView />
-      </MeetingProvider> 
+      </MeetingProvider>
     </Container>
   ) : (
     <NotFoundScreen />

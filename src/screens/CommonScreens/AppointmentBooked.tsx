@@ -397,7 +397,7 @@ const AppointmentBooked = ({ route }) => {
             <CText type="b12" numberOfLines={1} color={colors.white}>
               {appointmentDetailData?.data?.result[0]?.orderDetail?.doc_name}
             </CText>
-            <View style={localStyles.rowStyle}>
+            {/* <View style={localStyles.rowStyle}>
               <CText type="b12" numberOfLines={1} color={colors.white}>
                 {strings.Specialist} :
               </CText>
@@ -408,7 +408,7 @@ const AppointmentBooked = ({ route }) => {
                 style={{ width: moderateScale(200) }}>
                 {strings.Gynee}
               </CText>
-            </View>
+            </View> */}
           </View>
           <View style={localStyles.bottomSec}>
             <View style={localStyles.secondSec}>
