@@ -279,7 +279,7 @@ const VideoCall = ({navigation}) => {
   }, []);
   // console.log('TEST....', userInfo);
 
-  if(permissionGet){
+  if(!permissionGet){
     return(
       <Container>
         <CHeader title='Meeting Room' />
