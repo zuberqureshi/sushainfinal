@@ -1,5 +1,5 @@
-import { Alert, BackHandler, Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {  Image, StyleSheet, Text, View ,Alert, BackHandler } from 'react-native'
+import React , {useEffect} from 'react'
 import { Container } from '../../components/Container'
 import CHeader from '../../components/common/CHeader'
 import { StackNav } from '../../navigation/NavigationKeys'
@@ -7,29 +7,38 @@ import images from '../../assets/images'
 import CText from '../../components/common/CText'
 import { moderateScale } from '../../common/constants'
 import { colors, styles } from '../../themes'
-import strings from '../../i18n/strings'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import { useBackHandler } from '@react-native-community/hooks'
+import { useNavigation } from '@react-navigation/native';
 
-const VideoCompleted = ({navigation}) => {
+const VideoCompleted = () => {
 
-    // const backHandle = () => {
-    //     // Alert.alert('Hold on!', 'Are you sure you want to go back?', [
-    //     //   {
-    //     //     text: 'Cancel',
-    //     //     onPress: () => null,
-    //     //     style: 'cancel',
-    //     //   },
-    //     //   {text: 'YES', onPress: () => BackHandler.exitApp()},
-    //     // ]);
-    //     // console.log('backHANDDD');
+  const navigation = useNavigation()
+
+    const backHandle = () => {
+        // Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+        //   {
+        //     text: 'Cancel',
+        //     onPress: () => null,
+        //     style: 'cancel',
+        //   },
+        //   {text: 'YES', onPress: () => BackHandler.exitApp()},
+        // ]);
+        // console.log('backHANDDD');
         
-    //     navigation.navigate(StackNav.DrawerNavigation)
-    //     return true;
-    //   };
+        navigation.navigate(StackNav.DrawerNavigation)
+        return true;
+      };
 
       // useBackHandler(backHandle)
+    
+//  useEffect(() => {
+//     BackHandler.addEventListener("hardwareBackPress", backHandle);
+
+//     return () => BackHandler.removeEventListener("hardwareBackPress", backHandle);
+//   }, [backHandle]);
+
       
   return (
      <Container statusBarStyle='dark-content' >

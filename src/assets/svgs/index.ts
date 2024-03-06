@@ -130,6 +130,11 @@ import CallEndIcon from './callEndIcon.svg'
 import MuteIcon from './muteIcon.svg'
 import NoVideoIcon from './NoVideoIcon.svg'
 import PlusCircleIcon from './plusCircleIcon.svg'
+import VideoOnIcon from './videoOnIcon.svg'
+import MicOnIcon from './micOnIcon.svg'
+import MuteRedIcon from './muteRedIcon.svg'
+import NoVideoRedIcon from './noVideoRedIcon.svg'
+
 
 export {
   Home,
@@ -261,6 +266,12 @@ export {
   MuteIcon,
   NoVideoIcon,
   PlusCircleIcon,
+  VideoOnIcon,
+  MicOnIcon,
+  MuteRedIcon,
+  NoVideoRedIcon,
+  
+
 
 
 };

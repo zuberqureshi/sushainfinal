@@ -36,7 +36,11 @@ const ProductDetail = ({ route, navigation }) => {
 
   const dispatch = useDispatch()
   const cartData = useSelector(state => state.cart);
+
   const toast = useToast()
+
+  // console.log(products,'PRODEC DETAILSS');
+  
 
   const [productAvailability, setProductAvailability] = useState('')
   const onProductAvailability = (item: any) => setProductAvailability(item.value)
@@ -96,19 +100,6 @@ const ProductDetail = ({ route, navigation }) => {
       </View>
     )
   }
-
-  const imgData = [
-    {
-      image: images.productSlider,
-
-    },
-    {
-      image: images.productSlider,
-    },
-    {
-      image: images.productSlider,
-    }
-  ]
 
   const renderType = ({ item, index }) => {
 

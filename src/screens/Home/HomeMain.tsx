@@ -53,6 +53,7 @@ import { Box, Pressable,Text } from '@gluestack-ui/themed';
 import {  AuthContext } from '../../context/AuthContext'
 import CheckInternet from '../../components/common/CommonComponent/CheckInternet';
 import useGetTodayAppointments from '../../hooks/appointment/get-today-appointment';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 
 type Props = {
@@ -62,6 +63,7 @@ type Props = {
 
 const HomeMain = () => {
   const navigationDrawer = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const netInfo = useNetInfo()
   const [search, setSearch] = useState<string>('');
   const [userInfo, setUserInfo] = useState();
 
@@ -262,6 +264,7 @@ const locationSet = async() => {
              <CategoryList />
             }
             {/* <FrequentlyBoughtProducts /> */}
+            <CategoryList />
             
             <DoctorSpecialities />
             <ShopCategory shopCategaryData={shopByategoryData}/>
@@ -274,7 +277,7 @@ const locationSet = async() => {
         )}
 
       </Body>
-      <CheckInternet/>
+      <CheckInternet netStatus={netInfo} />
     </Container>
   );
 };

@@ -11,7 +11,7 @@ import {
   FlatList,
   Modal,
   Image,
-  PermissionsAndroid, Alert
+  PermissionsAndroid, Alert, BackHandler
 } from 'react-native';
 import {
   MeetingProvider,
@@ -24,14 +24,18 @@ import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimen
 import { Box } from '@gluestack-ui/themed';
 import { Container } from '../../components/Container';
 import { Text } from '@gluestack-ui/themed';
-import { colors } from '../../themes';
-import { CallEndIcon, MuteIcon, NoVideoIcon, OppsIcon } from '../../assets/svgs';
+import { colors, styles } from '../../themes';
+import { CallEndIcon, MicOnIcon, MuteIcon, MuteRedIcon, NoVideoIcon, NoVideoRedIcon, OppsIcon, VideoOnIcon } from '../../assets/svgs';
 import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { useNavigation } from '@react-navigation/native';
 import CHeader from '../../components/common/CHeader';
 import { androidCameraAudioPermission } from '../../utils/permission';
 import { StackNav } from '../../navigation/NavigationKeys';
 import { useBackHandler } from '@react-native-community/hooks';
+import { moderateScale } from '../../common/constants';
+import images from '../../assets/images';
+import CText from '../../components/common/CText';
+
 
 
 const NotFoundScreen = () => {
@@ -73,7 +77,7 @@ const NotFoundScreen = () => {
 }
 
 
-function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end }) {
+function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end ,localMic , localWebcam }) {
   const navigation = useNavigation()
   return (
     <View
@@ -87,7 +91,7 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end }) {
 
       <TouchableOpacity onPress={() => { toggleWebcam() }} activeOpacity={0.6} >
         <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-          <NoVideoIcon width={24} height={24} />
+         {localWebcam ? <VideoOnIcon width={24} height={24} /> : <NoVideoIcon width={24} height={24} />}
         </Box>
 
       </TouchableOpacity>
@@ -95,7 +99,7 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end }) {
 
       <TouchableOpacity onPress={() => { toggleMic() }} activeOpacity={0.6} >
         <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-          <MuteIcon width={24} height={24} />
+        { localMic ? <MicOnIcon color='red' width={24} height={24} />  :  <MuteIcon width={24} height={24} />}
         </Box>
 
       </TouchableOpacity>
@@ -117,22 +121,10 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end }) {
 }
 function ParticipantView({ participantId }) {
   
-  const { webcamStream, webcamOn , enableWebcam , } = useParticipant(participantId);
-  console.log('participantId', participantId,webcamOn)
+  const { webcamStream, webcamOn , enableWebcam ,micOn  } = useParticipant(participantId);
+  // console.log('participantId', participantId,webcamOn)
 
   // console.log(enableWebcam(),'Enable wencam');
-
-  useEffect(() => {
-    if (webcamOn === false) {
-          enableWebcam()
-      console.log('Enable wencam');
-
-    }
- }, [webcamOn])
-
-//  androidCameraAudioPermission().then(r=>  console.log(r,'participantStttttt'))
-
-  
   
 
   return webcamOn && webcamStream ? (
@@ -149,6 +141,11 @@ function ParticipantView({ participantId }) {
 
         }}
       />
+      <Box position='absolute' ml={8} mt={5} alignItems='center' flexDirection='row'  >
+       { !micOn && <MuteRedIcon width={20} height={20}  />}
+       { !webcamOn && <NoVideoRedIcon width={20} height={20}/>}
+      </Box>
+
     </Box>
 
 
@@ -157,7 +154,10 @@ function ParticipantView({ participantId }) {
   ) : (
 
     <Box h={250} w={'95%'} alignSelf='center' my={8} borderRadius={10} overflow='hidden' backgroundColor='grey' justifyContent='center' alignItems='center' >
-
+       <Box position='absolute' alignSelf='flex-start' ml={8} mt={5} top={0} >
+       { !webcamOn && <NoVideoRedIcon width={20} height={20}/>}    
+       </Box>
+     
       <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={16} >NO MEDIA</Text>
     </Box>
 
@@ -166,15 +166,30 @@ function ParticipantView({ participantId }) {
 }
 
 function ParticipantList({ participants }) {
+ const navigation = useNavigation()
 
+//  useEffect(()=>{
+//   const unsubscribe = navigation.addListener('beforeRemove' , e => {
+//     // e.preventDefault();
+//     // Alert.alert('Back Alert')
+//     // backAction()
+//     return true
+//   });
+
+//   return unsubscribe
+
+// },[navigation])
 
   return participants.length > 0 ? (
-    <FlatList
+    <Box flex={1} >
+     <FlatList
       data={participants}
       renderItem={({ item }) => {
         return <ParticipantView participantId={item} />;
       }}
     />
+    {participants.length === 1 && <Text fontFamily='$InterSemiBold' fontSize={16} color={colors.black} alignSelf='center' mb={100} >Please wait another participant </Text>}
+    </Box>
   ) : (
     <View
       style={{
@@ -183,7 +198,19 @@ function ParticipantList({ participants }) {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <Text style={{ fontSize: 20 }}>Press Join button to enter meeting.</Text>
+      <View style={localStyles.headerSection}>
+          <Image source={images.booking} style={localStyles.videoIcon} />
+          <CText
+            type="b14"
+            numberOfLines={2}
+            color={colors.black}
+            align="center"
+            style={{ marginVertical: 10 }}>
+           All participant leave
+          </CText>
+        </View>
+
+        <PrimaryButton onPress={()=>{navigation.navigate(StackNav.DrawerNavigation)}} buttonText='Done' marginHorizontal={responsiveWidth(2.5)} marginTop={responsiveHeight(2.5)} width={responsiveWidth(50)} />
     </View>
   );
 }
@@ -191,7 +218,7 @@ function ParticipantList({ participants }) {
 function MeetingView() {
   // Get `participants` from useMeeting Hook
   const navigation = useNavigation()
-  const { join, leave, toggleWebcam, toggleMic, participants, meetingId, end , enableWebcam } = useMeeting({});
+  const { join, leave, toggleWebcam, toggleMic, participants, meetingId, end , localMicOn,localWebcamOn } = useMeeting({});
   const participantsArrId = [...participants.keys()];
 
   const backAction = () => {
@@ -214,17 +241,23 @@ function MeetingView() {
     return true;
   };
 
-  useBackHandler(backAction)
+  // useEffect(() => {
+  //   BackHandler.addEventListener("hardwareBackPress", backAction);
 
-  useEffect(
+  //   return () => BackHandler.removeEventListener("hardwareBackPress", backAction);
+  // }, [backAction]);
+    
 
-    () => {
-      enableWebcam()
+  // useBackHandler(backAction)
+  // console.log('Check MIn ON',localMicOn,'CAMR',localWebcamOn);
+  
+
+  useEffect(() => {
+    
       join()
 
-    }, []
+    }, [])
 
-  )
   return (
     <Box flex={1} backgroundColor={colors.white} >
       {meetingId ? (
@@ -236,13 +269,15 @@ function MeetingView() {
 
       ) : null}
       <ParticipantList participants={participantsArrId} />
-      <ControlsContainer
+  { participantsArrId.length > 0 && <ControlsContainer
         join={join}
         leave={leave}
         end={end}
         toggleWebcam={toggleWebcam}
         toggleMic={toggleMic}
-      />
+        localMic={localMicOn}
+        localWebcam={localWebcamOn}
+      />}
     </Box>
   );
 }
@@ -329,4 +364,16 @@ const VideoCall = ({ navigation }) => {
 
 export default VideoCall
 
-const styles = StyleSheet.create({})
+const localStyles = StyleSheet.create({
+  videoIcon: {
+    width: moderateScale(300),
+    height: responsiveHeight(28),
+    ...styles.mv10,
+    // marginTop: responsiveHeight(5)
+  },
+  headerSection: {
+    ...styles.justifyCenter,
+    ...styles.itemsCenter,
+    ...styles.center
+  },
+})

@@ -14,7 +14,7 @@ import strings from '../../i18n/strings';
 import { DoctorSpecialityListData } from '../../types/Types';
 import CText from '../common/CText';
 import { colors, styles } from '../../themes';
-import { Api_Image_Base_Url, getHeight, moderateScale } from '../../common/constants';
+import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants';
 import images from '../../assets/images';
 import useGetHomeData from '../../hooks/home/get-home-data';
 import { Box, Spinner } from '@gluestack-ui/themed';
@@ -24,7 +24,7 @@ const RenderDoctorCard = ({ item }: any) => {
   return (
     <TouchableOpacity style={localStyles.illnessTypeStyle}>
       <Image
-        source={{ uri: `${Api_Image_Base_Url}${item.app_icon}` }}
+        source={{ uri: `${API_IMAGE_BASE_URL}${item.app_icon}` }}
         style={localStyles.doctorImgStyle}
       />
       <View style={localStyles.illnessTextStyle}>

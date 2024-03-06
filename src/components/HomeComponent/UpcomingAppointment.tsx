@@ -329,7 +329,7 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
       const permissionStatus = await androidCameraAudioPermission()
       // setPermissionGet(permissionStatus)
       if(permissionStatus || Platform.OS === 'ios' ){
-        console.log('in PERMISSIONSTATUS');
+        // console.log('in PERMISSIONSTATUS');
         
         setTimeout(() => {
           navigation.navigate(StackNav.VideoCall)
@@ -338,7 +338,7 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
       }else{
         console.log(permissionStatus, 'Not GRANTED videocall');
       }
-      console.log(permissionStatus, 'tryy videocall');
+      // console.log(permissionStatus, 'tryy videocall');
 
     } catch (err) {
 

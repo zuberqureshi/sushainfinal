@@ -1,5 +1,5 @@
 import { Linking, Modal, StyleSheet, View } from 'react-native';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, memo, useImperativeHandle, useState } from 'react';
 
 // local imports
 import { MobileDataIcon, NoInternetIcon, WifiIcon } from '../../../assets/svgs';
@@ -18,12 +18,12 @@ export interface InternetRef {
 
 const CheckInternet = ((props, ref) => {
 
-  const netInfo = useNetInfo()
-
   const onPressSetting = async () => await Linking.openSettings();
+  // console.log('checkNET',props.netStatus?.isConnected);
+  
 
   return (
-    <Modal animationType="fade" visible={!(netInfo?.isConnected)} transparent>
+    <Modal animationType="fade" visible={!(props?.netStatus?.isConnected)} transparent>
       <View style={localStyles.container}>
         <View style={localStyles.innerContainer}>
           <NoInternetIcon />
@@ -64,7 +64,7 @@ const CheckInternet = ((props, ref) => {
   );
 });
 
-export default CheckInternet;
+export default memo(CheckInternet);
 
 const localStyles = StyleSheet.create({
   container: {
