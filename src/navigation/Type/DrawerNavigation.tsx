@@ -1,18 +1,18 @@
-import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React,{useContext, useEffect} from 'react';
+import { Alert, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useEffect } from 'react';
 import {
   DrawerContentScrollView,
   createDrawerNavigator,
 } from '@react-navigation/drawer';
-import {ParamListBase, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import RNRestart from 'react-native-restart'
 // local import
-import {StackNav, TabNav} from '../NavigationKeys';
-import {StackRoute} from '../NavigationRoutes';
-import {colors, styles} from '../../themes';
+import { StackNav, TabNav } from '../NavigationKeys';
+import { StackRoute } from '../NavigationRoutes';
+import { colors, styles } from '../../themes';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { responsiveWidth,responsiveHeight,responsiveFontSize } from 'react-native-responsive-dimensions'
+import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions'
 import {
   AppointmentsDrawerIcon,
   BookYogaDrawerIcon,
@@ -30,7 +30,7 @@ import {
   UpcommingYogaDrawerIcon,
   VideoCallDrawerIcon,
 } from '../../assets/svgs';
-import {getHeight, moderateScale} from '../../common/constants';
+import { getHeight, moderateScale } from '../../common/constants';
 import images from '../../assets/images';
 import CText from '../../components/common/CText';
 import strings from '../../i18n/strings';
@@ -41,15 +41,15 @@ import strings from '../../i18n/strings';
 // } from '../../utils/asyncstorage';
 import { setLng } from '../../i18n/changeLng';
 import { removeAccessToken } from '../../utils/network';
-import {  AuthContext } from '../../context/AuthContext'
+import { AuthContext } from '../../context/AuthContext'
 
 
 const DrawerContentComponent = (props: any) => {
- 
 
-  const {icon, title, isNew = false,onPress} = props;
-  
-  
+
+  const { icon, title, isNew = false, onPress } = props;
+
+
   return (
     <TouchableOpacity onPress={onPress} style={localStyles.drawerContentStyle}>
       <View style={localStyles.drawerIconStyle}>{icon}</View>
@@ -74,7 +74,7 @@ const DrawerContentComponent = (props: any) => {
 
 
 const InnerSubDrawerComponent = (props: any) => {
-  const {icon, title,onPress} = props;
+  const { icon, title, onPress } = props;
 
   // const changeLng = (lng:string) => {
   //   if(lng ==='English' || lng === 'إنجليزي'){
@@ -86,15 +86,15 @@ const InnerSubDrawerComponent = (props: any) => {
   //     // strings.setLanguage('ar')
   //     setLng('ar')
   //     RNRestart.Restart()
-      
+
   //     return
   //   }
   // }
 
-  
+
 
   return (
-    <TouchableOpacity disabled={!(!!onPress) } onPress={()=>{onPress(title)}} style={localStyles.subDrawerStyle}>
+    <TouchableOpacity disabled={!(!!onPress)} onPress={() => { onPress(title) }} style={localStyles.subDrawerStyle}>
       <View style={localStyles.innerDrwerIconStyle}>{icon}</View>
       <CText
         type="r12"
@@ -109,16 +109,16 @@ const InnerSubDrawerComponent = (props: any) => {
 
 
 const InnerDrawerComponent = (props: any) => {
-  const {icon, title, icon1, icon2, icon3, title1, title2, title3,onPress,onPress1,onPress2,onPress3} = props;
+  const { icon, title, icon1, icon2, icon3, title1, title2, title3, onPress, onPress1, onPress2, onPress3 } = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const onPressOpen = () => setIsOpen(!isOpen);
-  
-  
+
+
   return (
     <View
       style={[
         localStyles.outerContainer,
-        isOpen && {borderWidth: moderateScale(1), borderColor: colors.primary},
+        isOpen && { borderWidth: moderateScale(1), borderColor: colors.primary },
       ]}>
       <TouchableOpacity
         onPress={onPressOpen}
@@ -138,8 +138,8 @@ const InnerDrawerComponent = (props: any) => {
       {isOpen && (
         <View style={localStyles.subContainerStyle}>
           <InnerSubDrawerComponent icon={icon1} title={title1} onPress={onPress1} />
-          <InnerSubDrawerComponent icon={icon2} title={title2}  />
-          {title3 && <InnerSubDrawerComponent icon={icon3} title={title3}  />}
+          <InnerSubDrawerComponent icon={icon2} title={title2} />
+          {title3 && <InnerSubDrawerComponent icon={icon3} title={title3} />}
         </View>
       )}
     </View>
@@ -147,14 +147,14 @@ const InnerDrawerComponent = (props: any) => {
 };
 
 const DrawerView = () => {
-   
+
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const authContext:any = useContext(AuthContext );
+  const authContext: any = useContext(AuthContext);
   const onPressLogOut = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       {
         text: 'Cancel',
-        onPress: () => {},
+        onPress: () => { },
         style: 'cancel',
       },
       {
@@ -162,32 +162,32 @@ const DrawerView = () => {
         onPress: async () => {
           await removeAccessToken('userInfo');
           await removeAccessToken('AccessTokenInfo');
- 
+
           navigation.reset({
             index: 0,
-            routes: [{name: StackNav.AuthStack}],
+            routes: [{ name: StackNav.AuthStack }],
           });
         },
       },
     ]);
   };
 
-  const changeLng = (lng:string) => {
-    if(lng ==='English' || lng === 'إنجليزي'){
+  const changeLng = (lng: string) => {
+    if (lng === 'English' || lng === 'إنجليزي') {
       // strings.setLanguage('en')
       setLng('en')
       RNRestart.Restart()
       return
-    }else if(lng ==='Arabic' || lng === 'عربي'){
+    } else if (lng === 'Arabic' || lng === 'عربي') {
       // strings.setLanguage('ar')
       setLng('ar')
       RNRestart.Restart()
-      
+
       return
     }
   }
 
-  
+
 
   return (
     <View style={localStyles.root}>
@@ -199,7 +199,7 @@ const DrawerView = () => {
               style={localStyles.userProfileStyle}
             />
             <View style={styles.ph10}>
-              <CText type="r20" color={colors.primary} style={{textTransform:'capitalize'}} >
+              <CText type="r20" color={colors.primary} style={{ textTransform: 'capitalize' }} >
                 {authContext?.userInfo?.userName}
               </CText>
               <CText type="r12" style={styles.mv5} color={colors.textColor2}>
@@ -221,19 +221,20 @@ const DrawerView = () => {
           <DrawerContentComponent
             icon={<HomeDrawerIcon />}
             title={strings.home}
-            onPress={()=>{
+            onPress={() => {
               navigation.
-              navigation.navigate(TabNav.Home)}}
+                navigation.navigate(TabNav.Home)
+            }}
           />
           <DrawerContentComponent
             icon={<VideoCallDrawerIcon />}
             title={strings.bookVideoConsultation}
-            onPress={()=>{navigation.navigate(TabNav.FindADoctorHome)}}
+            onPress={() => { navigation.navigate(TabNav.FindADoctorHome) }}
           />
           <DrawerContentComponent
             icon={<BuyDrawerIcon />}
             title={strings.buyMedicine}
-            onPress={()=>{navigation.navigate(TabNav.Medicines)}}
+            onPress={() => { navigation.navigate(TabNav.Medicines) }}
           />
           <DrawerContentComponent
             icon={<CareDrawerIcon />}
@@ -244,7 +245,7 @@ const DrawerView = () => {
             title={strings.myAppointments}
             icon1={<UpcomingVideoAppointmentsDrawerIcon />}
             title1={strings.upcomingVideoAppointments}
-            onPress1={()=>{navigation.navigate(StackNav.Appointments)}}
+            onPress1={() => { navigation.navigate(StackNav.Appointments) }}
             icon2={<AppointmentsDrawerIcon />}
             title2={strings.pastAppointments}
             icon3={<UpcomingClinicAppointmentsDrawerIcon />}
@@ -265,7 +266,7 @@ const DrawerView = () => {
           />
 
           <InnerDrawerComponent
-            icon={ <MIcon name="google-translate" size={responsiveWidth(6)} color={colors.success} />}
+            icon={<MIcon name="google-translate" size={responsiveWidth(6)} color={colors.success} />}
             title={strings.language}
             // icon1={<PastYogaDrawerIcon />}
             title1={strings.english}
@@ -273,13 +274,13 @@ const DrawerView = () => {
             // icon2={<UpcommingYogaDrawerIcon />}
             title2={strings.arabic}
             onPress2={changeLng}
-            
-            
+
+
           />
           <DrawerContentComponent
             icon={<MyOrderDrawerIcon />}
             title={strings.myOrders}
-            onPress={()=>{navigation.navigate(StackNav.OrderSummery)}}
+            onPress={() => { navigation.navigate(StackNav.MyOrders) }}
           />
           <DrawerContentComponent
             icon={<PrescriptionDrawerIcon />}
@@ -294,17 +295,17 @@ const DrawerView = () => {
           <CText type="r12" color={colors.success}>
             {strings.support}
           </CText>
-          <TouchableOpacity onPress={()=>{
-            navigation.navigate(StackNav.Address)
-            }} style={styles.mt15}>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate(StackNav.OrderSummery)
+          }} style={styles.mt15}>
             <CText type="r12" color={colors.textColor5}>
               {strings.newTicket}
             </CText>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{
+          <TouchableOpacity onPress={() => {
             navigation.navigate(StackNav.VideoCall)
-            }}
-           style={styles.mt5}>
+          }}
+            style={styles.mt5}>
             <CText type="r12" color={colors.textColor5}>
               {strings.viewTicket}
             </CText>
@@ -329,13 +330,16 @@ export default function DrawerNavigation() {
       screenOptions={{
         headerShown: false,
         drawerType: 'front',
-        drawerStyle: {width: '85%'},
+        drawerStyle: { width: '85%' },
         drawerHideStatusBarOnOpen: false,
       }}
       initialRouteName={StackNav.TabBar}
       drawerContent={(props: any) => <DrawerView {...props} />}>
       <Drawer.Screen name={StackNav.TabBar} component={StackRoute.TabBarNavigation} />
       <Drawer.Screen name={StackNav.CategoryDoctorListDrawer} component={StackRoute.CategoryDoctorList} />
+      <Drawer.Screen name={StackNav.ProductByCategories} component={StackRoute.ProductByCategories} />
+      <Drawer.Screen name={StackNav.MyOrders} component={StackRoute.MyOrders} />
+
       <Drawer.Screen name={StackNav.LifeStyleDrawer} component={StackRoute.LifeStyle} />
     </Drawer.Navigator>
   );
@@ -388,11 +392,12 @@ const localStyles = StyleSheet.create({
   bottomStyle: {
     ...styles.p15,
     ...styles.itemsStart,
-    borderBottomWidth: moderateScale(1),
-    borderBottomColor: colors.gray4,
+
   },
   logOutStyle: {
     ...styles.p15,
+    borderTopWidth: moderateScale(1),
+    borderTopColor: colors.gray4,
   },
   innerDrawerStyle: {
     ...styles.rowSpaceBetween,

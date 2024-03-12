@@ -383,10 +383,10 @@ const ProductByCategories = ({ route, navigation }: any) => {
     // console.log(item,'serch ITEm');
     
     return (
-      <TouchableOpacity onPress={async() => {  await dispatch(addProducts({ ...item, qty: 0 }))
+      <TouchableOpacity style={styles.p10} onPress={async() => { 
       navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 }})
       }} >
-        <CText type="s10" numberOfLines={1} style={styles.p10} color={colors.black}>
+        <CText type="s10" numberOfLines={1}  color={colors.black}>
           {item?.name}
         </CText>
       </TouchableOpacity>

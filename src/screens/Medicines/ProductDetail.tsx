@@ -19,18 +19,19 @@ import SimilarProduct from '../../components/Medicines/SimilarProduct'
 import { StackNav } from '../../navigation/NavigationKeys'
 import { Container } from '../../components/Container'
 import Body from '../../components/Body/Body'
-import { Box, Text,Toast,ToastTitle,useToast } from '@gluestack-ui/themed'
+import { Box, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import RenderHtml from 'react-native-render-html';
 import { useDispatch, useSelector } from 'react-redux'
 import { addProductsToCart } from '../../redux/cartSlice'
 import { increaseQty } from '../../redux/productSlice'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 // import { ScrollView } from 'react-native-virtualized-view'
 
 const wWidht = Dimensions.get('screen').width;
 const wHeight = Dimensions.get('screen').height;
 const ProductDetail = ({ route, navigation }) => {
-  
-  const {productDetail} = route.params
+
+  const { productDetail } = route.params
   const [sliderImgActive, setSliderImgActive] = useState(0)
   const [productTypeActive, setProductTypeActive] = useState(0)
 
@@ -39,17 +40,30 @@ const ProductDetail = ({ route, navigation }) => {
 
   const toast = useToast()
 
+  const animatedY = useSharedValue(0)
+  const animatedX = useSharedValue(0)
+  const scale = useSharedValue(1)
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        // {translateX : animatedX.value},
+        // {translateY : animatedY.value},
+        { scale: scale.value },
+      ],
+    };
+  })
   // console.log(products,'PRODEC DETAILSS');
-  
+
 
   const [productAvailability, setProductAvailability] = useState('')
   const onProductAvailability = (item: any) => setProductAvailability(item.value)
-  
+
   const getSliderImg = () => {
-    let string = `` ;
-    if(!!productDetail?.other_img){
-       string = `${productDetail?.images},${productDetail?.other_img}`
-    }else{
+    let string = ``;
+    if (!!productDetail?.other_img) {
+      string = `${productDetail?.images},${productDetail?.other_img}`
+    } else {
       string = `${productDetail?.images}`
     }
     return string.split(',')
@@ -57,19 +71,20 @@ const ProductDetail = ({ route, navigation }) => {
 
   const imgSliderString = `${productDetail?.images},${productDetail?.other_img}`
   let imgSlider = getSliderImg()
-  
-  
+
+
 
   const getItemPriceCart = () => {
-    let total = 0 ;
+    let total = 0;
     cartData.map(item => {
-   
-      if(item?.id === productDetail?.id){
-     
-      total = total+item.final_price}
+
+      if (item?.id === productDetail?.id) {
+
+        total = total + item.final_price
+      }
     })
 
-    return total ;
+    return total;
   }
   const getPriceItemAdd = getItemPriceCart()
 
@@ -89,12 +104,17 @@ const ProductDetail = ({ route, navigation }) => {
       <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(2.5) }} >
         <ShareIconBlack />
         <LikeIcon />
-         
-         <Pressable  onPress={()=>{navigation.navigate(StackNav.Cart)}} >
-         <CartBlack />
-        
-      
-        <CText type='b8' style={{ backgroundColor: colors.white, position: 'absolute', right: -4, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.2), borderRadius: responsiveWidth(2), top: responsiveHeight(-0.5), }} >{cartData?.length}</CText>
+
+        <Pressable onPress={() => { navigation.navigate(StackNav.Cart) }} >
+          <CartBlack />
+
+          {/* <Box position='absolute' top={0} right={0} backgroundColor={colors.white} borderRadius={10} px={6} py={3} mt={-8} mr={-4}  >
+        <CText type='b8' >{cartData?.length}</CText>
+        </Box> */}
+          <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5) }, animatedStyle]} >
+            <CText type='b8' style={{ textAlign: 'center' }} >{cartData?.length}</CText>
+          </Animated.View>
+
         </Pressable>
 
       </View>
@@ -113,139 +133,149 @@ const ProductDetail = ({ route, navigation }) => {
 
     )
   }
-const onClickAddToCart = () => {
+  const onClickAddToCart = () => {
 
-  
-  dispatch(addProductsToCart(productDetail))
-  dispatch(increaseQty(productDetail?.id))
 
-  toast.show({
-    placement: 'bottom',
-    render: ({ id }: { id: string }) => {
-      const toastId = "toast-" + id
-      return (
-        <Toast nativeID={toastId} variant='accent' action='success'>
-          <ToastTitle>Add To Cart</ToastTitle>
-        </Toast>
-      )
-    }
-  })
-}
+    dispatch(addProductsToCart(productDetail))
+    dispatch(increaseQty(productDetail?.id))
+
+    scale.value = withSpring(1.5)
+    setTimeout(() => {
+      scale.value = withSpring(1)
+    }, 150);
+
+    toast.show({
+      placement: 'bottom',
+      render: ({ id }: { id: string }) => {
+        const toastId = "toast-" + id
+        return (
+          <Toast nativeID={toastId} variant='accent' action='success'>
+            <ToastTitle>Add To Cart</ToastTitle>
+          </Toast>
+        )
+      }
+    })
+  }
 
 
   return (
     <Container statusBarStyle='dark-content' >
 
- 
 
 
-      <CHeader rightIcon={<HeaderRightIcon />} />
+
+      {/* <CHeader  rightIcon={<HeaderRightIcon />} /> */}
+      <Box backgroundColor={colors.primary3} py={15} px={15} flexDirection='row' justifyContent='space-between' alignItems='center'  >
+        <BackArrow />
+        <HeaderRightIcon />
+
+      </Box>
       <Body>
-      <View style={{ ...styles.flexRow, ...styles.itemsCenter, ...styles.justifyBetween, marginHorizontal: responsiveWidth(4), marginTop: responsiveHeight(1.5), overflow: 'hidden' }} >
-        <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(1.5) }} >
-          <Location />
-          <CText type='m14' style={{ alignSelf: 'flex-end' }}  > Deliver to- Pune</CText>
+        <View style={{ ...styles.flexRow, ...styles.itemsCenter, ...styles.justifyBetween, marginHorizontal: responsiveWidth(4), marginTop: responsiveHeight(1.5), overflow: 'hidden' }} >
+          <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(1.5) }} >
+            <Location />
+            <CText type='m14' style={{ alignSelf: 'flex-end' }}  > Deliver to- Pune</CText>
+          </View>
+
+          <CText type='m12' style={{ borderBottomWidth: 1, borderBottomColor: colors.black }} >Change</CText>
+
         </View>
 
-        <CText type='m12' style={{ borderBottomWidth: 1, borderBottomColor: colors.black }} >Change</CText>
 
-      </View>
+        <View style={{ width: wWidht * 0.9, height: wHeight * 0.22, alignSelf: 'center', borderWidth: 1, marginHorizontal: responsiveWidth(5), borderColor: '#E3DBDB', borderRadius: responsiveWidth(5), paddingTop: responsiveHeight(1.8), marginTop: responsiveHeight(2) }} >
+          <ScrollView
+            onScroll={({ nativeEvent }) => onChangeSliderImg(nativeEvent)}
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+            horizontal
+            style={{ width: wWidht * 0.9, height: wHeight * 0.22 }}
+          >
 
+            {productDetail?.image_third_party === 'NO' ?
+              imgSlider?.map((e, index) => {
+                return (<Image key={index} source={{ uri: `${API_IMAGE_BASE_URL}${e}` }} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
 
-      <View style={{ width: wWidht * 0.9, height: wHeight * 0.22, alignSelf: 'center', borderWidth: 1, marginHorizontal: responsiveWidth(5), borderColor: '#E3DBDB', borderRadius: responsiveWidth(5), paddingTop: responsiveHeight(1.8), marginTop: responsiveHeight(2) }} >
-        <ScrollView
-          onScroll={({ nativeEvent }) => onChangeSliderImg(nativeEvent)}
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          horizontal
-          style={{ width: wWidht * 0.9, height: wHeight * 0.22 }}
-        >
+              }
+              ) : imgSlider?.map((e, index) => {
+                return (<Image key={index} source={{ uri: `${e}` }} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
 
-          { productDetail?.image_third_party === 'NO' ?
-            imgSlider?.map((e, index) =>{     
-              return(<Image key={index} source={{uri: `${API_IMAGE_BASE_URL}${e}`}} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
-            
+              }
+              )
             }
-            ) : imgSlider?.map((e, index) =>{     
-              return(<Image key={index} source={{uri: `${e}`}} style={{ width: wWidht * 0.9, height: wHeight * 0.20 }} resizeMode='contain' />)
-            
-            }
+
+          </ScrollView>
+        </View>
+
+        <View style={localStyles.wrapDot} >
+          {
+            imgSlider?.map((e, index) =>
+              <Text
+                key={index}
+                style={sliderImgActive === index ? localStyles.dotActive : localStyles.dot}
+              >
+                ●
+              </Text>
             )
           }
+        </View>
 
-        </ScrollView>
-      </View>
+        <View style={{ paddingHorizontal: responsiveWidth(3), paddingBottom: responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1', gap: responsiveHeight(0.4) }} >
+          <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black}   >{productDetail?.name}</Text>
+          <Text fontFamily='$InterRegular' fontSize={8} lineHeight={10} color={colors.black} textTransform='uppercase' >BY {productDetail?.brand}</Text>
 
-      <View style={localStyles.wrapDot} >
-        {
-          imgSlider?.map((e, index) =>
-            <Text
-              key={index}
-              style={sliderImgActive === index ? localStyles.dotActive : localStyles.dot}
-            >
-              ●
-            </Text>
-          )
-        }
-      </View>
+          <View style={{ marginVertical: responsiveHeight(0.5) }} >
+            <FlashList
+              // style={{ flex: 1, }}
+              data={['100 ML', '200 ML', '300 ML']}
+              renderItem={renderType}
+              keyExtractor={(item, index) => index.toString()}
 
-      <View style={{ paddingHorizontal: responsiveWidth(3), paddingBottom: responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' ,gap:responsiveHeight(0.4)}} >
-        <Text  fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black}   >{productDetail?.name}</Text>
-        <Text fontFamily='$InterRegular' fontSize={8} lineHeight={10} color={colors.black} textTransform='uppercase' >BY {productDetail?.brand}</Text>
+              horizontal
+              // justifyContent="space-between"
 
-        <View style={{ marginVertical: responsiveHeight(0.5) }} >
-          <FlashList
-            // style={{ flex: 1, }}
-            data={['100 ML', '200 ML', '300 ML']}
-            renderItem={renderType}
-            keyExtractor={(item, index) => index.toString()}
+              estimatedItemSize={200}
+            />
 
-            horizontal
-            // justifyContent="space-between"
-           
-            estimatedItemSize={200}
-          />
+          </View>
+
+          <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} color={colors.black}  >{productDetail?.oum_unit} Pack of {productDetail?.quantity_per_packaging} {productDetail?.oum_name} in {productDetail?.packaging}</Text>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+            <FlashList
+              // style={{ flex: 1, }}
+              data={[1, 2, 3, 4, 5]}
+              renderItem={({ item, index }) => (item <= productDetail?.rating ? <StarFilled /> : <StarUnFilled />)}
+              keyExtractor={(item, index) => index.toString()}
+
+              horizontal
+              // justifyContent="space-between"
+              // contentContainerStyle={{}}
+              estimatedItemSize={200}
+            />
+
+            <Pressable onPress={() => { navigation.navigate(StackNav.ProductsReview) }} >
+              <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={'#93989A'} >4 Reviews</Text>
+            </Pressable>
+
+          </View>
+
+          <View style={{ ...styles.flexRow, alignItems: 'center' }} >
+            <BagBlue />
+            <Text fontFamily='$InterRegular' fontSize={10} lineHeight={12} color={colors.primary} alignSelf='flex-end' ml={3} >{productDetail?.buyers} people bought this</Text>
+          </View>
 
         </View>
 
-        <Text fontFamily='$InterRegular' fontSize={12} lineHeight={14} color={colors.black}  >{productDetail?.oum_unit} Pack of {productDetail?.quantity_per_packaging} {productDetail?.oum_name} in {productDetail?.packaging}</Text>
+        <View style={{ paddingBottom: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }} >
-          <FlashList
-            // style={{ flex: 1, }}
-            data={[1, 2, 3, 4, 5]}
-            renderItem={({ item, index }) => (item <= productDetail?.rating ? <StarFilled /> : <StarUnFilled />)}
-            keyExtractor={(item, index) => index.toString()}
+          <View style={{ ...styles.flexRow, marginTop: responsiveHeight(1.5), gap: responsiveWidth(3), paddingHorizontal: responsiveWidth(3) }} >
+            <CText type='s12' >Availability In</CText>
+            <Box backgroundColor={'#EBFBD9'} px={12} py={4} borderRadius={10} flexDirection='row' alignItems='center' gap={4}>
+              <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={colors.black} alignSelf='center'  >{productDetail?.availability}</Text>
+              <DownArrowBlack />
+            </Box>
 
-            horizontal
-            // justifyContent="space-between"
-            // contentContainerStyle={{}}
-            estimatedItemSize={200}
-          />
-            
-          <Pressable onPress={()=>{navigation.navigate(StackNav.ProductsReview)}} >
-          <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={'#93989A'} >4 Reviews</Text>
-          </Pressable>  
-          
-        </View>
-
-        <View style={{ ...styles.flexRow,alignItems:'center' }} >
-          <BagBlue />
-          <Text fontFamily='$InterRegular' fontSize={10} lineHeight={12} color={colors.primary} alignSelf='flex-end' ml={3} >{productDetail?.buyers} people bought this</Text>
-        </View>
-
-      </View>
-
-      <View style={{  paddingBottom: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1'}} >
-
-        <View style={{ ...styles.flexRow, marginTop: responsiveHeight(1.5), gap: responsiveWidth(3),paddingHorizontal: responsiveWidth(3)  }} >
-          <CText type='s12' >Availability In</CText>
-          <Box backgroundColor={'#EBFBD9'} px={12} py={4} borderRadius={10} flexDirection='row' alignItems='center' gap={4}>
-          <Text fontFamily='$InterMedium' fontSize={10} lineHeight={12} color={colors.black} alignSelf='center'  >{productDetail?.availability}</Text>
-          <DownArrowBlack />
-          </Box>
-         
-          {/* <Dropdown
+            {/* <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdown}
             placeholderStyle={localStyles.placeholderStyle}
@@ -260,98 +290,100 @@ const onClickAddToCart = () => {
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyle}
           /> */}
-        </View>
-
-
-        <CText style={{ marginTop: responsiveHeight(1),paddingHorizontal: responsiveWidth(3)  }} type='r12'  >MRP  <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black} >{productDetail?.symbol} {productDetail?.final_price}</Text></CText>
-
-        <View style={{ ...styles.flexRow, marginTop: responsiveHeight(2), gap: responsiveWidth(3),paddingHorizontal: responsiveWidth(3)  }}  >
-          <TouchableOpacity onPress={()=>{
-             onClickAddToCart()
-            }} activeOpacity={0.6} style={{ borderColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3),borderWidth:1 }} >
-
-            <CText
-              type='m14'
-              color={colors.primary}
-            >
-              Add to Cart
-            </CText>
-
-          </TouchableOpacity>
-
-          <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3)}} >
-
-            <CText
-              type='m14'
-              color={colors.white}
-            >
-              Buy Now
-            </CText>
-
-          </TouchableOpacity>
-        </View>
-        
-        <View style={{backgroundColor:'#FEE7E7',paddingHorizontal: responsiveWidth(3),paddingVertical:responsiveHeight(2),marginTop:responsiveHeight(2) }} >
-
-          <View style={{...styles.flexRow, }} >
-          <CText type='s10' style={{alignSelf:'flex-end'}} >MRP <CText type='r10' style={{textDecorationLine:'line-through',}} >{'\u20B9'} 690</CText></CText>
-
-          <View style={{...styles.flexRow, }} >
-            <CText type='s16'>  {'\u20B9'} 138 * </CText>
-            <CText type='s12' color='#F40909' >(20% OFF)</CText>
-          </View>
           </View>
 
-          <View style={{...styles.flexRow,gap:responsiveWidth(2),marginTop:responsiveHeight(0.7) }} >
-            <CText type='s10' >Sale ends in</CText>
 
-            <View style={{backgroundColor:'#F6FFFB',borderRadius:responsiveWidth(2),paddingHorizontal:responsiveWidth(1.5),paddingVertical:responsiveHeight(0.1)}} >
-              <CText type='m10' >01h:05m23s</CText>
+          <CText style={{ marginTop: responsiveHeight(1), paddingHorizontal: responsiveWidth(3) }} type='r12'  >MRP  <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black} >{productDetail?.symbol} {productDetail?.final_price}</Text></CText>
+
+          <View style={{ ...styles.flexRow, marginTop: responsiveHeight(2), gap: responsiveWidth(3), paddingHorizontal: responsiveWidth(3) }}  >
+            <TouchableOpacity onPress={() => {
+              onClickAddToCart()
+
+
+            }} activeOpacity={0.6} style={{ borderColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), borderWidth: 1 }} >
+
+              <CText
+                type='m14'
+                color={colors.primary}
+              >
+                Add to Cart
+              </CText>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: colors.primary, paddingHorizontal: responsiveWidth(6), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3) }} >
+
+              <CText
+                type='m14'
+                color={colors.white}
+              >
+                Buy Now
+              </CText>
+
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ backgroundColor: '#FEE7E7', paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginTop: responsiveHeight(2) }} >
+
+            <View style={{ ...styles.flexRow, }} >
+              <CText type='s10' style={{ alignSelf: 'flex-end' }} >MRP <CText type='r10' style={{ textDecorationLine: 'line-through', }} >{'\u20B9'} 690</CText></CText>
+
+              <View style={{ ...styles.flexRow, }} >
+                <CText type='s16'>  {'\u20B9'} 138 * </CText>
+                <CText type='s12' color='#F40909' >(20% OFF)</CText>
+              </View>
+            </View>
+
+            <View style={{ ...styles.flexRow, gap: responsiveWidth(2), marginTop: responsiveHeight(0.7) }} >
+              <CText type='s10' >Sale ends in</CText>
+
+              <View style={{ backgroundColor: '#F6FFFB', borderRadius: responsiveWidth(2), paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.1) }} >
+                <CText type='m10' >01h:05m23s</CText>
+              </View>
             </View>
           </View>
+
         </View>
 
-      </View>
-     
 
-      <View style={{paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1'}} >
-        
-        <View style={{gap:responsiveHeight(0.8)}} >
-        <CText type='s14' >Product details</CText>
+        <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
 
-        <View>
-        <CText type='s12' color='#5E5B58' >Description:</CText>
-        <RenderHtml
-      contentWidth={responsiveWidth(20)}
-      baseStyle={{ color: '#525454',fontFamily:'InterMedium',fontSize:11,lineHeight:12}}
-      source={ {html: productDetail?.single_description} }
-    />
-        {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >
+          <View style={{ gap: responsiveHeight(0.8) }} >
+            <CText type='s14' >Product details</CText>
+
+            <View>
+              <CText type='s12' color='#5E5B58' >Description:</CText>
+              <RenderHtml
+                contentWidth={responsiveWidth(20)}
+                baseStyle={{ color: '#525454', fontFamily: 'InterMedium', fontSize: 11, lineHeight: 12 }}
+                source={{ html: productDetail?.single_description }}
+              />
+              {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >
         This enriched formula with Aloe Vera Leaf Extract, Basil Extract, Neem Extract, Tea Tree Oil, White Tea and Cucumber Extract known for their natural healing properties which helps in deeply cleanses and decongests the pores of your skin.
         </CText> */}
-        </View>
+            </View>
 
-        <View>
-        <CText type='s12' color='#5E5B58' >Highlights:</CText>
-        <RenderHtml
-      contentWidth={responsiveWidth(20)}
-      baseStyle={{ color: '#525454',fontFamily:'InterMedium',fontSize:11,lineHeight:16,}}
-      source={ {html: productDetail?.pro_highlight} }
-    />
-        {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >• It helps in fading any marks or blemishes left by acne or pimples.</CText>
+            <View>
+              <CText type='s12' color='#5E5B58' >Highlights:</CText>
+              <RenderHtml
+                contentWidth={responsiveWidth(20)}
+                baseStyle={{ color: '#525454', fontFamily: 'InterMedium', fontSize: 11, lineHeight: 16, }}
+                source={{ html: productDetail?.pro_highlight }}
+              />
+              {/* <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >• It helps in fading any marks or blemishes left by acne or pimples.</CText>
         <CText type='m10' color='#525454' style={{width:responsiveWidth(89),}} >• Contains Salicylic Acid that helps treat acne prevent acne.</CText>
         <CText type='m10' color='#525454' style={{width:responsiveWidth(89),}} >• Unclogs pores and allows the skin to breathe and shine.</CText> */}
-        </View>
+            </View>
 
-        <View>
-        <CText type='s12' color='#5E5B58' >Direction Of Use:</CText>
+            <View>
+              <CText type='s12' color='#5E5B58' >Direction Of Use:</CText>
 
-        <CText type='m10' color='#525454' style={{width:responsiveWidth(89),marginTop:responsiveHeight(0.3)}} >As directed by your Healthcare Professional.</CText>
-        </View>
-    
-        </View>
-       
-        <Dropdown
+              <CText type='m10' color='#525454' style={{ width: responsiveWidth(89), marginTop: responsiveHeight(0.3) }} >As directed by your Healthcare Professional.</CText>
+            </View>
+
+          </View>
+
+          <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdownDetail}
             placeholderStyle={localStyles.placeholderStyleDetail}
@@ -362,12 +394,12 @@ const onClickAddToCart = () => {
             placeholder={'Composition'}
             value={productAvailability}
             onChange={onProductAvailability}
-            renderRightIcon={() => <DownArrowBlack/>}
+            renderRightIcon={() => <DownArrowBlack />}
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyleDetail}
           />
 
-        <Dropdown
+          <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdownDetail}
             placeholderStyle={localStyles.placeholderStyleDetail}
@@ -378,128 +410,128 @@ const onClickAddToCart = () => {
             placeholder={'Doctor’s Review'}
             value={productAvailability}
             onChange={onProductAvailability}
-            renderRightIcon={() => <DownArrowBlack/>}
+            renderRightIcon={() => <DownArrowBlack />}
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyleDetail}
           />
 
 
-       
-      </View>
-     
 
-     <View style={{paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(2.5),borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1'}} >
-        
-        <CText type='s14' >Delivery & Services</CText>
-
-        <View style={{...styles.flexRow,gap:responsiveWidth(4),marginTop:responsiveHeight(2)}} >
-          <View style={{...styles.flexRow}} >
-            <TruckIcon/>
-            <View style={{alignSelf:'flex-end',borderWidth:1,borderColor:'#80B644',borderRadius:responsiveWidth(1.8),position:'absolute',marginLeft:responsiveWidth(3.5),bottom:-1,}} >
-              <GreenSmaalTick/>
-            </View>
-
-          </View>
-          <CText type='m12' >Get it by Mon, 9 Oct</CText>
         </View>
 
-        <View style={{...styles.flexRow,gap:responsiveWidth(4),marginTop:responsiveHeight(1)}} >
-          <View style={{...styles.flexRow}} >
-            <CashIcon/>
-            <View style={{alignSelf:'flex-end',borderWidth:1,borderColor:'#80B644',borderRadius:responsiveWidth(1.8),position:'absolute',marginLeft:responsiveWidth(3.5),bottom:-1,}} >
-              <GreenSmaalTick/>
+
+        <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
+
+          <CText type='s14' >Delivery & Services</CText>
+
+          <View style={{ ...styles.flexRow, gap: responsiveWidth(4), marginTop: responsiveHeight(2) }} >
+            <View style={{ ...styles.flexRow }} >
+              <TruckIcon />
+              <View style={{ alignSelf: 'flex-end', borderWidth: 1, borderColor: '#80B644', borderRadius: responsiveWidth(1.8), position: 'absolute', marginLeft: responsiveWidth(3.5), bottom: -1, }} >
+                <GreenSmaalTick />
+              </View>
+
             </View>
+            <CText type='m12' >Get it by Mon, 9 Oct</CText>
+          </View>
+
+          <View style={{ ...styles.flexRow, gap: responsiveWidth(4), marginTop: responsiveHeight(1) }} >
+            <View style={{ ...styles.flexRow }} >
+              <CashIcon />
+              <View style={{ alignSelf: 'flex-end', borderWidth: 1, borderColor: '#80B644', borderRadius: responsiveWidth(1.8), position: 'absolute', marginLeft: responsiveWidth(3.5), bottom: -1, }} >
+                <GreenSmaalTick />
+              </View>
+
+            </View>
+            <CText type='m12' >Cash on Delivery is available</CText>
+          </View>
+        </View>
+
+
+        <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
+          <CText type='s14' >Return Policy</CText>
+          <CText type='m12' style={{ marginTop: responsiveHeight(0.5) }} >This Product is not Refundable</CText>
+        </View>
+
+
+        <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1', ...styles.flexRow, ...styles.justifyBetween, }} >
+
+          <View  >
+            <View style={{ alignItems: 'center', borderWidth: 1, borderColor: '#80B644', alignSelf: 'center', paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.25), borderRadius: responsiveWidth(6), marginBottom: responsiveHeight(0.5) }}  >
+              <Genuine />
+
+            </View>
+            <CText type='s8' align='center' style={{ width: responsiveWidth(15) }} >100% Genuine products</CText>
+          </View>
+
+          <View  >
+            <View style={{ alignItems: 'center', borderWidth: 1, borderColor: '#80B644', alignSelf: 'center', paddingHorizontal: responsiveWidth(2.2), paddingVertical: responsiveHeight(1), borderRadius: responsiveWidth(6), marginBottom: responsiveHeight(0.5) }}  >
+              <RecurringPayment />
+
+            </View>
+            <CText type='s8' align='center' style={{ width: responsiveWidth(15) }} >Safe & Secure Payment</CText>
+          </View>
+
+          <View  >
+            <View style={{ alignItems: 'center', borderWidth: 1, borderColor: '#80B644', alignSelf: 'center', paddingHorizontal: responsiveWidth(2.5), paddingVertical: responsiveHeight(1.2), borderRadius: responsiveWidth(6), marginBottom: responsiveHeight(0.5) }}  >
+              <GreenTruck />
+
+            </View>
+            <CText type='s8' align='center' style={{ width: responsiveWidth(15) }} >Contactless Delivery</CText>
+          </View>
+
+          <View  ><View style={{ alignItems: 'center', borderWidth: 1, borderColor: '#80B644', alignSelf: 'center', paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.5), borderRadius: responsiveWidth(6), marginBottom: responsiveHeight(0.5) }}  >
+            <WorkspaceTrusted />
 
           </View>
-          <CText type='m12' >Cash on Delivery is available</CText>
+            <CText type='s8' align='center' style={{ width: responsiveWidth(15) }} >Trusted by Professionals</CText>
+          </View>
+
+
         </View>
-     </View>
 
 
-     <View style={{paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(2.5),borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1'}} >        
-        <CText type='s14' >Return Policy</CText>
-        <CText type='m12' style={{marginTop:responsiveHeight(0.5)}} >This Product is not Refundable</CText>
-     </View>
+        <View style={{ paddingTop: responsiveHeight(2), marginBottom: responsiveHeight(8) }} >
+
+          <View style={{ ...styles.flexRow, ...styles.justifyBetween, paddingHorizontal: responsiveWidth(3), marginBottom: responsiveHeight(1.5) }} >
+            <CText type='s14' >Similar Products</CText>
+            <CText type='s12' color='#149C5C' >View All</CText>
+          </View>
+
+          <SimilarProduct title={'Similar Products'} data={medicineBestSellingData} bestSeller={false} />
 
 
-     <View style={{paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(2.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1',...styles.flexRow,...styles.justifyBetween,}} >
-        
-      <View  >
-         <View style={{alignItems:'center',borderWidth:1,borderColor:'#80B644',alignSelf:'center',paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(1.25),borderRadius:responsiveWidth(6),marginBottom:responsiveHeight(0.5)}}  >
-          <Genuine/>
-         
-         </View>
-         <CText type='s8' align='center' style={{width:responsiveWidth(15)}} >100% Genuine products</CText>
-      </View>
-
-      <View  >
-      <View style={{alignItems:'center',borderWidth:1,borderColor:'#80B644',alignSelf:'center',paddingHorizontal:responsiveWidth(2.2),paddingVertical:responsiveHeight(1),borderRadius:responsiveWidth(6),marginBottom:responsiveHeight(0.5)}}  >
-          <RecurringPayment/>
-         
-         </View>
-         <CText type='s8' align='center' style={{width:responsiveWidth(15)}} >Safe & Secure Payment</CText>
-      </View>
-
-      <View  >
-      <View style={{alignItems:'center',borderWidth:1,borderColor:'#80B644',alignSelf:'center',paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveHeight(1.2),borderRadius:responsiveWidth(6),marginBottom:responsiveHeight(0.5)}}  >
-          <GreenTruck/>
-         
-         </View>
-         <CText type='s8' align='center' style={{width:responsiveWidth(15)}} >Contactless Delivery</CText>
-      </View>
-
-      <View  ><View style={{alignItems:'center',borderWidth:1,borderColor:'#80B644',alignSelf:'center',paddingHorizontal:responsiveWidth(3),paddingVertical:responsiveHeight(1.5),borderRadius:responsiveWidth(6),marginBottom:responsiveHeight(0.5)}}  >
-          <WorkspaceTrusted/>
-         
-         </View>
-         <CText type='s8' align='center' style={{width:responsiveWidth(15)}} >Trusted by Professionals</CText>
-      </View>
+          <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: colors.success, alignSelf: 'center', paddingVertical: responsiveHeight(2), paddingHorizontal: responsiveWidth(8), borderRadius: responsiveWidth(5), marginTop: responsiveHeight(3.5) }} >
+            <CText type='m12' color={colors.white} >Ask your question to our experts</CText>
+          </TouchableOpacity>
 
 
-     </View>
-
-
-     <View style={{paddingTop:responsiveHeight(2),marginBottom:responsiveHeight(8)}} >
-
-     <View style={{...styles.flexRow,...styles.justifyBetween,paddingHorizontal:responsiveWidth(3),marginBottom:responsiveHeight(1.5)}} >
-        <CText type='s14' >Similar Products</CText>
-        <CText type='s12' color='#149C5C' >View All</CText>
-      </View>
-
-      <SimilarProduct title={'Similar Products'} data={medicineBestSellingData} bestSeller={false} />
-      
-
-      <TouchableOpacity activeOpacity={0.6} style={{backgroundColor:colors.success,alignSelf:'center',paddingVertical:responsiveHeight(2),paddingHorizontal:responsiveWidth(8),borderRadius:responsiveWidth(5),marginTop:responsiveHeight(3.5)}} >
-        <CText type='m12' color={colors.white} >Ask your question to our experts</CText>
-      </TouchableOpacity>
-
-
-     </View>
-
-    
-    
+        </View>
 
 
 
 
 
-    
+
+
+
+
       </Body>
-  { !!getPriceItemAdd && <View style={{flexDirection:'row',alignItems:'center',backgroundColor:'#FBEADE',height:responsiveHeight(9),justifyContent:'space-between',paddingHorizontal:responsiveWidth(3.5),borderTopLeftRadius:responsiveWidth(4),borderTopRightRadius:responsiveWidth(4)}}  >
+      {!!getPriceItemAdd && <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBEADE', height: responsiveHeight(9), justifyContent: 'space-between', paddingHorizontal: responsiveWidth(3.5), borderTopLeftRadius: responsiveWidth(4), borderTopRightRadius: responsiveWidth(4) }}  >
 
-<Text style={{color:colors.black,   ...typography.fontSizes.f16,...typography.fontWeights.Bold,}}>Total Price: {productDetail?.symbol} {getItemPriceCart()}</Text>
+        <Text style={{ color: colors.black, ...typography.fontSizes.f16, ...typography.fontWeights.Bold, }}>Total Price: {productDetail?.symbol} {getItemPriceCart()}</Text>
 
-<TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}}  >
-  <View style={{backgroundColor:'#FD872E',paddingHorizontal:responsiveWidth(2.8),paddingVertical:responsiveHeight(1),flexDirection:'row',alignItems:'center',gap:responsiveWidth(1.5),borderRadius:responsiveWidth(3)}} >
-    <CartIconWhite/>
-    <Text style={{color:colors.white,   ...typography.fontSizes.f12,...typography.fontWeights.Bold,}} >Go to Cart</Text>
-  </View>
-</TouchableOpacity>
-
-
+        <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.Cart) }}  >
+          <View style={{ backgroundColor: '#FD872E', paddingHorizontal: responsiveWidth(2.8), paddingVertical: responsiveHeight(1), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5), borderRadius: responsiveWidth(3) }} >
+            <CartIconWhite />
+            <Text style={{ color: colors.white, ...typography.fontSizes.f12, ...typography.fontWeights.Bold, }} >Go to Cart</Text>
+          </View>
+        </TouchableOpacity>
 
 
-</View>}
+
+
+      </View>}
 
     </Container>
   )
@@ -556,12 +588,12 @@ const localStyles = StyleSheet.create({
   },
   dropdownDetail: {
     backgroundColor: '#FFF1F1',
-   
+
     paddingHorizontal: responsiveWidth(2.5),
     borderRadius: responsiveWidth(2),
     paddingLeft: responsiveWidth(3),
     height: responsiveHeight(6),
-    marginTop:responsiveHeight(2)
+    marginTop: responsiveHeight(2)
 
 
   },

@@ -213,7 +213,7 @@ const Appointments = ({ navigation }) => {
   const onSubmitReport = async () => {
     console.log({ selectedAppId });
 
-    setReportUploadIsLoading(true)
+ if(slectedFileData?.uri !== ''){  setReportUploadIsLoading(true)
     const formData = new FormData()
 
 
@@ -250,15 +250,6 @@ const Appointments = ({ navigation }) => {
         queryKey: [appointmentService.queryKeys.getReportByAppointmentId + selectedAppId]
       })
 
-
-      // queryClient.invalidateQueries({
-      //   queryKey: [ProfileService.queryKeys.completeProfile]
-      // })
-
-      // queryClient.invalidateQueries({
-      //   queryKey: [ProfileService.queryKeys.retrieveRoleProfile]
-      // })
-
       if (responseJson?.success) {
         setModalReportUploadVisible(false)
         toast.show({
@@ -290,6 +281,19 @@ const Appointments = ({ navigation }) => {
           return (
             <Toast nativeID={toastId} variant="accent" action="error">
               <ToastTitle>Something went wrong please try again later.</ToastTitle>
+            </Toast>
+          );
+        },
+      })
+    }
+    }else{
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          const toastId = "toast-" + id
+          return (
+            <Toast nativeID={toastId} variant="accent" action="warning">
+              <ToastTitle>Please select image</ToastTitle>
             </Toast>
           );
         },

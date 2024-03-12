@@ -328,11 +328,11 @@ const LoginScreen = () => {
     <Container>
 
       <Body style={localStyles.root}>
-        <TouchableOpacity onPress={onPressSkip}>
+        {/* <TouchableOpacity onPress={onPressSkip}>
           <Text fontFamily='$InterMedium' fontSize={12} color={colors.primary} style={styles.selfEnd}>
             {strings.skip}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Image style={localStyles.imageStyle} source={images.signupImage} />
         <View style={localStyles.userSignInContainer}>
           <Text fontFamily='$InterSemiBold' fontSize={16}>{strings.userSignIn}</Text>

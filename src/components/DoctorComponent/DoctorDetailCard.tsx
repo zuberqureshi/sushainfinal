@@ -21,7 +21,7 @@ import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-specli
 import moment from 'moment';
 import { getAccessToken } from '../../utils/network';
 
-export default function DoctorDetailCard({ title = 'diabetes' }: any) {
+export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultation }: any) {
 
   //init
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -171,7 +171,7 @@ export default function DoctorDetailCard({ title = 'diabetes' }: any) {
 
     return (
       <View>
-        <TouchableOpacity style={localStyles.bannerContaienr}>
+   <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
             source={images.exclusiveTherapyImage}
             style={localStyles.bannerImageStyle}
@@ -233,7 +233,7 @@ export default function DoctorDetailCard({ title = 'diabetes' }: any) {
         keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}
         // estimatedItemSize={100}
-        ListHeaderComponent={ListHeaderComponent}
+        ListHeaderComponent={  ListHeaderComponent  }
         ListFooterComponent={() => { return (<View style={{ height: responsiveHeight(10) }} />) }}
         ListEmptyComponent={EmptyListMessage}
 

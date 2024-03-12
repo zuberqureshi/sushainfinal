@@ -77,7 +77,7 @@ const NotFoundScreen = () => {
 }
 
 
-function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end ,localMic , localWebcam }) {
+function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end, localMic, localWebcam }) {
   const navigation = useNavigation()
   return (
     <View
@@ -91,7 +91,7 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end ,localMic
 
       <TouchableOpacity onPress={() => { toggleWebcam() }} activeOpacity={0.6} >
         <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-         {localWebcam ? <VideoOnIcon width={24} height={24} /> : <NoVideoIcon width={24} height={24} />}
+          {localWebcam ? <VideoOnIcon width={24} height={24} /> : <NoVideoIcon width={24} height={24} />}
         </Box>
 
       </TouchableOpacity>
@@ -99,7 +99,7 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end ,localMic
 
       <TouchableOpacity onPress={() => { toggleMic() }} activeOpacity={0.6} >
         <Box backgroundColor={colors.primary} px={30} py={8} borderRadius={8} >
-        { localMic ? <MicOnIcon color='red' width={24} height={24} />  :  <MuteIcon width={24} height={24} />}
+          {localMic ? <MicOnIcon color='red' width={24} height={24} /> : <MuteIcon width={24} height={24} />}
         </Box>
 
       </TouchableOpacity>
@@ -120,12 +120,12 @@ function ControlsContainer({ join, leave, toggleWebcam, toggleMic, end ,localMic
   );
 }
 function ParticipantView({ participantId }) {
-  
-  const { webcamStream, webcamOn , enableWebcam ,micOn  } = useParticipant(participantId);
+
+  const { webcamStream, webcamOn, enableWebcam, micOn } = useParticipant(participantId);
   // console.log('participantId', participantId,webcamOn)
 
   // console.log(enableWebcam(),'Enable wencam');
-  
+
 
   return webcamOn && webcamStream ? (
 
@@ -142,8 +142,8 @@ function ParticipantView({ participantId }) {
         }}
       />
       <Box position='absolute' ml={8} mt={5} alignItems='center' flexDirection='row'  >
-       { !micOn && <MuteRedIcon width={20} height={20}  />}
-       { !webcamOn && <NoVideoRedIcon width={20} height={20}/>}
+        {!micOn && <MuteRedIcon width={20} height={20} />}
+        {!webcamOn && <NoVideoRedIcon width={20} height={20} />}
       </Box>
 
     </Box>
@@ -154,10 +154,10 @@ function ParticipantView({ participantId }) {
   ) : (
 
     <Box h={250} w={'95%'} alignSelf='center' my={8} borderRadius={10} overflow='hidden' backgroundColor='grey' justifyContent='center' alignItems='center' >
-       <Box position='absolute' alignSelf='flex-start' ml={8} mt={5} top={0} >
-       { !webcamOn && <NoVideoRedIcon width={20} height={20}/>}    
-       </Box>
-     
+      <Box position='absolute' alignSelf='flex-start' ml={8} mt={5} top={0} >
+        {!webcamOn && <NoVideoRedIcon width={20} height={20} />}
+      </Box>
+
       <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={16} >NO MEDIA</Text>
     </Box>
 
@@ -166,29 +166,29 @@ function ParticipantView({ participantId }) {
 }
 
 function ParticipantList({ participants }) {
- const navigation = useNavigation()
+  const navigation = useNavigation()
 
-//  useEffect(()=>{
-//   const unsubscribe = navigation.addListener('beforeRemove' , e => {
-//     // e.preventDefault();
-//     // Alert.alert('Back Alert')
-//     // backAction()
-//     return true
-//   });
+  //  useEffect(()=>{
+  //   const unsubscribe = navigation.addListener('beforeRemove' , e => {
+  //     // e.preventDefault();
+  //     // Alert.alert('Back Alert')
+  //     // backAction()
+  //     return true
+  //   });
 
-//   return unsubscribe
+  //   return unsubscribe
 
-// },[navigation])
+  // },[navigation])
 
   return participants.length > 0 ? (
     <Box flex={1} >
-     <FlatList
-      data={participants}
-      renderItem={({ item }) => {
-        return <ParticipantView participantId={item} />;
-      }}
-    />
-    {participants.length === 1 && <Text fontFamily='$InterSemiBold' fontSize={16} color={colors.black} alignSelf='center' mb={100} >Please wait another participant </Text>}
+      <FlatList
+        data={participants}
+        renderItem={({ item }) => {
+          return <ParticipantView participantId={item} />;
+        }}
+      />
+      {participants.length === 1 && <Text fontFamily='$InterSemiBold' fontSize={16} color={colors.black} alignSelf='center' mb={100} >Please wait another participant </Text>}
     </Box>
   ) : (
     <View
@@ -199,18 +199,18 @@ function ParticipantList({ participants }) {
         alignItems: 'center',
       }}>
       <View style={localStyles.headerSection}>
-          <Image source={images.booking} style={localStyles.videoIcon} />
-          <CText
-            type="b14"
-            numberOfLines={2}
-            color={colors.black}
-            align="center"
-            style={{ marginVertical: 10 }}>
-           All participant leave
-          </CText>
-        </View>
+        <Image source={images.booking} style={localStyles.videoIcon} />
+        <CText
+          type="b14"
+          numberOfLines={2}
+          color={colors.black}
+          align="center"
+          style={{ marginVertical: 10 }}>
+          All participant leave
+        </CText>
+      </View>
 
-        <PrimaryButton onPress={()=>{navigation.navigate(StackNav.DrawerNavigation)}} buttonText='Done' marginHorizontal={responsiveWidth(2.5)} marginTop={responsiveHeight(2.5)} width={responsiveWidth(50)} />
+      <PrimaryButton onPress={() => { navigation.navigate(StackNav.DrawerNavigation) }} buttonText='Done' marginHorizontal={responsiveWidth(2.5)} marginTop={responsiveHeight(2.5)} width={responsiveWidth(50)} />
     </View>
   );
 }
@@ -218,7 +218,7 @@ function ParticipantList({ participants }) {
 function MeetingView() {
   // Get `participants` from useMeeting Hook
   const navigation = useNavigation()
-  const { join, leave, toggleWebcam, toggleMic, participants, meetingId, end , localMicOn,localWebcamOn } = useMeeting({});
+  const { join, leave, toggleWebcam, toggleMic, participants, meetingId, end, localMicOn, localWebcamOn } = useMeeting({});
   const participantsArrId = [...participants.keys()];
 
   const backAction = () => {
@@ -246,17 +246,19 @@ function MeetingView() {
 
   //   return () => BackHandler.removeEventListener("hardwareBackPress", backAction);
   // }, [backAction]);
-    
+
 
   // useBackHandler(backAction)
   // console.log('Check MIn ON',localMicOn,'CAMR',localWebcamOn);
-  
+
 
   useEffect(() => {
-    
-      join()
+    (async function () {
+     await join()
+    })();
 
-    }, [])
+
+  }, [])
 
   return (
     <Box flex={1} backgroundColor={colors.white} >
@@ -269,7 +271,7 @@ function MeetingView() {
 
       ) : null}
       <ParticipantList participants={participantsArrId} />
-  { participantsArrId.length > 0 && <ControlsContainer
+      {participantsArrId.length > 0 && <ControlsContainer
         join={join}
         leave={leave}
         end={end}
@@ -285,8 +287,8 @@ function MeetingView() {
 
 const VideoCall = ({ navigation }) => {
 
-  const [meetingId, setMeetingId] = useState('gotq-lk7v-736w');
- 
+  const [meetingId, setMeetingId] = useState('9o19-xjyq-mamy');
+
 
   // const { enableWebcam } = useMeeting({});
 
@@ -351,6 +353,7 @@ const VideoCall = ({ navigation }) => {
             message: "Meeting is running.",
           },
         }}
+        joinWithoutUserInteraction
         token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIyYzgyMGVkZi1jOTg3LTQ2MDItYjJhNy01Y2VhZDI4ZTQ0YjciLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcwODM0NTgzOCwiZXhwIjoxODY2MTMzODM4fQ.0PJziz8wk472-GHp-ZCrjoxAHxWH-jw2V6nP39m1rFo`}>
         <MeetingView />
       </MeetingProvider>

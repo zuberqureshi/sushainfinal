@@ -11,7 +11,7 @@ import Test from '../../screens/CommonScreens/VideoCall';
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigation() {
-  const authContext:any = useContext(AuthContext);
+  const authContext: any = useContext(AuthContext);
 
   useEffect(() => {
     getLocation()
@@ -19,9 +19,9 @@ export default function StackNavigation() {
   }, [])
 
   const selectedLng = async () => {
-    const lngData:any = await getLng()
+    const lngData: any = await getLng()
     if (!!lngData) {
-      strings.setLanguage(lngData as string) 
+      strings.setLanguage(lngData as string)
     }
     console.log("Drawer LOggggggg", lngData);
 
@@ -54,13 +54,13 @@ export default function StackNavigation() {
       initialRouteName={StackNav.Splash}>
       <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
 
- 
- 
+
+
       <Stack.Screen
         name={StackNav.AuthStack}
         component={StackRoute.AuthStack}
       />
-  
+
       <Stack.Screen
         name={StackNav.DrawerNavigation}
         component={StackRoute.DrawerNavigation}
@@ -102,11 +102,11 @@ export default function StackNavigation() {
         name={StackNav.CategoryDoctorList}
         component={StackRoute.CategoryDoctorList}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={StackNav.ProductByCategories}
         component={StackRoute.ProductByCategories}
-      />
-       <Stack.Screen
+      /> */}
+      <Stack.Screen
         name={StackNav.ProductDetail}
         component={StackRoute.ProductDetail}
       />
@@ -134,17 +134,17 @@ export default function StackNavigation() {
       <Stack.Screen
         name={StackNav.Cart}
         component={StackRoute.Cart}
-      /> 
+      />
 
       <Stack.Screen
         name={StackNav.Address}
         component={StackRoute.Address}
-      /> 
+      />
 
       <Stack.Screen
         name={StackNav.OrderSummery}
         component={StackRoute.OrderSummery}
-      /> 
+      />
       <Stack.Screen
         name={StackNav.ClinicConsultation}
         component={StackRoute.ClinicConsultation}
@@ -164,9 +164,14 @@ export default function StackNavigation() {
         component={StackRoute.VideoCompleted}
       />
 
+      <Stack.Screen
+        name={StackNav.OrderDetails}
+        component={StackRoute.OrderDetails}
+      />
+
 
     </Stack.Navigator>
   );
 
-    
+
 }

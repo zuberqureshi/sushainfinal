@@ -44,5 +44,7 @@ export const StackNav = {
   LifeStyleDrawer:'LifeStyleDrawer',
   VideoCall : 'VideoCall',
   VideoCompleted : 'VideoCompleted',
+  MyOrders : 'MyOrders',
+  OrderDetails : 'OrderDetails',
 
 };

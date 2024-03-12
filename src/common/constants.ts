@@ -1,5 +1,6 @@
 import {Dimensions, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import DeviceCountry from 'react-native-device-country';
 
 //Device dimensions
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
@@ -33,6 +34,13 @@ export function getHeight(value: number) {
 export function moderateScale(size: number) {
   const newSize = size * scale;
   return Math.round(newSize);
+}
+
+export const  getCountryCode = async () => {
+
+ const countryCode = await DeviceCountry.getCountryCode()
+ return countryCode?.code ;
+  
 }
 
 //AsyncStorage keys

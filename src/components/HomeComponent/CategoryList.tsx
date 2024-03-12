@@ -66,6 +66,8 @@ const CategoryList = () => {
           navigation.navigate(StackNav.InstantConsultation)
         }else if(index === 0){
           navigation.navigate(TabNav?.FindADoctorHome)
+        }else if(index === 2){
+          navigation.navigate(TabNav?.Medicines)
         }
       }} >
         <View style={localStyles.itemStyle}>
