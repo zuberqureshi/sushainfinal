@@ -16,14 +16,14 @@ export interface InternetRef {
   isNotConnected: () => void;
 }
 
-const CheckInternet = ((props, ref) => {
+const CheckInternet = (({netStatus}) => {
 
   const onPressSetting = async () => await Linking.openSettings();
-  // console.log('checkNET',props.netStatus?.isConnected);
+  console.log('checkNET',netStatus);
   
 
   return (
-    <Modal animationType="fade" visible={!(props?.netStatus?.isConnected)} transparent>
+    <Modal animationType="fade" visible={!(netStatus)} transparent>
       <View style={localStyles.container}>
         <View style={localStyles.innerContainer}>
           <NoInternetIcon />

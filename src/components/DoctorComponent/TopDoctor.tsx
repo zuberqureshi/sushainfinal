@@ -6,7 +6,7 @@ import {FlashList} from '@shopify/flash-list';
 import CText from '../common/CText';
 import {colors} from '../../themes';
 import {styles} from '../../themes';
-import {Api_Image_Base_Url, getHeight, moderateScale} from '../../common/constants';
+import {API_IMAGE_BASE_URL, Api_Image_Base_Url, getHeight, moderateScale} from '../../common/constants';
 import images from '../../assets/images';
 import RatingComponent from '../HomeComponent/RatingComponent';
 import SubHeader from '../common/CommonComponent/SubHeader';
@@ -35,7 +35,7 @@ export default function TopDoctor({data}:any) {
       <View key={item?.photo?.toString()} style={localStyles.cardMainContainer}>
         <View style={styles.flexRow}>
           <Image
-            source={{uri:`${Api_Image_Base_Url}${item?.photo}`}}
+            source={{uri:`${API_IMAGE_BASE_URL}${item?.photo}`}}
             style={localStyles.doctorImgStyle}
           />
           <View style={localStyles.rightContainer}>

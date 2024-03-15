@@ -47,14 +47,12 @@ import { shopByategoryData } from '../../api/constant';
 import { getLocation } from '../../utils/service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Box, Pressable,Text } from '@gluestack-ui/themed';
-// import {HomePageAPI, SearchAPI} from '../../api/homeApis';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
 import {  AuthContext } from '../../context/AuthContext'
 import CheckInternet from '../../components/common/CommonComponent/CheckInternet';
 import useGetTodayAppointments from '../../hooks/appointment/get-today-appointment';
 import { useNetInfo } from '@react-native-community/netinfo';
-
 
 type Props = {
   icon: React.JSX.Element;
@@ -106,6 +104,7 @@ async function load (){
 
 useEffect(() => {
   load();
+
 }, []);
 
 
@@ -264,7 +263,7 @@ const locationSet = async() => {
              <CategoryList />
             }
             {/* <FrequentlyBoughtProducts /> */}
-            <CategoryList />
+            {/* <CategoryList /> */}
             
             <DoctorSpecialities />
             <ShopCategory shopCategaryData={shopByategoryData}/>
@@ -277,7 +276,7 @@ const locationSet = async() => {
         )}
 
       </Body>
-      <CheckInternet netStatus={netInfo} />
+   { netInfo?.isConnected !== null &&  <CheckInternet netStatus={netInfo?.isConnected} />}
     </Container>
   );
 };

@@ -22,9 +22,9 @@ export default function ExclusiveTherapy({bannerData}: any) {
 const navigation = useNavigation()
 
   // console.log('bannerData', bannerData, BASE_IMG_NEW_PATH + bannerData);
-  const RenderCardComponent = ({style, title, image}: any) => {
+  const RenderCardComponent = ({style, title, image,onPress}: any) => {
     return (
-      <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ClinicDoctorDetailCard)}} style={[localStyles.subContainerStyle, style]}>
+      <TouchableOpacity onPress={onPress} style={[localStyles.subContainerStyle, style]}>
         <View style={localStyles.titleTextStyle}>
           <Image source={image} style={localStyles.iconImageStyle} />
           <CText
@@ -41,6 +41,8 @@ const navigation = useNavigation()
       </TouchableOpacity>
     );
   };
+
+
 
   return (
     <View>
@@ -73,6 +75,7 @@ const navigation = useNavigation()
         title="Want to Visit Clinic ?"
         image={images.hospitalImage}
         style={[styles.mh20, styles.mb10]}
+        onPress={()=>{navigation.navigate(StackNav.ClinicConsultation)}}
       />
       <BannerList bannerData={bannerData} type={'bottom'} />
     </View>

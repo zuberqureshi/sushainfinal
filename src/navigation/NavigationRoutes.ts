@@ -47,7 +47,7 @@ import SelectTimeSlot from "../screens/CommonScreens/SelectTimeSlot";
 import CategoryDoctorList from "../screens/CommonScreens/CategoryDoctorList";
 import DoctorProfile from "../screens/CommonScreens/DortorProfile";
 import InstantConsultation from "../screens/InstantConsultation/ConsultDoctor";
-import ClinicConsultation from "../screens/ClinicConsultation/DoctorDetailCard";
+import ClinicConsultation from "../screens/ClinicConsultation/ClinicConsultation";
 import Appointments from "../screens/Appointments/Appointments";
 import PatientsReview from "../screens/CommonScreens/PatientsReview";
 import LifeStyle from "../screens/LifeStyle/LifeStyle";
@@ -56,6 +56,8 @@ import Cart from "../screens/CommonScreens/Cart";
 import Address from "../screens/CommonScreens/Address";
 import VideoCall from "../screens/CommonScreens/VideoCall";
 import VideoCompleted from "../screens/CommonScreens/VideoCompleted";
+import MyOrders from "../screens/OrderSummery/MyOrders";
+import OrderDetails from "../screens/OrderSummery/OrderDetails";
 
 
 
@@ -109,6 +111,8 @@ export const StackRoute = {
   LifeStyle,
   VideoCall,
   VideoCompleted,
+  MyOrders,
+  OrderDetails,
 
 
 };
