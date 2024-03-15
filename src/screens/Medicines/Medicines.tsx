@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, TextInput, } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, TextInput, FlatList, } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors, styles } from '../../themes';
 import CHeader from '../../components/common/CHeader';
 
@@ -22,6 +22,11 @@ import SearchWithLikeComponent from '../../components/common/CommonComponent/Sea
 import { Container } from '../../components/Container';
 import { Box } from '@gluestack-ui/themed';
 import { StackNav } from '../../navigation/NavigationKeys';
+import { getAccessToken } from '../../utils/network';
+import { useSelector } from 'react-redux';
+import useGetMedicinesBestSeller from '../../hooks/medicine/get-medicine-bestseller';
+import Loader from '../../components/Loader/Loader';
+
 
 
 
@@ -46,6 +51,39 @@ const BottomContainer = ({ icon, title }: any) => {
 const Medicines = ({route,navigation}:any) => {
 
   const iconSize = moderateScale(21);
+  const {personalCareType} = route.params
+  console.log(route.params,'routeee medcicness');
+
+  const cartData = useSelector(state => state.cart);
+
+  const [mediType, setMediType] = useState<string>('')
+
+  const {data : bestSellerData , isLoading : bestSellerIsLoading } = useGetMedicinesBestSeller({masterCat:mediType,personalCareType:personalCareType})
+
+  const fetchType = async () => {
+    let medType = await getAccessToken('medType')
+    console.log({ medType });
+    setMediType(medType)
+    return medType;
+
+  }
+
+  useEffect(() => {
+    fetchType()
+  }, [])
+
+  if(bestSellerIsLoading){
+    return(
+      <Container>
+              <CHeader
+        title={strings.medicines}
+      //   rightIcon={<RightText />}
+      />
+      <Loader/>
+      </Container>
+    )
+  }
+  
 
   return (
     <Container  statusBarStyle='dark-content' >
@@ -69,14 +107,20 @@ const Medicines = ({route,navigation}:any) => {
           //  onChangeText={(t)=>setSearchText(t)}
            style={localStyles.inputContainerStyle}
           />
-      <Box flexDirection='row' alignItems='center' gap={4} >
+      <Box flexDirection='row' alignItems='center' gap={5} >
       <TouchableOpacity
         onPress={()=>{}}
         style={localStyles.cartBtnStyle}>
         <LikeIcon height={iconSize} width={iconSize} />
       </TouchableOpacity>
-      <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} style={localStyles.cartBtnStyle}>
+      <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} >
+        <Box>
         <Cart height={iconSize} width={iconSize} />
+     { cartData?.length !=0 &&  <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{width:0,height:1}} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
+          <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
+        </Box>}
+        </Box>
+       
       </TouchableOpacity>
       </Box>    
       
@@ -123,9 +167,9 @@ const Medicines = ({route,navigation}:any) => {
             </CText> */}
         </View>
 
-        <MedicinesConcerns title={strings.medicinesbyHealthConcerns} />
+        <MedicinesConcerns title={strings.medicinesbyHealthConcerns} mediType={mediType} personalCare={personalCareType} />
 
-        <SellingProduct title={strings.bestSelling} data={medicineBestSellingData} bestSeller={false} />
+        <SellingProduct title={strings.bestSelling} data={bestSellerData?.data?.result[0]?.productDetail} bestSeller={false} />
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -148,46 +192,27 @@ const Medicines = ({route,navigation}:any) => {
           {strings.findProductsFromAyurvedaBrands}
         </Text>
 
-        <View style={{ alignSelf: 'center', marginBottom: responsiveHeight(3) }} >
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', ...styles.center, ...styles.mh20, gap: responsiveWidth(6), marginTop: responsiveHeight(2) }} >
-            <Image
-              source={images.shopBrand1}
-              style={localStyles.shopBrand}
+        <View style={{ alignSelf: 'center', marginBottom: responsiveHeight(3) ,marginTop:responsiveHeight(1.5) }} >
+ 
+
+          <FlatList
+          style={{alignSelf:'center',gap:responsiveHeight(1.5)}}
+          columnWrapperStyle={{gap:responsiveWidth(5)}}
+          data={[images.shopBrand1,images.shopBrand2,images.shopBrand3,images.shopBrand4,images.shopBrand5,images.shopBrand6]}
+          renderItem={({item,index}) => {
+
+            return(
+              <Image
+              source={item}
+              style={[localStyles.shopBrand,]}
               resizeMode="contain"
             />
-
-            <Image
-              source={images.shopBrand2}
-              style={localStyles.shopBrand}
-              resizeMode="contain"
-            />
-
-            <Image
-              source={images.shopBrand3}
-              style={localStyles.shopBrand}
-              resizeMode="contain"
-            />
-
-            <Image
-              source={images.shopBrand4}
-              style={localStyles.shopBrand}
-              resizeMode="contain"
-            />
-
-            <Image
-              source={images.shopBrand5}
-              style={localStyles.shopBrand}
-              resizeMode="contain"
-            />
-
-            <Image
-              source={images.shopBrand6}
-              style={localStyles.shopBrand}
-              resizeMode="contain"
-            />
-
-
-          </View>
+            )
+          }}
+          keyExtractor={(item, index) => index?.toString()}
+          numColumns={3}
+          
+           />
 
           <TouchableOpacity style={localStyles.viewButtonWrapper} >
             <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: responsiveWidth(2) }} >

@@ -61,13 +61,17 @@ const CategoryList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const renderItem = ({item, index}: props) => {
     return (
-      <Pressable onPress={()=>{
+      <TouchableOpacity activeOpacity={0.8} onPress={()=>{
+       
         if(index === 1){
           navigation.navigate(StackNav.InstantConsultation)
         }else if(index === 0){
           navigation.navigate(TabNav?.FindADoctorHome)
         }else if(index === 2){
-          navigation.navigate(TabNav?.Medicines)
+          navigation.navigate(TabNav.Medicines,{ screen: StackNav.MedicineHome , params : {personalCareType:'NO'} })
+        }else if(index === 3){
+          navigation.navigate(TabNav.Medicines,{ screen: StackNav.MedicineHome , params : {personalCareType:'YES'} })
+         
         }
       }} >
         <View style={localStyles.itemStyle}>
@@ -89,7 +93,7 @@ const CategoryList = () => {
           {item.des}
         </CText>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 
