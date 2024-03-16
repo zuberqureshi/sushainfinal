@@ -222,6 +222,9 @@ export default function TabBarNavigation({}) {
           name={TabNav.Medicines}
           component={tabRouteMedicines}
           initialParams={{personalCareType:'No'}}
+          options={{
+            tabBarHideOnKeyboard:true
+          }}
         />
         <Tab.Screen
           position="RIGHT"

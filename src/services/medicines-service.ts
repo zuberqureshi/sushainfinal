@@ -7,6 +7,10 @@ class MedicinesService {
     getMedicinesHealthConcerns : 'getMedicinesHealthConcerns',
     getMedicinesByCategory : 'getMedicinesByCategory',
     getMedicinesBestSeller : 'getMedicinesBestSeller',
+    getMedicinesBrandList : 'getMedicinesBrandList',
+    getMedicinesCombos :'getMedicinesCombos',
+    getMedicinesRecommended : 'getMedicinesRecommended',
+    getMedicinesByBrand : 'getMedicinesByBrand',
   };
 
   getMedicinesHealthConcerns = async (data:any) => {
@@ -36,7 +40,42 @@ class MedicinesService {
     });
   }
 
+  
+  getMedicinesBrandList = async (data:any) => {
+    const {masterCat , personalCareType} = data
+    return fetcher({
+      url: `order/brandlist?master_cat=${masterCat}&personal_care=${personalCareType}`,
+      method: 'GET',
+    });
+  }
+ 
+  getMedicinesCombos = async (data:any) => {
+    // const {masterCat , personalCareType} = data
+    return fetcher({
+      url: `order/comboproducts?skip=1`,
+      method: 'GET',
+    });
+   }
 
+   getMedicinesRecommended = async (data:any) => {
+    const {userId } = data
+    // console.log(userId,'Recommmm');
+    
+    return fetcher({
+      url: `order/recommendedproduct?user_id=${userId}&skip=1`,
+      method: 'GET',
+    });
+   }
+
+   getMedicinesByBrand = async (data:any) => {
+    const {brand } = data
+    // console.log(userId,'Recommmm');
+    
+    return fetcher({
+      url: `order/productbybrand?brand=${brand}&skip=1`,
+      method: 'GET',
+    });
+   }
 
 
    

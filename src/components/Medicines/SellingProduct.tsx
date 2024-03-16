@@ -24,7 +24,7 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
       return (
         <View style={localStyles.bestSellingWrapper} >
 
-            <Pressable  onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} style={localStyles.imgContainer} >
+            <Pressable  onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 } }) }} style={localStyles.imgContainer} >
 
               <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}} >
                 {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
@@ -44,11 +44,11 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
               
             </Pressable>
 
-            <Text fontFamily='$InterRegular' color={colors.black} numberOfLines={2} h={30} fontSize={12} lineHeight={15} w={'90%'} >{item?.name}</Text>
+            <Text fontFamily='$InterRegular' color={colors.black} numberOfLines={2} h={30} fontSize={12} lineHeight={15} w={'90%'} mt={3} >{item?.name}</Text>
 
             <View style={localStyles.bottomWrapper} >
 
-                <Text style={localStyles.priceText}>{'\u20B9'} { item?.product_pricing?.length != 0 ? item?.product_pricing?.selling_price : item?.final_price}</Text>
+                <Text style={localStyles.priceText}>{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
 
                 <TouchableOpacity style={localStyles.addButtomWrapper} >
                     <Text style={localStyles.addButtomText} >ADD</Text>

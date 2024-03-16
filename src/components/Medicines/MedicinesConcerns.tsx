@@ -39,7 +39,7 @@ const MedicinesConcerns = ({title,mediType,personalCare}: {title: string,mediTyp
 
     
   return (
-    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.name,bannerImg:item?.listing_banner_mbl,personalCareType:personalCare})}}  style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.name,bannerImg:item?.listing_banner_mbl,personalCareType:personalCare,brandParam:''})}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
         { !!item?.app_icon ? <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.app_icon}`}} style={localStyles.imgStyle} /> :
           
