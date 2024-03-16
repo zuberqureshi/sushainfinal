@@ -1,4 +1,4 @@
-import {StyleSheet, Image, View, FlatList,TouchableOpacity,Pressable} from 'react-native';
+import {StyleSheet, Image, View, FlatList,TouchableOpacity,Pressable, TouchableHighlight} from 'react-native';
 import React from 'react';
 
 // local imports
@@ -61,7 +61,7 @@ const CategoryList = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const renderItem = ({item, index}: props) => {
     return (
-      <TouchableOpacity activeOpacity={0.8} onPress={()=>{
+      <TouchableHighlight underlayColor={'transparent'} activeOpacity={0.8} onPress={()=>{
        
         if(index === 1){
           navigation.navigate(StackNav.InstantConsultation)
@@ -93,7 +93,7 @@ const CategoryList = () => {
           {item.des}
         </CText>
         </View>
-      </TouchableOpacity>
+      </TouchableHighlight>
     );
   };
 

@@ -174,10 +174,6 @@ const Medicines = ({ route, navigation }: any) => {
   return (
     <Container statusBarStyle='dark-content' >
       <CHeader title={strings.medicines} />
-
-      <ScrollView
-        style={{ marginBottom: responsiveHeight(10) }}
-        showsVerticalScrollIndicator={false}>
       <View style={localStyles.searchContainer}>
         <TouchableOpacity onPress={() => { navigation.openDrawer() }}>
           <Menu />
@@ -232,6 +228,11 @@ const Medicines = ({ route, navigation }: any) => {
           </View>
         )}
       </View>
+
+      <ScrollView
+        style={{ marginBottom: responsiveHeight(10) }}
+        showsVerticalScrollIndicator={false}>
+ 
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image

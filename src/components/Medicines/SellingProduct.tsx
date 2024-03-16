@@ -1,5 +1,5 @@
 import { StyleSheet, View,Image,TouchableOpacity,FlatList, Dimensions, VirtualizedList, Pressable } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import SubHeader from '../common/CommonComponent/SubHeader'
 import { colors ,styles} from '../../themes'
 import typography from '../../themes/typography'
@@ -9,14 +9,47 @@ import { HeartLightBlue } from '../../assets/svgs'
 import images from '../../assets/images'
 import { API_IMAGE_BASE_URL, moderateScale } from '../../common/constants'
 import strings from '../../themes/strings'
-import { Text } from '@gluestack-ui/themed'
+import { Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { StackNav } from '../../navigation/NavigationKeys'
+import { useDispatch } from 'react-redux'
+import { addProductsToCart } from '../../redux/cartSlice'
+import { increaseQty } from '../../redux/productSlice'
 
 
 const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSeller:boolean}) => {
 
   const navigation = useNavigation()
+  const toast = useToast()
+
+  const [load, setLoad] = useState(false)
+
+  const dispatch = useDispatch()
+
+  const onClickAddToCart = (item) => {
+
+
+    dispatch(addProductsToCart(item))
+    dispatch(increaseQty(item?.id))
+
+    // scale.value = withSpring(1.5)
+    // setTimeout(() => {
+    //   scale.value = withSpring(1)
+    // }, 150);
+
+    toast.show({
+      placement: 'bottom',
+      render: ({ id }: { id: string }) => {
+        const toastId = "toast-" + id
+        return (
+          <Toast nativeID={toastId} variant='accent' action='success'>
+            <ToastTitle>Add To Cart</ToastTitle>
+          </Toast>
+        )
+      }
+    })
+    
+  }
 
     const RenderDSpecialities = ({item}: any) => {
         // console.log({item});
@@ -50,8 +83,8 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
 
                 <Text style={localStyles.priceText}>{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
 
-                <TouchableOpacity style={localStyles.addButtomWrapper} >
-                    <Text style={localStyles.addButtomText} >ADD</Text>
+                <TouchableOpacity onPress={()=>{onClickAddToCart({...item,qty:0 })}} activeOpacity={0.6} style={localStyles.addButtomWrapper} >
+                   <Text style={localStyles.addButtomText} >ADD</Text>
                 </TouchableOpacity>
 
             </View>
