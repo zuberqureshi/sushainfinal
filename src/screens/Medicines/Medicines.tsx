@@ -311,7 +311,7 @@ const Medicines = ({ route, navigation }: any) => {
               return (
                 <>
                   {!!item?.img ? 
-                  <Pressable onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:'',bannerImg:'',personalCareType:personalCareType,brandParam:item?.name})}}  >
+                  <Pressable   >
                      <Image
                     source={{ uri: `${API_IMAGE_BASE_URL}${item?.img}` }}
                     style={[localStyles.shopBrand,]}

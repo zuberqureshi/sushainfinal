@@ -67,7 +67,7 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
               </View>
 
                
-                <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}} style={localStyles.itemImg}  />
+                <Image source={{uri: item?.image_third_party === 'NO' ? `${API_IMAGE_BASE_URL}${item?.images}` : `${item?.images}`}} style={localStyles.itemImg}  />
 
               { !bestSeller && <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(2.3),marginLeft:responsiveWidth(2.4)}} >
                     <Text style={localStyles.ratingText}  >{item?.rating}</Text>
