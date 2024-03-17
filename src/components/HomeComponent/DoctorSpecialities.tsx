@@ -13,7 +13,7 @@ import { ThumbIcon } from '../../assets/svgs';
 import images from '../../assets/images';
 import moment from 'moment';
 import useGetSpeclizationlist from '../../hooks/home/get-speclization-list';
-import { Box, Spinner, } from '@gluestack-ui/themed';
+import { Box, Spinner, Text, } from '@gluestack-ui/themed';
 import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
@@ -101,6 +101,11 @@ const RenderFooterComponent = memo(({ resultValue, isLoading ,selectedSpecDoctor
           scrollEnabled={false}
           numColumns={3}
           estimatedItemSize={10}
+          ListEmptyComponent={()=>{
+            return(
+              <Text textAlign='center' fontFamily='$InterMedium' fontSize={14} color={colors.black} >Oops! No doctor available</Text>
+            )
+          }}
 
           contentContainerStyle={styles.ph10}
         /> : <Box alignSelf='center' >
