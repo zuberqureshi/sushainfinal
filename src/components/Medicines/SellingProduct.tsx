@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View,Image,TouchableOpacity,FlatList, Dimensions, VirtualizedList } from 'react-native'
-import React from 'react'
+import { StyleSheet, View,Image,TouchableOpacity,FlatList, Dimensions, VirtualizedList, Pressable } from 'react-native'
+import React, { useState } from 'react'
 import SubHeader from '../common/CommonComponent/SubHeader'
 import { colors ,styles} from '../../themes'
 import typography from '../../themes/typography'
@@ -7,12 +7,49 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-nat
 import { medicineBestSellingData } from '../../api/constant'
 import { HeartLightBlue } from '../../assets/svgs'
 import images from '../../assets/images'
-import { moderateScale } from '../../common/constants'
+import { API_IMAGE_BASE_URL, moderateScale } from '../../common/constants'
 import strings from '../../themes/strings'
-
+import { Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
+import { useNavigation } from '@react-navigation/native'
+import { StackNav } from '../../navigation/NavigationKeys'
+import { useDispatch } from 'react-redux'
+import { addProductsToCart } from '../../redux/cartSlice'
+import { increaseQty } from '../../redux/productSlice'
 
 
 const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSeller:boolean}) => {
+
+  const navigation = useNavigation()
+  const toast = useToast()
+
+  const [load, setLoad] = useState(false)
+
+  const dispatch = useDispatch()
+
+  const onClickAddToCart = (item) => {
+
+
+    dispatch(addProductsToCart(item))
+    dispatch(increaseQty(item?.id))
+
+    // scale.value = withSpring(1.5)
+    // setTimeout(() => {
+    //   scale.value = withSpring(1)
+    // }, 150);
+
+    toast.show({
+      placement: 'bottom',
+      render: ({ id }: { id: string }) => {
+        const toastId = "toast-" + id
+        return (
+          <Toast nativeID={toastId} variant='accent' action='success'>
+            <ToastTitle>Add To Cart</ToastTitle>
+          </Toast>
+        )
+      }
+    })
+    
+  }
 
     const RenderDSpecialities = ({item}: any) => {
         // console.log({item});
@@ -20,7 +57,7 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
       return (
         <View style={localStyles.bestSellingWrapper} >
 
-            <View style={localStyles.imgContainer} >
+            <Pressable  onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 } }) }} style={localStyles.imgContainer} >
 
               <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}} >
                 {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
@@ -30,24 +67,24 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
               </View>
 
                
-                <Image source={item?.image} style={localStyles.itemImg}  />
+                <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}} style={localStyles.itemImg}  />
 
               { !bestSeller && <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(2.3),marginLeft:responsiveWidth(2.4)}} >
-                    <Text style={localStyles.ratingText}  >4.5</Text>
+                    <Text style={localStyles.ratingText}  >{item?.rating}</Text>
                     <Image source={images.starBlack} style={localStyles.starBlack} />
                     <Text style={localStyles.ratingText}  >/5</Text>
                 </View>}
               
-            </View>
+            </Pressable>
 
-            <Text style={localStyles.itemTitle}  >{item?.title}</Text>
+            <Text fontFamily='$InterRegular' color={colors.black} numberOfLines={2} h={30} fontSize={12} lineHeight={15} w={'90%'} mt={3} >{item?.name}</Text>
 
             <View style={localStyles.bottomWrapper} >
 
-                <Text style={localStyles.priceText}>{'\u20B9'} {item?.price}</Text>
+                <Text style={localStyles.priceText}>{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
 
-                <TouchableOpacity style={localStyles.addButtomWrapper} >
-                    <Text style={localStyles.addButtomText} >ADD</Text>
+                <TouchableOpacity onPress={()=>{onClickAddToCart({...item,qty:0 })}} activeOpacity={0.6} style={localStyles.addButtomWrapper} >
+                   <Text style={localStyles.addButtomText} >ADD</Text>
                 </TouchableOpacity>
 
             </View>

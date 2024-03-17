@@ -1,5 +1,5 @@
 // library imports
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Modal, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useState, useEffect, useMemo, useContext} from 'react';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -46,7 +46,7 @@ import useGetHomeBannerData from '../../hooks/home/get-home-banner';
 import { shopByategoryData } from '../../api/constant';
 import { getLocation } from '../../utils/service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Box, Pressable,Text } from '@gluestack-ui/themed';
+import { Box, Pressable,Spinner,Text } from '@gluestack-ui/themed';
 // import CDebounce from '../../components/common/CDebounce';
 // import { getLng } from '../../i18n/changeLng';
 import {  AuthContext } from '../../context/AuthContext'
@@ -67,6 +67,7 @@ const HomeMain = () => {
 
   const [resultData, setResultData] = useState<any>({});
   const [searchResult, setSearchResult] = useState([]);
+  const [loadingModel, setLoadingModel] = useState(false)
   const authContext:any = useContext(AuthContext );
 
   // console.log( 'authContext', authContext.userInfo )
@@ -277,6 +278,29 @@ const locationSet = async() => {
 
       </Body>
    { netInfo?.isConnected !== null &&  <CheckInternet netStatus={netInfo?.isConnected} />}
+   <Modal
+        animationType="slide"
+        transparent={true}
+        visible={loadingModel}
+      // onRequestClose={() => setModalVisible(false)}
+      >
+        <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' justifyContent='center' elevation={5} w={'55%'} h={'15%'} gap={10} >
+            {/* <Box alignItems='center' gap={5} >
+              <OppsIcon />
+              <Text style={{ color: colors.white, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Done</Text>
+              <Text fontFamily='$InterSemiBold' color={colors.black} textAlign='center' fontSize={18} mt={3} >Oops!</Text>
+              <Text fontFamily='$InterRegular' color={'#767474'} textAlign='center' fontSize={13} >MeetID Not Found</Text>
+
+              <PrimaryButton onPress={() => { navigation.goBack() }} buttonText='Try again' height={35} />
+            </Box> */}
+            <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Please wait</Text>
+
+            {/* <Button title="Close" onPress={() => setModalVisible(false)} /> */}
+            <Spinner size={'large'} color={colors.primary} />
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 };

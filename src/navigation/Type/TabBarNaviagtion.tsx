@@ -55,7 +55,11 @@ const tabRouteDoctor = () => {
   );
 };
 
-const tabRouteMedicines = () => {
+const tabRouteMedicines = (props) => {
+
+  // console.log(props.route.params,'tab ROUTESS');
+  
+
   return (
     <Stack.Navigator
       screenOptions={{headerShown: false}}
@@ -63,6 +67,7 @@ const tabRouteMedicines = () => {
       <Stack.Screen
         name={StackNav.MedicineHome}
         component={TabRoute.Medicines}
+        initialParams={{personalCareType:'NO'}}
       />
       <Stack.Screen
         name={StackNav.ProductByCategoriesTab}
@@ -216,6 +221,10 @@ export default function TabBarNavigation({}) {
           position="RIGHT"
           name={TabNav.Medicines}
           component={tabRouteMedicines}
+          initialParams={{personalCareType:'No'}}
+          options={{
+            tabBarHideOnKeyboard:true
+          }}
         />
         <Tab.Screen
           position="RIGHT"

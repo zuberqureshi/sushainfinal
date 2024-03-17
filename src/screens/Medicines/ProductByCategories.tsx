@@ -30,11 +30,14 @@ import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/c
 import { FlashList } from 'react-native-actions-sheet'
 import { Dropdown } from 'react-native-element-dropdown'
 import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-concerns'
+import { getAccessToken } from '../../utils/network'
+import { queryClient } from '../../react-query/client'
+import medicinesService from '../../services/medicines-service'
 
 const ProductByCategories = ({ route, navigation }: any) => {
 
   //  console.log(route.params);
-  const { categoryName, bannerImg } = route.params
+  const { categoryName, bannerImg , personalCareType } = route.params
 
   const debounce = (func, delay) => {
     let timeoutId;
@@ -62,18 +65,56 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const [selectedProductCategory, setSelectedProductCtegory] = useState(categoryName)
   const [searchText, setSearchText] = useState('')
   const [searchDataList, setSearchDataList] = useState([])
+  const [mediType, setMediType] = useState<string>('')
 
   const [pageNum, setPageNum] = useState(1)
   const [filterData1, setFilterData1] = useState([{ title: 'By Rating', isSelected: false }, { title: 'Price - Low High', isSelected: false }, { title: 'Price - High To Low', isSelected: false }])
   const [filterData2, setFilterData2] = useState([{ title: 'Dabur', isSelected: false }, { title: 'Sushain', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }])
 
+  const { data: medicinesHealthConcernsData, isLoading: medicinesHealthConcernsIsLoading } = useGetMedicinesHealthConcerns({masterCat:mediType,personalCareType:personalCareType})
+
   const dispatch = useDispatch()
 
   const cartData = useSelector(state => state.cart);
   // console.log({cartData});
+
+  const fetchType = async () => {
+    let medType = await getAccessToken('medType')
+    await setPageNum(1)
+
+    setMediType(medType)
+    setSelectedProductCtegory(categoryName)
+    dispatch(clearProducts())
+
+    queryClient.invalidateQueries({
+      queryKey: [medicinesService.queryKeys.getMedicinesHealthConcerns + {masterCat:mediType,personalCareType:personalCareType}]
+    })
+  
+    if (medicinesHealthConcernsData?.data && !medicinesHealthConcernsIsLoading) {
+      const updatedData = medicinesHealthConcernsData?.data?.result[0].categroyList?.map((item: any) => {
+        return { label: item?.name, value: item?.name }
+      })
+
+      setProductCategory(updatedData)
+  
+    }
+
+    // return medType;
+    console.log(selectedProductCategory,mediType,personalCareType);
+  }
+
+  useEffect(() => {
+    dispatch(clearProducts())
+    fetchType()
+    
+  }, [categoryName,personalCareType])
+  
+  // useEffect(() => {
+
+  // }, [])
   
 
-  const { data: medicinesHealthConcernsData, isLoading: medicinesHealthConcernsIsLoading } = useGetMedicinesHealthConcerns()
+  
 
   const onProductCategoryChange = (item: any) => {
     setPageNum(1)
@@ -104,11 +145,13 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const products = useSelector(state => state.product);
   // console.log(products,products.length,'PREDUXBBB');
 
+
+
   const fetchData = () => {
-    // console.log(products.length, pageNum, selectedProductCategory, 'DATA LEE');
+    console.log(products.length, pageNum, selectedProductCategory, 'DATA LEE');
 
     setShowLoad(true)
-    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10`).then(res => res.json())
+    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&personal_care=${personalCareType}`).then(res => res.json())
       .then(async (res) => {
         // console.log(res?.result[0]?.productList?.length, pageNum, 'APIII DATAAA')
         // await dispatch(clearProducts())
@@ -463,11 +506,17 @@ const ProductByCategories = ({ route, navigation }: any) => {
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { navigation.navigate(StackNav.Cart) }}
-            style={localStyles.cartBtnStyle}>
-            <Cart height={iconSize} width={iconSize} />
-          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} >
+        <Box>
+        <Cart height={iconSize} width={iconSize} />
+     { cartData?.length !=0 &&  <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{width:0,height:1}} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
+          <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
+        </Box>}
+        </Box>
+       
+      </TouchableOpacity>
+    
+
         </Box>
 
         {!!searchDataList.length && (

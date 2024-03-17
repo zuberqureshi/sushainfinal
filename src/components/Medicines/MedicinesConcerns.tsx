@@ -15,19 +15,20 @@ import {OptimizedFlatList} from 'react-native-optimized-flatlist'
 import { StackNav } from '../../navigation/NavigationKeys';
 import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-concerns';
 import Loader from '../Loader/Loader';
+import { Avatar, AvatarFallbackText, Spinner } from '@gluestack-ui/themed';
 // import { StackNav } from '../../navigation/NavigationKeys';
 
 
 
-const MedicinesConcerns = ({title}: {title: string}) => {
+const MedicinesConcerns = ({title,mediType,personalCare}: {title: string,mediType:string,personalCare:string}) => {
  
   const navigation = useNavigation()
   
-  const {data,isLoading} = useGetMedicinesHealthConcerns()
+  const {data,isLoading} = useGetMedicinesHealthConcerns({masterCat:mediType,personalCareType:personalCare})
   // console.log('medicen    ===',data?.data?.result[0].categroyList);
   if(isLoading){
     return(
-      <Loader/>
+      <Spinner size={'small'} color={colors.primary} />
     )
   }
 
@@ -38,9 +39,15 @@ const MedicinesConcerns = ({title}: {title: string}) => {
 
     
   return (
-    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.name,bannerImg:item?.listing_banner_mbl})}}  style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.ProductByCategories,{categoryName:item?.name,bannerImg:item?.listing_banner_mbl,personalCareType:personalCare,brandParam:''})}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
-        <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.app_icon}`}} style={localStyles.imgStyle} />
+        { !!item?.app_icon ? <Image source={{uri:`${API_IMAGE_BASE_URL}${item?.app_icon}`}} style={localStyles.imgStyle} /> :
+          
+        <Avatar bgColor={colors.placeHolderColor} size="md" borderRadius="$full" >
+        <AvatarFallbackText>{item?.name}</AvatarFallbackText>
+      </Avatar>
+    
+        }
       </View>
       <View style={localStyles.titleContainer}>
         <CText type="m12" align="center" style={styles.ph5} numberOfLines={2}>
