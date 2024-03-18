@@ -8,10 +8,10 @@ import {shopByategoryData} from '../../api/constant';
 import {colors, styles} from '../../themes';
 import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
-import {moderateScale} from '../../common/constants';
-import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
+import {API_IMAGE_BASE_URL, moderateScale} from '../../common/constants';
 import { useNavigation } from '@react-navigation/native';
 import { StackNav } from '../../navigation/NavigationKeys';
+import { Spinner } from '@gluestack-ui/themed';
 
 interface general_sub_category {
   id: number;
@@ -28,7 +28,7 @@ const RenderDSpecialities = ({item}: {item: general_sub_category}) => {
   const navigation = useNavigation();
   
   return (
-    <TouchableOpacity onPress={()=>{ navigation.navigate(StackNav.CategoryDoctorList, {itm:item?.specilization_name });}}  style={localStyles.rootContaienr}>
+    <TouchableOpacity onPress={()=>{ navigation.navigate(StackNav.CategoryDoctorListDrawer, {itm:item?.specilization_name });}}  style={localStyles.rootContaienr}>
       <View style={localStyles.imgOuterContaiener}>
         <Image source={{uri :`${API_IMAGE_BASE_URL}${item?.img}`}} style={localStyles.imgStyle} />
       </View>
@@ -49,7 +49,7 @@ export default function DoctorCategoryComponent({title,data}: {title: string,dat
   return (
     <View>
       <SubHeader title={title} isViewHide={false} />
-      <FlashList
+     { data?.length > 0 ? <FlashList
         data={data}
         renderItem={renderItem}
         horizontal
@@ -58,7 +58,7 @@ export default function DoctorCategoryComponent({title,data}: {title: string,dat
         showsHorizontalScrollIndicator={false}
         // justifyContent="space-between"
         estimatedItemSize={200}
-      />
+      /> : <Spinner color={colors.primary} size={'small'} />}
     </View>
   );
 }

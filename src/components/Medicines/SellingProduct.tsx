@@ -70,7 +70,7 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
                 <Image source={{uri: item?.image_third_party === 'NO' ? `${API_IMAGE_BASE_URL}${item?.images}` : `${item?.images}`}} style={localStyles.itemImg}  />
 
               { !bestSeller && <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(2.3),marginLeft:responsiveWidth(2.4)}} >
-                    <Text style={localStyles.ratingText}  >{item?.rating}</Text>
+                    <Text style={localStyles.ratingText}  >{!!item?.rating ? item?.rating : 5}</Text>
                     <Image source={images.starBlack} style={localStyles.starBlack} />
                     <Text style={localStyles.ratingText}  >/5</Text>
                 </View>}

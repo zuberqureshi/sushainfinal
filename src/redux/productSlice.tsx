@@ -48,10 +48,17 @@ const productSlice = createSlice({
              state[cartIndex].qty = 0 ;
             }
          },
-        clearProducts(state) {
+         clearProducts(state) {
             state.splice(0, state.length); // Clear the array
         }
+        //  clearProducts(state) {
+        //     console.log('clearPRRR SLICE');
+            
+        //     return []; // Return a new empty array to clear the products
+        // },
+    
     },
+
 })
 
 

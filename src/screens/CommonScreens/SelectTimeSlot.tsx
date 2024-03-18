@@ -85,7 +85,7 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" },
+    initialValues: instantconsultation === 'NO' ? { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" } : { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "",slotdateday: startDate , couponcode: "" },
     validationSchema: patientBookingValidationSchema,
     onSubmit: values => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
@@ -94,7 +94,8 @@ export default function SelectTimeSlot({ route, }: Props) {
       // loadUserInfo();
      
       if(coloredCheckBoxValue){
-        if (!(!!values.slottimeid) || !(!!values.slotdateday)) {
+
+        if (!(!!values.slottimeid) && instantconsultation === 'NO' || !(!!values.slotdateday) && instantconsultation === 'NO') {
           toast.show({
             placement: "bottom",
             render: ({ id }) => {
@@ -111,7 +112,7 @@ export default function SelectTimeSlot({ route, }: Props) {
           })
   
         } else {
-          const payload = {
+          const payload = instantconsultation === 'NO' ? {
             userId: userInfo?.userId,
             doc_id: doctorid,
             slot_id: formik.values.slottimeid,
@@ -131,7 +132,27 @@ export default function SelectTimeSlot({ route, }: Props) {
             type:"virtual", // virtual , CLINIC
             device_name:"Android honor7x",
             device_type:"NATIVEAPP"
-          }
+          } : {
+            userId: userInfo?.userId,
+            doc_id: 911,
+            slot_id: '',
+            booking_date: formik.values.slotdateday,
+            voucher: '',
+            instant_consultation: instantconsultation,  // YES , NO 
+            bookingspecilization: "",
+            usercity: "Gwalior",
+            country_code: "IN",
+            person_name: formik.values.patientname,
+            person: formik.values.bookingfor,
+            person_age: formik.values.patientage,
+            person_mobile: formik.values.patientnumber,
+            person_weight: formik.values.patientweight,
+            person_gender: formik.values.patientgender,
+            followup:"NO"  ,   //YES , NO
+            type:"virtual", // virtual , CLINIC
+            device_name:"Android honor7x",
+            device_type:"NATIVEAPP"
+          } 
   
           console.log({payload});
           
@@ -172,6 +193,9 @@ export default function SelectTimeSlot({ route, }: Props) {
   
             },
             onError: (error: any) => {
+
+              console.log(error);
+              
   
               toast.show({
                 placement: "bottom",
@@ -618,7 +642,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             </View>
           </View>
 
-          <View style={{ marginTop: responsiveHeight(2) }}>
+        { instantconsultation === 'NO' && <View style={{ marginTop: responsiveHeight(2) }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
               <Text style={{
                 color: colors.black, ...typography.fontSizes.f12,
@@ -662,8 +686,12 @@ export default function SelectTimeSlot({ route, }: Props) {
               }
 
             </View>
-          </View>
+          </View>}
 
+
+        
+       { instantconsultation === 'NO' && <>
+        
           <CText type="m14" style={styles.mt10}>
             {strings.timeAvailable}
           </CText>
@@ -713,11 +741,11 @@ export default function SelectTimeSlot({ route, }: Props) {
             // justifyContent="space-between"
             /> : <Spinner size={'small'} color={colors.primary} />}
           </View>
+          </>}
 
 
 
-
-          <View style={localStyles.couponStyle}>
+         { instantconsultation === 'NO' && <View style={localStyles.couponStyle}>
 
 
 
@@ -748,7 +776,7 @@ export default function SelectTimeSlot({ route, }: Props) {
 
 
 
-          </View>
+          </View>}
 
 
 

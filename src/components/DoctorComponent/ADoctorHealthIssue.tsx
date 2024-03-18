@@ -15,15 +15,15 @@ import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
 import {colors, styles} from '../../themes';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
-import {getHeight, moderateScale} from '../../common/constants';
+import {API_IMAGE_BASE_URL, getHeight, moderateScale} from '../../common/constants';
 import images from '../../assets/images';
 import CButton from '../common/CButton';
 import {StackNav} from '../../navigation/NavigationKeys';
 // import {DoctorSpecListAPI} from '../../api/homeApis';
-import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
 import { Spinner } from '@gluestack-ui/themed';
 
 const RenderDSpecialities = memo(({item, onPressDoctorSpeciality}: any) => {
+  
   return (
     <View style={localStyles.mainContaienr}>
       <TouchableOpacity
@@ -31,7 +31,7 @@ const RenderDSpecialities = memo(({item, onPressDoctorSpeciality}: any) => {
         style={localStyles.rootContaienr}>
         <View style={localStyles.imgOuterContainer}>
           <Image
-            source={{uri:API_IMAGE_BASE_URL+item?.app_icon}}
+            source={{ uri: `${API_IMAGE_BASE_URL}${item?.app_icon}` }}
             style={localStyles.imgStyle}
           />
         </View>
@@ -77,7 +77,7 @@ export default function ADoctorHealthIssue({data}:any) {
         isViewHide={false}
       />
     { data?.length >=1 ?  <FlatList
-        data={data?.splice(0, 16)}
+        data={data?.slice(0, 16)}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.ph20}

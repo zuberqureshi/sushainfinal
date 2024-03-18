@@ -203,7 +203,7 @@ export default function TabBarNavigation({}) {
         initialRouteName={'Home'}>
         <Tab.Screen
           position="LEFT"
-          name={'Home'}
+          name={TabNav.Home}
           component={()=>{return(<HomeMain/>)}}
         />
         <Tab.Screen

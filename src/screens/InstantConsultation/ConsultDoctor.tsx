@@ -29,6 +29,8 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import { useFormik } from 'formik'
 import useCheckCouponCode from '../../hooks/booking/check-coupon-code'
 import { getAccessToken } from '../../utils/network'
+import { useNavigation } from '@react-navigation/native'
+import { StackNav } from '../../navigation/NavigationKeys'
 
 const ConsultDoctor = () => {
 
@@ -41,6 +43,7 @@ const ConsultDoctor = () => {
   const [mediType, setMediType] = useState<string>('')
  
    const toast = useToast()
+   const navigation = useNavigation()
    
   const formik = useFormik({
     enableReinitialize: true,
@@ -69,7 +72,8 @@ const ConsultDoctor = () => {
         })
 
       } else {
-        console.log(values,'sbmit jjj');
+        let fees = !!payPrice ? payPrice : 715 
+        navigation.navigate(StackNav.SelectTimeSlot, { doctorid:'',doctorslots:'',instantconsultation:'YES',doctorfees:fees});
       }
      }else{
       toast.show({
@@ -320,7 +324,7 @@ const ConsultDoctor = () => {
           <MIcon name="greater-than" size={responsiveWidth(5)} color={colors.black} />
  */}     
               {applyCoupon ? <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: responsiveHeight(1), paddingHorizontal: responsiveWidth(2.5), borderWidth: 1, borderStyle: 'dashed', borderColor: colors.primary, borderRadius: responsiveWidth(1.5), flex: 1, justifyContent: 'space-between', marginLeft: responsiveWidth(1.4) }} >
-              <CText type='m12' color={colors.primary} >{'RL50'}</CText>
+              <CText type='m12' color={colors.primary} >{formik?.values?.couponcode}</CText>
               <Pressable onPress={() => {
                 setApplyCoupon(false)
                 setPayPrice('')
