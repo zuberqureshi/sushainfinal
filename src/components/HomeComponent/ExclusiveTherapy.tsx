@@ -11,15 +11,16 @@ import CText from '../common/CText';
 import {RightArrow} from '../../assets/svgs';
 import BannerList from './BannerList';
 import {BASE_IMG_NEW_PATH} from '../../api/constant';
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { StackNav } from '../../navigation/NavigationKeys';
 import { Box } from '@gluestack-ui/themed';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 
 
 export default function ExclusiveTherapy({bannerData}: any) {
 
-const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   // console.log('bannerData', bannerData, BASE_IMG_NEW_PATH + bannerData);
   const RenderCardComponent = ({style, title, image,onPress}: any) => {

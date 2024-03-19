@@ -2,7 +2,7 @@ import { FlatList, Pressable, StyleSheet, TextInput, TouchableOpacity, View, Ima
 import React, { useCallback, useEffect, useState } from 'react'
 import { Container } from '../../components/Container'
 import CHeader from '../../components/common/CHeader'
-import { Cart, CrossBottomTab, HeartLightBlue, LikeIcon, Menu } from '../../assets/svgs'
+import { Cart, CartIconWhite, CrossBottomTab, HeartLightBlue, LikeIcon, Menu } from '../../assets/svgs'
 import { Box, Spinner, Text } from '@gluestack-ui/themed'
 import { StackNav } from '../../navigation/NavigationKeys'
 import CText from '../../components/common/CText'
@@ -35,6 +35,18 @@ const ProductsByBrand = ({ route }) => {
 
     const cartData = useSelector(state => state.cart);
     const products = useSelector(state => state.product);
+
+    const getTotalPriceCart = () => {
+        let total = 0;
+        cartData.map(item => {
+          // console.log('getTOTAL', item?.qty,item.final_price);
+    
+    
+          total = total + (item?.qty + 1) * item.final_price
+        })
+    
+        return total;
+      }
 
     const fecthFirst = async () => {
         await setPageNum(1)
@@ -371,7 +383,24 @@ const ProductsByBrand = ({ route }) => {
                 {/* {showLoad && <Box  >
                     <Loader />
                 </Box>} */}
+  
             </Box>
+            {
+        cartData.length > 0 && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBEADE', height: responsiveHeight(9), justifyContent: 'space-between', paddingHorizontal: responsiveWidth(3.5), borderTopLeftRadius: responsiveWidth(4), borderTopRightRadius: responsiveWidth(4) }}  >
+
+            <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }}>{cartData?.length} Items | {'\u20B9'} {getTotalPriceCart()}</Text>
+
+            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.Cart) }}  >
+              <View style={{ backgroundColor: '#FD872E', paddingHorizontal: responsiveWidth(2.8), paddingVertical: responsiveHeight(1), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5), borderRadius: responsiveWidth(3) }} >
+                <CartIconWhite />
+                <Text style={{ color: colors.white, ...typography.fontSizes.f12, ...typography.fontWeights.Bold, }} >Go to Cart</Text>
+              </View>
+            </TouchableOpacity>
+
+          </View>
+        )
+      }
         </Container>
     )
 }

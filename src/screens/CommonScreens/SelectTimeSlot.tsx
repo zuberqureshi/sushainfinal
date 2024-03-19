@@ -134,8 +134,8 @@ export default function SelectTimeSlot({ route, }: Props) {
             device_type:"NATIVEAPP"
           } : {
             userId: userInfo?.userId,
-            doc_id: 911,
-            slot_id: '',
+            doc_id: doctorid,
+            slot_id: 58,
             booking_date: formik.values.slotdateday,
             voucher: '',
             instant_consultation: instantconsultation,  // YES , NO 
@@ -410,19 +410,33 @@ export default function SelectTimeSlot({ route, }: Props) {
       onSuccess: (data) => {
         console.log(data?.data?.result[0]?.finalPrice);
 
-        toast.show({
-          placement: "bottom",
-          render: ({ id }: { id: string }) => {
-            const toastId = "toast-" + id
-            return (
-              <Toast nativeID={toastId} variant="accent" action="success">
-                <ToastTitle>Coupon Applied</ToastTitle>
-              </Toast>
-            );
-          },
-        })
-        setPayPrice(data?.data?.result[0]?.finalPrice)
-        setApplyCoupon(true)
+        if(data?.data?.success){
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>Coupon Applied</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+          setPayPrice(data?.data?.result[0]?.finalPrice)
+          setApplyCoupon(true)
+         }else{
+          toast.show({
+            placement: "bottom",
+            render: ({ id }: { id: string }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="warning">
+                  <ToastTitle>{data?.data?.message}</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+         }
 
       },
       onError: (error: any) => {

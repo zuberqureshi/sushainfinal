@@ -3,12 +3,13 @@ import React from 'react'
 import { Box, Image, Text } from '@gluestack-ui/themed'
 import images from '../../assets/images'
 import { colors } from '../../themes'
-import { useNavigation } from '@react-navigation/native'
+import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { StackNav, TabNav } from '../../navigation/NavigationKeys'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const CategoryListNew = ({mediType}) => {
 
-    const navigation = useNavigation()
+    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   return (
   <Box flexDirection='row' alignItems='center' gap={14}   px={20} mt={10} >
@@ -24,7 +25,7 @@ const CategoryListNew = ({mediType}) => {
         <Image alt='icon' source={images.trustedBrand} resizeMode='contain' h={63} w={70} />
         <Text fontFamily='$InterRegular' color={colors.black} fontSize={10} lineHeight={12} numberOfLines={1} textAlign='center' >Personal Care</Text>
     </TouchableOpacity>
-    <TouchableOpacity activeOpacity={0.6} >
+    <TouchableOpacity activeOpacity={0.6} onPress={()=>{ navigation.navigate(StackNav.InstantConsultation)}}  >
         <Image alt='icon' source={images.expertTherapists} resizeMode='contain' h={63} w={70} />
         <Text fontFamily='$InterRegular' color={colors.black} fontSize={10} lineHeight={12} numberOfLines={1} textAlign='center' >Yoga</Text>
     </TouchableOpacity>

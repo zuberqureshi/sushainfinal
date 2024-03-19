@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity, ScrollView, TextInput, Pressable } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import CSafeAreaView from '../../components/common/CSafeAreaView'
 import CHeader from '../../components/common/CHeader'
 import strings from '../../i18n/strings'
@@ -29,8 +29,11 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton'
 import { useFormik } from 'formik'
 import useCheckCouponCode from '../../hooks/booking/check-coupon-code'
 import { getAccessToken } from '../../utils/network'
-import { useNavigation } from '@react-navigation/native'
+import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { StackNav } from '../../navigation/NavigationKeys'
+import useGetSetting from '../../hooks/home/get-setting'
+import { AuthContext } from '../../context/AuthContext'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const ConsultDoctor = () => {
 
@@ -41,10 +44,13 @@ const ConsultDoctor = () => {
   const [payPrice, setPayPrice] = useState('')
   const [isChecked, setIsChecked] = useState(false)
   const [mediType, setMediType] = useState<string>('')
+
+  const authContext: any = useContext(AuthContext);
  
    const toast = useToast()
-   const navigation = useNavigation()
-   
+   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
+   const {data : settingData , isLoading : settingIsLoading } = useGetSetting()
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { healthissue: "", language: "", couponcode: ""},
@@ -72,8 +78,8 @@ const ConsultDoctor = () => {
         })
 
       } else {
-        let fees = !!payPrice ? payPrice : 715 
-        navigation.navigate(StackNav.SelectTimeSlot, { doctorid:'',doctorslots:'',instantconsultation:'YES',doctorfees:fees});
+        let fees = !!payPrice ? payPrice : settingData?.data?.result[0]?.generalSettings?.vc_instant_fees 
+        navigation.navigate(StackNav.SelectTimeSlot, { doctorid:settingData?.data?.result[0]?.generalSettings?.vc_instant_doc_id,doctorslots:'',instantconsultation:'YES',doctorfees:fees});
       }
      }else{
       toast.show({
@@ -110,6 +116,7 @@ const ConsultDoctor = () => {
   //api call
   const { data: speclizationlistData, isLoading: isLoadingSpeclizationlist } = useGetInstantspeclizationlist()
   const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetInstantDoctorsBySpeclization({ specialization: !!formik.values.healthissue ? formik.values.healthissue : 'Diabetes' , type : mediType})
+ 
   const useCheckCouponCodeMutation = useCheckCouponCode()
   //  console.log(doctorBySpeclizationData?.data?.result[0].instantdocList[0],'INSTANAT')
 
@@ -148,28 +155,42 @@ const ConsultDoctor = () => {
        const payload = {
          coupon_code: formik.values.couponcode,
          type: "APPOINTMENT",
-         userid: '',
+         userid: authContext?.userInfo?.userId ,
          displayMode: "NATIVEAPP",
-         Totalmrp: '715'
+         Totalmrp:settingData?.data?.result[0]?.generalSettings?.vc_instant_fees
        }
    
        useCheckCouponCodeMutation.mutate(payload, {
          onSuccess: (data) => {
-           console.log(data?.data?.result[0]?.finalPrice);
+           console.log(data?.data?.result[0],'code APPPLYY');
    
-           toast.show({
-             placement: "bottom",
-             render: ({ id }: { id: string }) => {
-               const toastId = "toast-" + id
-               return (
-                 <Toast nativeID={toastId} variant="accent" action="success">
-                   <ToastTitle>Coupon Applied</ToastTitle>
-                 </Toast>
-               );
-             },
-           })
-           setPayPrice(data?.data?.result[0]?.finalPrice)
-           setApplyCoupon(true)
+           if(data?.data?.success){
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="success">
+                    <ToastTitle>Coupon Applied</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+            setPayPrice(data?.data?.result[0]?.finalPrice)
+            setApplyCoupon(true)
+           }else{
+            toast.show({
+              placement: "bottom",
+              render: ({ id }: { id: string }) => {
+                const toastId = "toast-" + id
+                return (
+                  <Toast nativeID={toastId} variant="accent" action="warning">
+                    <ToastTitle>{data?.data?.message}</ToastTitle>
+                  </Toast>
+                );
+              },
+            })
+           }
    
          },
          onError: (error: any) => {
@@ -191,7 +212,7 @@ const ConsultDoctor = () => {
        }
      }
 
-  if (isLoadingSpeclizationlist) {
+  if (isLoadingSpeclizationlist || settingIsLoading ) {
     return (
       <Container statusBarStyle='dark-content' >
         <CHeader title={strings.consultDoctor} />
@@ -356,7 +377,7 @@ const ConsultDoctor = () => {
 
           <View style={{ marginTop: responsiveHeight(2), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: responsiveWidth(4), }} >
             <Text style={styles.cousultationFeeText}>{strings.consultationFee}</Text>
-            <Text style={styles.cousultationFeeRateText}>715</Text>
+            <Text style={styles.cousultationFeeRateText}>{settingData?.data?.result[0]?.generalSettings?.vc_instant_fees}</Text>
           </View>
 
           <View style={styles.dividerLine} ></View>
@@ -365,8 +386,8 @@ const ConsultDoctor = () => {
             <Text style={styles.amountPayText} >{strings.amounttoPay}</Text>
 
             <View style={{flexDirection:'row',alignItems:'center'}} >
-            <Text style={styles.amountPayRateText} >{'\u20B9'}{!!payPrice ? `${payPrice} ` : '715'}</Text>
-            { !!payPrice && <Text style={{color: colors.black,...typography.fontWeights.Regular,fontSize: responsiveFontSize(1.6),textDecorationLine:'line-through'}} >{ '715'}</Text>}
+            <Text style={styles.amountPayRateText} >{'\u20B9'}{!!payPrice ? `${payPrice} ` : settingData?.data?.result[0]?.generalSettings?.vc_instant_fees}</Text>
+            { !!payPrice && <Text style={{color: colors.black,...typography.fontWeights.Regular,fontSize: responsiveFontSize(1.6),textDecorationLine:'line-through'}} >{settingData?.data?.result[0]?.generalSettings?.vc_instant_fees}</Text>}
             </View>
           
           </View>
@@ -393,7 +414,7 @@ const ConsultDoctor = () => {
 
             <View style={{ flexDirection: 'row', alignItems: 'center', }} >
               <Text style={styles.totalFeesText} >{strings.totalFees}</Text>
-              <Text style={styles.totalFeesRateText} > {'\u20B9'}750</Text>
+              <Text style={styles.totalFeesRateText} > {'\u20B9'}{settingData?.data?.result[0]?.generalSettings?.vc_instant_fees}</Text>
 
             </View>
 
