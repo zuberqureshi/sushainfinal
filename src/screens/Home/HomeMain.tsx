@@ -315,7 +315,7 @@ const HomeMain = () => {
             setSlectedTypeNeed('ayurvedic')
             RNRestart.Restart()
           }} >
-            <Box backgroundColor={slectedTypeNeed === 'ayurvedic' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'ayurvedic' ? '#149C5C' : '#E5DFDF'} pl={slectedTypeNeed === 'ayurvedic' && 5} px={slectedTypeNeed === 'ayurvedic' ? 0 : 5} h={26} borderRadius={5} flexDirection='row' alignItems='center'  >
+            <Box backgroundColor={slectedTypeNeed === 'ayurvedic' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'ayurvedic' ? '#149C5C' : '#E5DFDF'} pl={slectedTypeNeed === 'ayurvedic' ? 5 : 5} px={slectedTypeNeed === 'ayurvedic' ? 0 : 5} h={26} borderRadius={5} flexDirection='row' alignItems='center'  >
               <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} >Ayurvedic</Text>
               {slectedTypeNeed === 'ayurvedic' && <CrossIconBlack />}
             </Box>
@@ -326,7 +326,7 @@ const HomeMain = () => {
             setSlectedTypeNeed('homeopathy')
             RNRestart.Restart()
           }} >
-            <Box backgroundColor={slectedTypeNeed === 'homeopathy' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'homeopathy' ? '#149C5C' : '#E5DFDF'} pl={slectedTypeNeed === 'homeopathy' && 5} px={slectedTypeNeed === 'homeopathy' ? 0 : 5} h={26} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' >
+            <Box backgroundColor={slectedTypeNeed === 'homeopathy' ? colors.lightSuccess : colors.white} borderWidth={1} borderColor={slectedTypeNeed === 'homeopathy' ? '#149C5C' : '#E5DFDF'} pl={slectedTypeNeed === 'homeopathy' ? 5 : 5} px={slectedTypeNeed === 'homeopathy' ? 0 : 5} h={26} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' >
               <Text fontFamily='$InterMedium' fontSize={10} color={colors.black2} textAlign='center' >Homeopathy</Text>
               {slectedTypeNeed === 'homeopathy' && <CrossIconBlack />}
             </Box>
