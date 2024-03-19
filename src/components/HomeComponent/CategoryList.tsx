@@ -80,7 +80,7 @@ const CategoryList = () => {
         <CText type='m10' color={colors.white} >In 60sec</CText>
         </View>}
 
-        <Image source={item.img_mbl} style={localStyles.imgStyle} />
+        <Image source={item?.img_mbl} style={localStyles.imgStyle} />
         <CText type="s12" style={{...styles.mv5,width:moderateScale(80)}} numberOfLines={2} align="center">
           {item.name}
         </CText>

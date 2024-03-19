@@ -4,8 +4,8 @@ import Carousel, {Pagination, ParallaxImage} from 'react-native-snap-carousel';
 
 // local imports
 import {colors, styles} from '../../themes';
-import {deviceWidth, getHeight, moderateScale} from '../../common/constants';
-import {API_BASE_URL,API_IMAGE_BASE_URL} from '@env'
+import {API_IMAGE_BASE_URL, deviceWidth, getHeight, moderateScale} from '../../common/constants';
+
 
 interface BannerData {
   id:number;

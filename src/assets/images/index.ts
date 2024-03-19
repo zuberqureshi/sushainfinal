@@ -61,4 +61,13 @@ export default {
   medicineCart1: require('./productSlider.png'),
   medicineCart2: require('./medicineCart2.png'),
   medicineCart3: require('./medicineCart1.png'),
+  consultationAr: require('./consultationAr.png'),
+  consultationHo: require('./consultationHo.png'),
+  medicineAr: require('./medicineAr.png'),
+  medicineHo: require('./medicineHo.png'),
+  expertTherapists: require('./expertTherapists.png'),
+  trustedBrand: require('./trustedBrand.png'),
+
+ 
+
 };

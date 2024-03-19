@@ -74,6 +74,9 @@ const AppointmentCancellation = ({ route }) => {
           queryClient.invalidateQueries({
             queryKey: [appointmentService.queryKeys.getUpcomingAppointments + authContext?.userInfo?.userId]
           })
+          queryClient.invalidateQueries({
+            queryKey: [appointmentService.queryKeys.getTodayAppointments + authContext?.userInfo?.userId]
+          })
 
           // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
           navigation.navigate(StackNav.Appointments)

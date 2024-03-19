@@ -26,7 +26,7 @@ import CInput from '../common/CInput';
 
 import { Box, CloseIcon, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed';
 import moment from 'moment';
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { StackNav } from '../../navigation/NavigationKeys';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ProgressView } from '@react-native-community/progress-view';
@@ -38,6 +38,7 @@ import appointmentService from '../../services/appointment-service';
 import useDeleteReportById from '../../hooks/appointment/delete-report';
 import PrimaryButton from '../common/Button/PrimaryButton';
 import { androidCameraAudioPermission, androidCameraPermission } from '../../utils/permission';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const TimeComponent = ({ icon, time, style }: any) => {
   return (
@@ -52,7 +53,7 @@ const TimeComponent = ({ icon, time, style }: any) => {
 
 export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: boolean, data: any }) {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const toast = useToast()
 
   const [review, setReview] = useState('');

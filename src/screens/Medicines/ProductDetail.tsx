@@ -111,8 +111,8 @@ const ProductDetail = ({ route, navigation }) => {
           {/* <Box position='absolute' top={0} right={0} backgroundColor={colors.white} borderRadius={10} px={6} py={3} mt={-8} mr={-4}  >
         <CText type='b8' >{cartData?.length}</CText>
         </Box> */}
-          <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5) }, animatedStyle]} >
-            <CText type='b8' style={{ textAlign: 'center' }} >{cartData?.length}</CText>
+          <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5.5), height:responsiveHeight(2.5) }, animatedStyle]} >
+            <CText type='b8' style={{ textAlign: 'center' }} numberOfLines={1} >{cartData?.length}</CText>
           </Animated.View>
 
         </Pressable>

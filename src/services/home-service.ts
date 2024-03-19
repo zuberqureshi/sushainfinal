@@ -8,6 +8,7 @@ class HomeService {
     getHomeBannerData:'getHomeBannerData',
     getSpeclizationlist:'getSpeclizationlist',
     getDoctorsBySpeclization:'getDoctorsBySpeclization',
+    getSetting : 'getSetting',
   };
 
   getHomeData = async () => {
@@ -36,6 +37,13 @@ class HomeService {
 
     return fetcher({
       url: `booking/doclistingspec?specialization=${specialization}`,
+      method: 'GET',
+    });
+  }
+
+  getSetting = async () => {
+    return fetcher({
+      url: 'auth/settings',
       method: 'GET',
     });
   }

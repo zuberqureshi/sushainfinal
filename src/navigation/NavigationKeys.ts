@@ -46,5 +46,6 @@ export const StackNav = {
   VideoCompleted : 'VideoCompleted',
   MyOrders : 'MyOrders',
   OrderDetails : 'OrderDetails',
+  ProductsByBrand : 'ProductsByBrand',
 
 };

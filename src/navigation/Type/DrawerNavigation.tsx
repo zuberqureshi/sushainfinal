@@ -42,6 +42,7 @@ import strings from '../../i18n/strings';
 import { setLng } from '../../i18n/changeLng';
 import { removeAccessToken } from '../../utils/network';
 import { AuthContext } from '../../context/AuthContext'
+import { Avatar, AvatarFallbackText } from '@gluestack-ui/themed';
 
 
 const DrawerContentComponent = (props: any) => {
@@ -194,10 +195,12 @@ const DrawerView = () => {
       <DrawerContentScrollView showsVerticalScrollIndicator={false}>
         <View style={localStyles.userDetailStyle}>
           <View style={localStyles.userPicStyle}>
-            <Image
+           { !!authContext?.userInfo?.userName ?    <Avatar bgColor='$amber600' size='md' borderRadius="$full" >
+          <AvatarFallbackText>{  authContext?.userInfo?.userName}</AvatarFallbackText>
+        </Avatar> : <Image
               source={images.yogaImage}
               style={localStyles.userProfileStyle}
-            />
+            />}
             <View style={styles.ph10}>
               <CText type="r20" color={colors.primary} style={{ textTransform: 'capitalize' }} >
                 {authContext?.userInfo?.userName}
@@ -222,7 +225,6 @@ const DrawerView = () => {
             icon={<HomeDrawerIcon />}
             title={strings.home}
             onPress={() => {
-              navigation.
                 navigation.navigate(TabNav.Home)
             }}
           />
@@ -338,6 +340,7 @@ export default function DrawerNavigation() {
       <Drawer.Screen name={StackNav.TabBar} component={StackRoute.TabBarNavigation} />
       <Drawer.Screen name={StackNav.CategoryDoctorListDrawer} component={StackRoute.CategoryDoctorList} />
       <Drawer.Screen name={StackNav.ProductByCategories} component={StackRoute.ProductByCategories} />
+      <Drawer.Screen name={StackNav.ProductsByBrand} component={StackRoute.ProductsByBrand} />
       <Drawer.Screen name={StackNav.MyOrders} component={StackRoute.MyOrders} />
 
       <Drawer.Screen name={StackNav.LifeStyleDrawer} component={StackRoute.LifeStyle} />

@@ -232,10 +232,10 @@ const ProductByCategories = ({ route, navigation }: any) => {
             <Text fontFamily='$InterRegular' color={colors.black} fontSize={8} w='90%' numberOfLines={1} lineHeight={10}  >Use In {item?.category?.split(',')[0]}</Text>
           </View>
 
-          <View style={{ paddingHorizontal: responsiveWidth(1.5), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: responsiveHeight(1.3) }}  >
+          <View style={{ paddingHorizontal: responsiveWidth(1.5), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  }}  >
 
             <View style={{ gap: moderateScale(2), marginTop: responsiveHeight(1) }} >
-              <Text fontFamily='$InterBold' color={colors.black} fontSize={12} lineHeight={12} >{'\u20B9'} {!!item?.final_price ? item?.final_price : 'N/A'}</Text>
+              <Text fontFamily='$InterBold' color={colors.black} fontSize={12} lineHeight={12} >{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(0.5) }} >
                 <Image source={images.startFilled} style={{ resizeMode: 'contain', width: responsiveWidth(2.5), height: responsiveHeight(1.25) }} />
                 <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} lineHeight={10} >{!!item?.rating ? item?.rating : 5}|5 reviews</Text>
@@ -811,7 +811,7 @@ const localStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9D9D9',
     width: responsiveWidth(45),
-    height: responsiveHeight(29),
+    height: responsiveHeight(27),
     borderRadius: responsiveWidth(3),
     marginBottom: responsiveHeight(1),
 

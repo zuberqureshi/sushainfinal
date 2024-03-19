@@ -23,7 +23,7 @@ import { Container } from '../../components/Container';
 import { Avatar, AvatarFallbackText, Box } from '@gluestack-ui/themed';
 import { StackNav } from '../../navigation/NavigationKeys';
 import { getAccessToken } from '../../utils/network';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import useGetMedicinesBestSeller from '../../hooks/medicine/get-medicine-bestseller';
 import Loader from '../../components/Loader/Loader';
 import useGetMedicinesBrandList from '../../hooks/medicine/get-medicines-brand-list';
@@ -32,6 +32,7 @@ import useGetMedicinesCombos from '../../hooks/medicine/get-medicine-combos';
 import useGetMedicinesRecommended from '../../hooks/medicine/get-medicine-recommended';
 import {  AuthContext } from '../../context/AuthContext'
 import useGetMedicinesByBrand from '../../hooks/medicine/get-medicines-by-brand';
+import { clearProducts } from '../../redux/productSlice';
 
 
 
@@ -60,6 +61,7 @@ const Medicines = ({ route, navigation }: any) => {
   // console.log(route.params, 'routeee medcicness');
 
   const cartData = useSelector(state => state.cart);
+  const dispatch = useDispatch()
 
   const authContext:any = useContext(AuthContext );
 
@@ -311,13 +313,15 @@ const Medicines = ({ route, navigation }: any) => {
               return (
                 <>
                   {!!item?.img ? 
-                  <Pressable   >
+                  <TouchableOpacity activeOpacity={0.6}  onPress={()=>{
+                  
+                    navigation.navigate(StackNav.ProductsByBrand,{brandName:item?.name})}} >
                      <Image
                     source={{ uri: `${API_IMAGE_BASE_URL}${item?.img}` }}
                     style={[localStyles.shopBrand,]}
                     resizeMode="contain"
                   /> 
-                  </Pressable>
+                  </TouchableOpacity>
                  :
                     <Box w={95} h={95} borderRadius={47} alignItems='center' justifyContent='center' borderColor={'#399fb5'} borderWidth={3} >
                       <Spinner size='small' color={colors.primary} />

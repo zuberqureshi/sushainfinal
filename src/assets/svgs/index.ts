@@ -134,7 +134,7 @@ import VideoOnIcon from './videoOnIcon.svg'
 import MicOnIcon from './micOnIcon.svg'
 import MuteRedIcon from './muteRedIcon.svg'
 import NoVideoRedIcon from './noVideoRedIcon.svg'
-
+import CartPayIcon from './cartPay.svg'
 
 export {
   Home,
@@ -270,6 +270,7 @@ export {
   MicOnIcon,
   MuteRedIcon,
   NoVideoRedIcon,
+  CartPayIcon,
   
 
 
