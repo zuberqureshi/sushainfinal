@@ -11,6 +11,7 @@ class MedicinesService {
     getMedicinesCombos :'getMedicinesCombos',
     getMedicinesRecommended : 'getMedicinesRecommended',
     getMedicinesByBrand : 'getMedicinesByBrand',
+    getMedicinesSubCategory : 'getMedicinesSubCategory',
   };
 
   getMedicinesHealthConcerns = async (data:any) => {
@@ -28,6 +29,14 @@ class MedicinesService {
 
     return fetcher({
       url: `order/medicinebycategory?master_cat=AYURVEDIC&cat_name=${name}&pageNumber=${pageParam}&pageSize=10`,
+      method: 'GET',
+    });
+  }
+
+  getMedicinesSubCategory = async (data:any) => {
+    const {masterCat , personalCareType , category} = data
+    return fetcher({
+      url: `order/medicinesubcategory?master_cat=${masterCat}&personal_care=${personalCareType}&category_name=${category}`,
       method: 'GET',
     });
   }
@@ -76,6 +85,7 @@ class MedicinesService {
       method: 'GET',
     });
    }
+
 
 
    

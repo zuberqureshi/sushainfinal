@@ -135,6 +135,7 @@ import MicOnIcon from './micOnIcon.svg'
 import MuteRedIcon from './muteRedIcon.svg'
 import NoVideoRedIcon from './noVideoRedIcon.svg'
 import CartPayIcon from './cartPay.svg'
+import CancelColorIcon from './cancelColorIcon.svg'
 
 export {
   Home,
@@ -271,6 +272,7 @@ export {
   MuteRedIcon,
   NoVideoRedIcon,
   CartPayIcon,
+  CancelColorIcon,
   
 
 

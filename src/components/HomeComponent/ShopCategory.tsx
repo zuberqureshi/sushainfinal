@@ -17,26 +17,64 @@ import { colors, styles } from '../../themes';
 import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants';
 import images from '../../assets/images';
 import useGetHomeData from '../../hooks/home/get-home-data';
-import { Box, Spinner } from '@gluestack-ui/themed';
+import { Avatar, AvatarFallbackText, Box, Spinner } from '@gluestack-ui/themed';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { StackNav } from '../../navigation/NavigationKeys';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-const RenderDoctorCard = ({ item }: any) => {
-  return (
-    <TouchableOpacity style={localStyles.illnessTypeStyle}>
-      <Image
-        source={{ uri: `${API_IMAGE_BASE_URL}${item.app_icon}` }}
-        style={localStyles.doctorImgStyle}
-      />
-      <View style={localStyles.illnessTextStyle}>
-        <CText type="m10" numberOfLines={1} color={colors.white}>
-          {item?.name}
-        </CText>
-      </View>
-    </TouchableOpacity>
-  );
-};
 
-const RenderFooterComponent = ({ resultValue, isLoading }: any) => {
+
+const RenderFooterComponent = ({ resultValue, isLoading,selectedTab }: any) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const RenderDoctorCard = ({ item }: any) => {
+
+    const onClick = (category) => {
+      switch (selectedTab) {
+        case 1:
+          // console.log('AR',category);
+          navigation.navigate(StackNav.ProductByCategories,{categoryName:category,bannerImg:'',personalCareType:'NO',brandParam:''})
+          break;
+        case 2:
+        //  console.log('PRC',category);
+         navigation.navigate(StackNav.ProductByCategories,{categoryName:category,bannerImg:'',personalCareType:'YES',brandParam:''})
+         
+          break;
+        case 3:
+          // console.log('HOM',category);
+          navigation.navigate(StackNav.ProductByCategories,{categoryName:category,bannerImg:'',personalCareType:'NO',brandParam:''})
+          
+          break;
+        case 4:
+          // console.log('IMMI',category);
+          navigation.navigate(StackNav.ProductByCategories,{categoryName:category,bannerImg:'',personalCareType:'NO',brandParam:''})
+          
+          break;
+        default:
+        //  console.log('OOOO',category);
+         
+          break;
+      }
+    }
+
+    return (
+      <TouchableOpacity onPress={()=>{onClick(item?.name)}} style={localStyles.illnessTypeStyle}>
+       { !!item?.app_icon ? <Image
+          source={{ uri: `${API_IMAGE_BASE_URL}${item.app_icon}` }}
+          style={localStyles.doctorImgStyle}
+        /> : 
+        <Avatar bgColor='$blueGray700' alignSelf='center' w={90} h={90} my={3} borderRadius="$full" >
+          <AvatarFallbackText>{item?.name}</AvatarFallbackText>
+        </Avatar>
+       }
+        <View style={localStyles.illnessTextStyle}>
+          <CText type="m10" numberOfLines={1} color={colors.white}>
+            {item?.name}
+          </CText>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={localStyles.doctorListContaienr}>
@@ -173,7 +211,7 @@ export default function ShopCategory({ shopCategaryData, }: any) {
         contentContainerStyle={styles.ph20}
         scrollEnabled={false}
       />
-      <RenderFooterComponent resultValue={resultData} isLoading={homePageCategoryLoading} />
+      <RenderFooterComponent resultValue={resultData} isLoading={homePageCategoryLoading} selectedTab={selectedTab}  />
 
     </View>
   );

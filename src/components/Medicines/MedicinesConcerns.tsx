@@ -10,19 +10,20 @@ import {DoctorSpecialityListData} from '../../types/Types';
 import CText from '../common/CText';
 import {API_IMAGE_BASE_URL, moderateScale} from '../../common/constants';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import {OptimizedFlatList} from 'react-native-optimized-flatlist'
 import { StackNav } from '../../navigation/NavigationKeys';
 import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-concerns';
 import Loader from '../Loader/Loader';
 import { Avatar, AvatarFallbackText, Spinner } from '@gluestack-ui/themed';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 // import { StackNav } from '../../navigation/NavigationKeys';
 
 
 
 const MedicinesConcerns = ({title,mediType,personalCare}: {title: string,mediType:string,personalCare:string}) => {
  
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   
   const {data,isLoading} = useGetMedicinesHealthConcerns({masterCat:mediType,personalCareType:personalCare})
   // console.log('medicen    ===',data?.data?.result[0].categroyList);

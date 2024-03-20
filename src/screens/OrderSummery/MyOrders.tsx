@@ -86,9 +86,20 @@ const MyOrders = ({ navigation }) => {
                     <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'cancelled' ? colors.primary : '#BFBCBC'} textAlign='center' >Cancelled</Text>
                 </TouchableOpacity>
             </Box>
+            <Box flexDirection='row' justifyContent='space-between' gap={10} paddingHorizontal={25} mt={10} >
+                <TouchableOpacity onPress={() => { setSelectedOrderType('return') }} activeOpacity={0.6} style={{ flex: 1, borderWidth: selectedOrderType === 'return' ? 1 : 0, borderColor: colors.primary, borderRadius: responsiveWidth(3), overflow: 'hidden', backgroundColor: selectedOrderType === 'return' ? '#F2FDFF' : '#F4F2F2' }} >
+                    <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'return' ? colors.primary : '#BFBCBC'} textAlign='center'  >Return</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setSelectedOrderType('intransit') }} activeOpacity={0.6} style={{ flex: 1, borderWidth: selectedOrderType === 'intransit' ? 1 : 0, borderColor: colors.primary, borderRadius: responsiveWidth(3), overflow: 'hidden', backgroundColor: selectedOrderType === 'intransit' ? '#F2FDFF' : '#F4F2F2' }} >
+                    <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'intransit' ? colors.primary : '#BFBCBC'} textAlign='center' >In-transit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setSelectedOrderType('orderpacked') }} activeOpacity={0.6} style={{ flex: 1, borderWidth: selectedOrderType === 'orderpacked' ? 1 : 0, borderColor: colors.primary, borderRadius: responsiveWidth(3), overflow: 'hidden', backgroundColor: selectedOrderType === 'orderpacked' ? '#F2FDFF' : '#F4F2F2' }} >
+                    <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'orderpacked' ? colors.primary : '#BFBCBC'} textAlign='center' >Order packed</Text>
+                </TouchableOpacity>
+            </Box>
 
             <Body>
-                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.5), marginVertical: responsiveHeight(3.5) }} >
+                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginVertical: responsiveHeight(2.5) }} >
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
                         <View>
@@ -102,7 +113,7 @@ const MyOrders = ({ navigation }) => {
                         <CText type='m12' color={colors.primary} >Order ID: #12345609</CText>
                         <CText type='m10' color='#B5B4B4' >3 of 3 item(s)</CText>
                     </View>
-                    <View>
+                    {/* <View>
                         {
                             medicineCartDate.map((item, index) => {
                                 return (
@@ -123,21 +134,21 @@ const MyOrders = ({ navigation }) => {
                                 )
                             })
                         }
-                    </View>
-                    <CText type='s10' style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(7) }} >Total: {'\u20B9'} 5,280</CText>
+                    </View> */}
+                    {/* <CText type='s10' style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(7) }} >Total: {'\u20B9'} 5,280</CText> */}
                     <View style={{ borderBottomColor: '#E5E4E4', borderBottomWidth: 1, marginVertical: responsiveHeight(1) }} ></View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(1) }} >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5) }}>
                             <GreenDot />
                             <CText type='m10' color='#676666' >Delivery by 15 July,2023</CText>
                         </View>
-                        <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.OrderDetails)}} activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
+                        <TouchableOpacity onPress={() => { navigation.navigate(StackNav.OrderDetails) }} activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
                             <CText type='m12' color={colors.white} >Track Order</CText>
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.5), marginVertical: responsiveHeight(1) }} >
+                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), }} >
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
                         <View>
@@ -151,41 +162,20 @@ const MyOrders = ({ navigation }) => {
                         <CText type='m12' color={colors.primary} >Order ID: #12345609</CText>
                         <CText type='m10' color='#B5B4B4' >3 of 3 item(s)</CText>
                     </View>
-                    <View>
-                        {
-                            medicineCartDate.slice(0, 1).map((item, index) => {
-                                return (
-                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: responsiveHeight(1.6), gap: responsiveWidth(5) }} >
-                                        <View style={{ height: responsiveHeight(8), width: responsiveWidth(15), borderRadius: responsiveWidth(3), borderWidth: 1, borderColor: '#CDC9C9' }} >
-                                            <Image source={item.img} style={{ resizeMode: 'contain', height: '100%', width: '90%' }} />
-                                        </View>
-                                        <View style={{ gap: responsiveHeight(0.3) }} >
-                                            <CText type='s10' >{item.title}</CText>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(3) }} >
-                                                <CText type='m10' color='#676666' >Confirmed</CText>
-                                                <TouchableOpacity activeOpacity={0.6} >
-                                                    <CText type='m10' color={colors.primary} >Cancel</CText>
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    </View>
-                                )
-                            })
-                        }
-                    </View>
-                    {/* <CText type='s10' style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(7) }} >Total: {'\u20B9'} 5,280</CText> */}
+ 
                     <View style={{ borderBottomColor: '#E5E4E4', borderBottomWidth: 1, marginVertical: responsiveHeight(1) }} ></View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(1) }} >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5) }}>
                             <GreenDot />
-                            <CText type='m10' color='#676666' >Delivered on 15 July,2023</CText>
+                            <CText type='m10' color='#676666' >Delivery by 15 July,2023</CText>
                         </View>
-                        {/* <TouchableOpacity activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
+                        <TouchableOpacity onPress={() => { navigation.navigate(StackNav.OrderDetails) }} activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
                             <CText type='m12' color={colors.white} >Track Order</CText>
-                        </TouchableOpacity> */}
-                         <CText type='s10' color='#676666' style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(4) }} >Total: {'\u20B9'} 5,280</CText>
+                        </TouchableOpacity>
                     </View>
                 </View>
+
+
 
             </Body>
 

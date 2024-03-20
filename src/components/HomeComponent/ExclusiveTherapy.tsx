@@ -60,7 +60,7 @@ export default function ExclusiveTherapy({bannerData}: any) {
           style={localStyles.exclusiveTherapyImageStyle}
         />
       </View>
-      <View style={localStyles.midelContainer}>
+      {/* <View style={localStyles.midelContainer}>
         <RenderCardComponent
           title="PanchKarma"
           image={images.panchKarma}
@@ -71,7 +71,7 @@ export default function ExclusiveTherapy({bannerData}: any) {
           image={images.yogaImage}
           style={localStyles.width50}
         />
-      </View>
+      </View> */}
       <RenderCardComponent
         title="Want to Visit Clinic ?"
         image={images.hospitalImage}

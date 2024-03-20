@@ -33,6 +33,7 @@ import useGetMedicinesHealthConcerns from '../../hooks/medicine/get-medicine-con
 import { getAccessToken } from '../../utils/network'
 import { queryClient } from '../../react-query/client'
 import medicinesService from '../../services/medicines-service'
+import useGetMedicinesSubCategory from '../../hooks/medicine/get-medicine-sub-category'
 
 const ProductByCategories = ({ route, navigation }: any) => {
 
@@ -63,6 +64,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const [showLoad, setShowLoad] = useState(false)
   const [productCategory, setProductCategory] = useState([])
   const [selectedProductCategory, setSelectedProductCtegory] = useState(categoryName)
+  const [selectedProductSubCategory, setSelectedProductSubCtegory] = useState('')
   const [searchText, setSearchText] = useState('')
   const [searchDataList, setSearchDataList] = useState([])
   const [mediType, setMediType] = useState<string>('')
@@ -72,7 +74,8 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const [filterData2, setFilterData2] = useState([{ title: 'Dabur', isSelected: false }, { title: 'Sushain', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }])
 
   const { data: medicinesHealthConcernsData, isLoading: medicinesHealthConcernsIsLoading } = useGetMedicinesHealthConcerns({masterCat:mediType,personalCareType:personalCareType})
-
+  const { data: medicinesSubCategoryData, isLoading: medicinesSubCategoryIsLoading } = useGetMedicinesSubCategory({masterCat:mediType,personalCareType:personalCareType,category:selectedProductCategory})
+  
   const dispatch = useDispatch()
 
   const cartData = useSelector(state => state.cart);
@@ -81,7 +84,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const fetchType = async () => {
     let medType = await getAccessToken('medType')
     await setPageNum(1)
-
+    await setSelectedProductSubCtegory('')
     setMediType(medType)
     setSelectedProductCtegory(categoryName)
     dispatch(clearProducts())
@@ -94,13 +97,9 @@ const ProductByCategories = ({ route, navigation }: any) => {
       const updatedData = medicinesHealthConcernsData?.data?.result[0].categroyList?.map((item: any) => {
         return { label: item?.name, value: item?.name }
       })
-
       setProductCategory(updatedData)
-  
     }
-
-    // return medType;
-    console.log(selectedProductCategory,mediType,personalCareType);
+    console.log(selectedProductCategory,mediType,personalCareType,selectedProductSubCategory);
   }
 
   useEffect(() => {
@@ -109,9 +108,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
     
   }, [categoryName,personalCareType])
   
-  // useEffect(() => {
 
-  // }, [])
   
 
   
@@ -151,7 +148,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
     console.log(products.length, pageNum, selectedProductCategory, 'DATA LEE');
 
     setShowLoad(true)
-    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&personal_care=${personalCareType}`).then(res => res.json())
+    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&sub_category=${selectedProductSubCategory}&personal_care=${personalCareType}`).then(res => res.json())
       .then(async (res) => {
         // console.log(res?.result[0]?.productList?.length, pageNum, 'APIII DATAAA')
         // await dispatch(clearProducts())
@@ -194,7 +191,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
     dispatch(clearProducts())
     fetchData()
 
-  }, [selectedProductCategory])
+  }, [selectedProductCategory,selectedProductSubCategory])
 
   useEffect(() => {
     if (medicinesHealthConcernsData?.data && !medicinesHealthConcernsIsLoading) {
@@ -217,18 +214,18 @@ const ProductByCategories = ({ route, navigation }: any) => {
       <Pressable onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} >
         <View style={[localStyles.cardMainContainer, { marginLeft: index % 2 && responsiveWidth(2.4) }]} >
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end',marginBottom:responsiveHeight(0.5) }}>
             {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
-            <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} />
+            {/* <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
 
 
           </View>
 
-          <Image source={{ uri: `${API_IMAGE_BASE_URL}${item?.images}` }} style={localStyles.itemImg} />
+         { !!item?.images ? <Image source={{ uri: `${API_IMAGE_BASE_URL}${item?.images}` }} style={localStyles.itemImg} /> : <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}>Opps! sorry</Text>}
 
           <View style={{ paddingLeft: responsiveWidth(1.5), marginTop: responsiveHeight(0.5), gap: moderateScale(2), height: responsiveHeight(4) }} >
-            <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} w='89%' numberOfLines={2} lineHeight={10} >{item?.name}</Text>
+            <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}  >{item?.name}</Text>
             <Text fontFamily='$InterRegular' color={colors.black} fontSize={8} w='90%' numberOfLines={1} lineHeight={10}  >Use In {item?.category?.split(',')[0]}</Text>
           </View>
 
@@ -560,20 +557,20 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
         </View>
 
-        <MedicinesByCategory />
+        <MedicinesByCategory selectedProductSubCategory={selectedProductSubCategory} setSelectedProductSubCtegory={setSelectedProductSubCtegory}  data={medicinesSubCategoryData?.data?.result[0]?.subCategroyList} loading={medicinesSubCategoryIsLoading} />
 
-        <TouchableOpacity activeOpacity={0.6} style={localStyles.bannerContaienr}>
+     { !!bannerImg &&  <TouchableOpacity activeOpacity={0.6} style={localStyles.bannerContaienr}>
           <Image
             source={{ uri: `${API_IMAGE_BASE_URL}${bannerImg}` }}
             style={localStyles.bannerImageStyle}
             resizeMode="cover"
           />
         </TouchableOpacity>
-
+}
 
 
         <FlatList
-          style={{ flex: 1, alignSelf: 'center' }}
+          style={{ flex: 1, alignSelf: 'center',marginTop:responsiveHeight(1.5) }}
           data={products}
           renderItem={renderCardItem}
           keyExtractor={(item, index) => index.toString()}
@@ -814,6 +811,7 @@ const localStyles = StyleSheet.create({
     height: responsiveHeight(27),
     borderRadius: responsiveWidth(3),
     marginBottom: responsiveHeight(1),
+    paddingBottom:responsiveHeight(0.5)
 
   },
   bestsellerText: {

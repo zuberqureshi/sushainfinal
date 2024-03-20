@@ -143,8 +143,8 @@ export default function Splash() {
     console.log( 'authContextinsplash', authContext?.authState.authenticated)
     
     if(loginstatus==false)
-    navigation.navigate(StackNav.AuthStack)
-    else     navigation.navigate(StackNav.DrawerNavigation)
+    navigation.replace(StackNav.AuthStack)
+    else     navigation.replace(StackNav.DrawerNavigation)
 
   };
 

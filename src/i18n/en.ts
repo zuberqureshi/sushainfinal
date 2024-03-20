@@ -46,7 +46,7 @@ export default {
   cancel: 'Cancel',
   addLocation: 'Add location',
   hi: 'Hi,',
-  searchPlaceHolder: 'Search for medicines and doctors',
+  searchPlaceHolder: 'Search for medicines',
   viewAll: 'View All',
   findAyurvedicDoctorSpecialities: 'Find Ayurvedic Doctor By Specialities',
   shopByCategory: 'Shop By Category',

@@ -4,11 +4,11 @@ import {FlashList} from '@shopify/flash-list';
 
 // local imports
 import {colors, styles} from '../../themes';
-import {getHeight, moderateScale} from '../../common/constants';
+import {API_IMAGE_BASE_URL, getHeight, moderateScale} from '../../common/constants';
 import CText from '../common/CText';
 import SubHeader from '../common/CommonComponent/SubHeader';
 import {BrandIcon, DoctorIcon, ReviewsIcon, UserIcon} from '../../assets/svgs';
-import { API_BASE_URL, API_IMAGE_BASE_URL } from '@env'
+
 
 const BottomContainer = ({icon, title}: any) => {
   return (

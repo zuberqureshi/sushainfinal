@@ -11,19 +11,21 @@ import {FlashList} from '@shopify/flash-list';
 // local imports
 import strings from '../../i18n/strings';
 import SubHeader from '../common/CommonComponent/SubHeader';
-import {getHeight, moderateScale} from '../../common/constants';
+import {API_IMAGE_BASE_URL, getHeight, moderateScale} from '../../common/constants';
 import {colors, styles} from '../../themes';
 import images from '../../assets/images';
 import CText from '../common/CText';
-import { API_IMAGE_BASE_URL } from '@env'
+
 
 export default function AyurvedicProducts({ayurvedicData}: any) {
   // console.log('ayurvedicData', ayurvedicData);
   const renderItem = ({item, index}: any) => {
+
+    
     return (
       <TouchableOpacity style={localStyles.rootContainer}>
         <View>
-          <Image
+          <Image 
             source={{uri:`${API_IMAGE_BASE_URL}${item?.images}`}}
             style={localStyles.productImageStyle}
           />
@@ -47,7 +49,7 @@ export default function AyurvedicProducts({ayurvedicData}: any) {
             <CText type="s10" numberOfLines={2} color={colors.black}>
               {'\u20B9'}{item?.final_price}
             </CText>
-            <View>
+            {/* <View>
               <CText
                 type="r8"
                 numberOfLines={2}
@@ -55,7 +57,7 @@ export default function AyurvedicProducts({ayurvedicData}: any) {
                 color={colors.black}>
                 {'\u20B9'}{'667'}
               </CText>
-            </View>
+            </View> */}
           </View>
           <TouchableOpacity style={localStyles.addBtnContaiener}>
             <CText type="m10" color={colors.success}>
@@ -101,6 +103,7 @@ const localStyles = StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: moderateScale(3),
     ...styles.mt5,
+    
   },
   bookmarkImageStyle: {
     height: getHeight(38),
