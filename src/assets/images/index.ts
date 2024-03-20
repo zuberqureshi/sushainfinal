@@ -67,7 +67,7 @@ export default {
   medicineHo: require('./medicineHo.png'),
   expertTherapists: require('./expertTherapists.png'),
   trustedBrand: require('./trustedBrand.png'),
-
+  yoga: require('./yoga.png'),
  
 
 };

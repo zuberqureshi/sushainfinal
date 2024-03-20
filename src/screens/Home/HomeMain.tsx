@@ -243,10 +243,10 @@ const HomeMain = () => {
           <TouchableOpacity style={localStyles.locationContainer}>
             <Location />
             <View>
-              <CText type={'s12'} style={{ textTransform: 'capitalize' }} >
+              <Text fontFamily='$InterSemiBold' fontSize={12} color={colors.black} numberOfLines={1} w={75} textTransform='capitalize' >
                 {strings.hi} {authContext?.userInfo?.userName}
                 {/* {global.userDetail?.first_name || strings.firstName} */}
-              </CText>
+              </Text>
               <Pressable onPress={() => { getLocation() }} style={localStyles.locationContainer}>
                 <CText type={'s10'} color={colors.gray4}>
                   {!!userLocation ? userLocation : 'User Location'}

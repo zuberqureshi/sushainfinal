@@ -30,7 +30,7 @@ import useGetMedicinesBrandList from '../../hooks/medicine/get-medicines-brand-l
 import { Spinner } from '@gluestack-ui/themed';
 import useGetMedicinesCombos from '../../hooks/medicine/get-medicine-combos';
 import useGetMedicinesRecommended from '../../hooks/medicine/get-medicine-recommended';
-import {  AuthContext } from '../../context/AuthContext'
+import { AuthContext } from '../../context/AuthContext'
 import useGetMedicinesByBrand from '../../hooks/medicine/get-medicines-by-brand';
 import { clearProducts } from '../../redux/productSlice';
 
@@ -63,7 +63,7 @@ const Medicines = ({ route, navigation }: any) => {
   const cartData = useSelector(state => state.cart);
   const dispatch = useDispatch()
 
-  const authContext:any = useContext(AuthContext );
+  const authContext: any = useContext(AuthContext);
 
   const [mediType, setMediType] = useState<string>('')
   const [searchText, setSearchText] = useState('')
@@ -71,9 +71,9 @@ const Medicines = ({ route, navigation }: any) => {
 
   const { data: bestSellerData, isLoading: bestSellerIsLoading } = useGetMedicinesBestSeller({ masterCat: mediType, personalCareType: personalCareType })
   const { data: brandListData, isLoading: brandListIsLoading } = useGetMedicinesBrandList({ masterCat: mediType, personalCareType: personalCareType })
-  const {data : combosData , isLoading : combosDataIsLoading} = useGetMedicinesCombos()
-  const { data: recommendedData, isLoading: recommendedIsLoading } = useGetMedicinesRecommended({userId : authContext?.userInfo?.userId})
-  const { data: brandData, isLoading: brandDataIsLoading } = useGetMedicinesByBrand({brand : 'sushain'})
+  const { data: combosData, isLoading: combosDataIsLoading } = useGetMedicinesCombos()
+  const { data: recommendedData, isLoading: recommendedIsLoading } = useGetMedicinesRecommended({ userId: authContext?.userInfo?.userId })
+  const { data: brandData, isLoading: brandDataIsLoading } = useGetMedicinesByBrand({ brand: 'sushain' })
   // console.log(recommendedData?.data, 'branddata');
 
 
@@ -92,10 +92,10 @@ const Medicines = ({ route, navigation }: any) => {
 
   const debounce = (func, delay) => {
     let timeoutId;
-  
+
     return (...args) => {
       clearTimeout(timeoutId);
-  
+
       timeoutId = setTimeout(() => {
         func.apply(this, args);
       }, delay);
@@ -104,15 +104,15 @@ const Medicines = ({ route, navigation }: any) => {
 
   const fetchSearchResults = async (term) => {
     // console.log({term});
-    
+
     try {
 
       const url = `http://13.232.170.16:3006/api/v1/order/productsearch?name=${term}`
       let result = await fetch(url);
       result = await result.json();
       // console.log(result?.result,'SERCH DATTT');
-      
-       
+
+
       // Perform an API request based on the search term
       // const response = await fetch(`YOUR_API_ENDPOINT?q=${term}`);
       // const data = await response.json();
@@ -144,7 +144,7 @@ const Medicines = ({ route, navigation }: any) => {
     debouncedSearch(text);
   };
 
-  if (bestSellerIsLoading || brandListIsLoading || combosDataIsLoading || recommendedIsLoading || brandDataIsLoading)  {
+  if (bestSellerIsLoading || brandListIsLoading || combosDataIsLoading || recommendedIsLoading || brandDataIsLoading) {
     return (
       <Container statusBarStyle='dark-content' >
         <CHeader
@@ -157,12 +157,12 @@ const Medicines = ({ route, navigation }: any) => {
 
   const renderSearchResult = ({ item }: any) => {
     // console.log(item,'serch ITEm');
-    
+
     return (
-      <TouchableOpacity style={styles.p10} onPress={async() => { 
-      navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 }})
+      <TouchableOpacity style={styles.p10} onPress={async () => {
+        navigation.navigate(StackNav.ProductDetail, { productDetail: { ...item, qty: 0 } })
       }} >
-        <CText type="s10" numberOfLines={1}  color={colors.black}>
+        <CText type="s10" numberOfLines={1} color={colors.black}>
           {item?.name}
         </CText>
       </TouchableOpacity>
@@ -180,40 +180,41 @@ const Medicines = ({ route, navigation }: any) => {
         <TouchableOpacity onPress={() => { navigation.openDrawer() }}>
           <Menu />
         </TouchableOpacity>
-        
+
         <Box flexDirection='row' alignItems='center' h={40} px={10} borderWidth={1} borderColor={colors.gray4} borderRadius={5} flex={0.9} >
-          <Search/>
-        <TextInput
-          placeholder={strings.searchPlaceHolder}
-          value={searchText}
-          numberOfLines={1}
-          onChangeText={handleSearch}
-          style={localStyles.inputContainerStyle}
-        />
-        { !!searchDataList.length && <TouchableOpacity activeOpacity={0.7} onPress={()=>{
-          setSearchDataList([])
-          setSearchText('')}} >
-          <CrossBottomTab/>
-        </TouchableOpacity> }
+          <Search />
+          <TextInput
+            placeholder={strings.searchPlaceHolder}
+            value={searchText}
+            numberOfLines={1}
+            onChangeText={handleSearch}
+            style={localStyles.inputContainerStyle}
+          />
+          {!!searchDataList.length && <TouchableOpacity activeOpacity={0.7} onPress={() => {
+            setSearchDataList([])
+            setSearchText('')
+          }} >
+            <CrossBottomTab />
+          </TouchableOpacity>}
         </Box>
 
-        
+
         <Box gap={5} flexDirection='row' alignItems='center' >
           <TouchableOpacity
 
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} >
-        <Box>
-        <Cart height={iconSize} width={iconSize} />
-     { cartData?.length !=0 &&  <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{width:0,height:1}} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
-          <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
-        </Box>}
-        </Box>
-       
-      </TouchableOpacity>
-    
+          <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.Cart) }} >
+            <Box>
+              <Cart height={iconSize} width={iconSize} />
+              {cartData?.length != 0 && <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{ width: 0, height: 1 }} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
+                <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
+              </Box>}
+            </Box>
+
+          </TouchableOpacity>
+
 
         </Box>
 
@@ -234,7 +235,7 @@ const Medicines = ({ route, navigation }: any) => {
       <ScrollView
         style={{ marginBottom: responsiveHeight(10) }}
         showsVerticalScrollIndicator={false}>
- 
+
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -267,7 +268,7 @@ const Medicines = ({ route, navigation }: any) => {
 
         <MedicinesConcerns title={strings.medicinesbyHealthConcerns} mediType={mediType} personalCare={personalCareType} />
 
-        <SellingProduct title={strings.bestSelling} data={bestSellerData?.data?.result[0]?.productDetail} bestSeller={false} />
+        <SellingProduct title={strings.bestSelling} data={bestSellerData?.data?.result[0]?.productDetail} bestSeller={true} />
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -279,13 +280,13 @@ const Medicines = ({ route, navigation }: any) => {
 
         <Box flexDirection='row' alignItems='center' justifyContent='space-between' px={10} >
           <CText type='s14' >Shop by Brand</CText>
-          <Box flexDirection='row' alignItems='center'  borderWidth={1} borderColor={colors.green1} borderRadius={5} w={100} h={35} pl={3} >
-            <Search/>
+          <Box flexDirection='row' alignItems='center' borderWidth={1} borderColor={colors.green1} borderRadius={5} w={100} h={35} pl={3} >
+            <Search />
             <TextInput
-             placeholder='Search any brand'
-             placeholderTextColor={colors.placeHolderColor}
-             numberOfLines={1}
-             style={{...typography.fontWeights.Regular,...typography.fontSizes.f10,flex:1,lineHeight:12}}
+              placeholder='Search any brand'
+              placeholderTextColor={colors.placeHolderColor}
+              numberOfLines={1}
+              style={{ ...typography.fontWeights.Regular, ...typography.fontSizes.f10, flex: 1, lineHeight: 12 }}
             />
           </Box>
 
@@ -312,20 +313,21 @@ const Medicines = ({ route, navigation }: any) => {
             renderItem={({ item, index }) => {
               return (
                 <>
-                  {!!item?.img ? 
-                  <TouchableOpacity activeOpacity={0.6}  onPress={()=>{
-                  
-                    navigation.navigate(StackNav.ProductsByBrand,{brandName:item?.name})}} >
-                     <Image
-                    source={{ uri: `${API_IMAGE_BASE_URL}${item?.img}` }}
-                    style={[localStyles.shopBrand,]}
-                    resizeMode="contain"
-                  /> 
-                  </TouchableOpacity>
-                 :
+                  {!!item?.img ?
+                    <TouchableOpacity activeOpacity={0.6} onPress={() => {
+                      navigation.navigate(StackNav.ProductsByBrand, { brandName: item?.name })
+                    }} >
+                      <Image
+                        source={{ uri: `${API_IMAGE_BASE_URL}${item?.img}` }}
+                        style={[localStyles.shopBrand,]}
+                        resizeMode="contain"
+                      />
+                    </TouchableOpacity>
+                    :
                     <Box w={95} h={95} borderRadius={47} alignItems='center' justifyContent='center' borderColor={'#399fb5'} borderWidth={3} >
-                      <Spinner size='small' color={colors.primary} />
-                      {/* <Text>Image No Found</Text> */}
+                      <Avatar bgColor='$amber600' size="lg" borderRadius="$full" >
+                        <AvatarFallbackText>{item?.name}</AvatarFallbackText>
+                      </Avatar>
                     </Box>
                   }
                 </>
@@ -337,9 +339,7 @@ const Medicines = ({ route, navigation }: any) => {
 
           />
 
-
         </View>
-
         <TouchableOpacity style={localStyles.viewButtonWrapper} >
           <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: responsiveWidth(2) }} >
             <Text style={localStyles.viewButtonText} >View All</Text>
@@ -347,11 +347,7 @@ const Medicines = ({ route, navigation }: any) => {
           </View>
         </TouchableOpacity>
 
-        {/* <SubHeader title={'Save Big With Combos'} isViewHide={true} style={{marginTop:responsiveHeight(4)}} /> */}
-
-
         <SellingProduct title={'Save Big With Combos'} data={combosData?.data?.result[0]?.productDetail} bestSeller={true} />
-
 
         {/* <SubHeader title={'Value Deals Under'} isViewHide={false} /> */}
 
@@ -542,7 +538,7 @@ const localStyles = StyleSheet.create({
     ...typography.fontSizes.f10,
     ...typography.fontWeights.SemiBold,
     flex: 1,
-    paddingRight:responsiveWidth(0.3),
+    paddingRight: responsiveWidth(0.3),
     // marginHorizontal: responsiveWidth(2.5),
     // height: responsiveHeight(5),
     // borderWidth: 1,

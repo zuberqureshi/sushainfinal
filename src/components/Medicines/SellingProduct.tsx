@@ -61,7 +61,7 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
 
               <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}} >
                 {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
-              <HeartLightBlue style={{alignSelf:'flex-end'}} width={responsiveWidth(6)} height={responsiveHeight(4)} />
+              {/* <HeartLightBlue style={{alignSelf:'flex-end'}} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
 
               </View>
@@ -146,7 +146,7 @@ const localStyles = StyleSheet.create({
       borderWidth:1,
       borderColor:'#D9D9D9',
       width:responsiveWidth(43),
-      height:moderateScale(190),
+      height:moderateScale(170),
       borderRadius:responsiveWidth(3),
 
     },
