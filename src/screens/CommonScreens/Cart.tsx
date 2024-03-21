@@ -387,7 +387,7 @@ const Cart = ({ navigation }) => {
               <Text fontFamily='$InterSemiBold' color={colors.gray6} fontSize={12} lineHeight={15} >Hide Details</Text>
             </Box>
 
-            <Box borderBottomWidth={1} borderColor='#CBCACA' borderStyle='dashed' mx={10} ></Box>
+            <Box borderBottomWidth={1} borderColor='#CBCACA' mx={10} ></Box>
 
             <Box px={10} gap={5} >
             <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Valid on total value of items worth 200 or more</Text>
