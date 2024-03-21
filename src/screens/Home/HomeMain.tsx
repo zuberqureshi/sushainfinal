@@ -256,8 +256,8 @@ const HomeMain = () => {
             </View>
           </TouchableOpacity>
           <View style={localStyles.iconContainer}>
-            <Icon icon={<Heart />} onPress={onPressLike} />
-            <Icon icon={<Notification />} onPress={onPressNotification} />
+            {/* <Icon icon={<Heart />} onPress={onPressLike} />
+            <Icon icon={<Notification />} onPress={onPressNotification} /> */}
            { !!authContext?.userInfo?.userName ?    <Avatar bgColor='$amber600' size='xs' borderRadius="$full" >
           <AvatarFallbackText>{  authContext?.userInfo?.userName}</AvatarFallbackText>
         </Avatar> :<Icon icon={<User />} onPress={onPressUser} />}
@@ -424,7 +424,7 @@ const localStyles = StyleSheet.create({
     borderWidth: moderateScale(1),
     ...styles.ph10,
     ...styles.center,
-    height: moderateScale(40),
+    height: moderateScale(37),
     borderRadius: moderateScale(6),
     borderColor: colors.gray4,
   },

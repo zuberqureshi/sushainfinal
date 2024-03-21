@@ -498,11 +498,10 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
         
         <Box gap={5} flexDirection='row' alignItems='center' >
-          <TouchableOpacity
-
+          {/* <TouchableOpacity
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} >
         <Box>
         <Cart height={iconSize} width={iconSize} />
@@ -532,7 +531,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
       <KeyBoardAvoidWrapper>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', paddingRight: responsiveWidth(4), marginTop: responsiveHeight(1), }} >
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', paddingRight: responsiveWidth(4), marginTop: responsiveHeight(1), }} >
           <CButton
             title={strings.sort}
             onPress={() => { StackNav.ProductDetail }}
@@ -553,9 +552,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
             type="r12"
             frontIcon={<FilterIcon />}
           />
-
-
-        </View>
+        </View> */}
 
         <MedicinesByCategory selectedProductSubCategory={selectedProductSubCategory} setSelectedProductSubCtegory={setSelectedProductSubCtegory}  data={medicinesSubCategoryData?.data?.result[0]?.subCategroyList} loading={medicinesSubCategoryIsLoading} />
 

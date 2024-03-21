@@ -419,7 +419,7 @@ const LoginScreen = () => {
 
 
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.selfEnd, styles.mb10]}
             onPress={onPressResetPassword}>
             <Text
@@ -430,9 +430,9 @@ const LoginScreen = () => {
               color={colors.success}>
               {strings.resetPassword}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <PrimaryButton disabled={loading} loading={loading} onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginBottom={responsiveHeight(3)} />
+          <PrimaryButton disabled={loading} loading={loading} onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginTop={responsiveHeight(2.5)} marginBottom={responsiveHeight(3)} />
         </View>
 
         <View style={localStyles.dividerContainer}>
@@ -446,7 +446,7 @@ const LoginScreen = () => {
           <GoogleLogin navigation={navigation} />
           <FaceBookLogin navigation={navigation} />
         </View>
-        <View style={localStyles.dividerContainer}>
+        {/* <View style={localStyles.dividerContainer}>
           <View
             style={[
               localStyles.dividerStyle,
@@ -464,9 +464,9 @@ const LoginScreen = () => {
               },
             ]}
           />
-        </View>
-        <PrimaryButton onPress={onPressSignInModal} buttonText={strings.doctorLogin} height={getHeight(34)} marginVertical={responsiveHeight(3)} />
-        <Text fontFamily='$InterRegular' fontSize={10} color={colors.gray} alignSelf='center'>
+        </View> */}
+        {/* <PrimaryButton onPress={onPressSignInModal} buttonText={strings.doctorLogin} height={getHeight(34)} marginVertical={responsiveHeight(3)} /> */}
+        <Text fontFamily='$InterRegular' fontSize={10} color={colors.gray} alignSelf='center' mt={140} >
           {strings.byProceedingYou}
           <Text
             onPress={() => { }}

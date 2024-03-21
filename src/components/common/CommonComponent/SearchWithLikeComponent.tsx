@@ -130,11 +130,11 @@ export default function SearchWithLikeComponent() {
         // rightAccessory={rightAccessory}
         inputStyle={localStyles.inputStyle}
       />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={()=>{}}
         style={localStyles.cartBtnStyle}>
         <LikeIcon height={iconSize} width={iconSize} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity style={localStyles.cartBtnStyle}>
         <Cart height={iconSize} width={iconSize} />
       </TouchableOpacity>
@@ -165,8 +165,9 @@ const localStyles = StyleSheet.create({
   },
   searchSuggestionContainer: {
     position: 'absolute',
+    flex:1,
     top: moderateScale(50),
-    width: '65%',
+    width: '85%',
     height: getHeight(350),
     backgroundColor: colors.white,
     ...styles.selfCenter,
@@ -186,7 +187,7 @@ const localStyles = StyleSheet.create({
     gap: moderateScale(10),
   },
   inputStyle: {
-    width: '65%',
+    width: '80%',
   },
   inputContainerStyle: {
     height: moderateScale(40),
