@@ -17,24 +17,30 @@ import { addProducts, clearProducts, decreaseQty, increaseQty } from '../../redu
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice'
 import images from '../../assets/images'
 import Loader from '../../components/Loader/Loader'
+import useGetMedicinesBrandList from '../../hooks/medicine/get-medicines-brand-list'
 
 
 const ProductsByBrand = ({ route }) => {
 
     const navigation = useNavigation()
     const iconSize = moderateScale(21);
-    const { brandName } = route.params
+    const { brandName , masterCat , personalCareType } = route.params
     const loadMore = true;
 
     const [searchText, setSearchText] = useState('')
     const [searchDataList, setSearchDataList] = useState([])
     const [showLoad, setShowLoad] = useState(false)
     const [pageNum, setPageNum] = useState(1)
+    const [brandNameState, setbrandNameState] = useState(brandName)
 
     const dispatch = useDispatch()
 
     const cartData = useSelector(state => state.cart);
     const products = useSelector(state => state.product);
+
+    const { data: brandListData, isLoading: brandListIsLoading } = useGetMedicinesBrandList({ masterCat: masterCat, personalCareType: personalCareType })
+    // console.log(brandListData?.data?.result[0]?.brandList,'item searn',masterCat,personalCareType);
+    
 
     const getTotalPriceCart = () => {
         let total = 0;
@@ -50,9 +56,10 @@ const ProductsByBrand = ({ route }) => {
 
     const fecthFirst = async () => {
         await setPageNum(1)
-     await   dispatch(clearProducts())
+     await dispatch(clearProducts())
+  
         fetchData()
-        console.log('first');
+        console.log('first',brandNameState);
     }
 
     // useFocusEffect(
@@ -69,7 +76,7 @@ const ProductsByBrand = ({ route }) => {
         fecthFirst()
 
 
-    }, [brandName])
+    }, [brandNameState])
     
 
     const debounce = (func, delay) => {
@@ -88,10 +95,6 @@ const ProductsByBrand = ({ route }) => {
         // console.log({term});
 
         try {
-
-            const url = `http://13.232.170.16:3006/api/v1/order/productsearch?name=${term}`
-            let result = await fetch(url);
-            result = await result.json();
             // console.log(result?.result,'SERCH DATTT');
 
 
@@ -99,13 +102,18 @@ const ProductsByBrand = ({ route }) => {
             // const response = await fetch(`YOUR_API_ENDPOINT?q=${term}`);
             // const data = await response.json();
 
-            const searchData = result?.result[0]?.productDetail?.filter(item => {
+            const searchData = brandListData?.data?.result[0]?.brandList?.filter(item => {
+                
+                
                 const searchTerm = term.toLocaleLowerCase()
                 const fullName = item?.name?.toLocaleLowerCase()
+// console.log({fullName});
 
                 return searchTerm && fullName.startsWith(searchTerm)
             }
             )
+            // console.log(searchData,'brand screen',term);
+            
 
             await setSearchDataList(searchData)
 
@@ -130,10 +138,10 @@ const ProductsByBrand = ({ route }) => {
 
     const RenderSeparator = () => <View style={localStyles.dividerStyle} />;
     const fetchData = () => {
-        console.log(products.length, pageNum, brandName, 'DATA LEE');
+        console.log(products.length, pageNum, brandNameState, 'DATA LEE');
 
         setShowLoad(true)
-        fetch(`http://13.232.170.16:3006/api/v1/order/productbybrand?brand=${brandName}&skip=${pageNum}`).then(res => res.json())
+        fetch(`http://13.232.170.16:3006/api/v1/order/productbybrand?brand=${brandNameState}&skip=${pageNum}`).then(res => res.json())
             .then(async (res) => {
                 // console.log(res?.result[0], pageNum, 'APIII DATAAA')
                 // await dispatch(clearProducts())
@@ -176,7 +184,8 @@ const ProductsByBrand = ({ route }) => {
 
         return (
             <TouchableOpacity style={styles.p10} onPress={async () => {
-                navigation.navigate(StackNav.ProductDetail, { productDetail: { ...item, qty: 0 } })
+                await   dispatch(clearProducts())
+                 setbrandNameState(item?.name)
             }} >
                 <CText type="s10" numberOfLines={1} color={colors.black}>
                     {item?.name}
@@ -193,9 +202,9 @@ const ProductsByBrand = ({ route }) => {
             <Pressable onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} >
                 <View style={[localStyles.cardMainContainer, { marginLeft: index % 2 && responsiveWidth(2.4) }]} >
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end',marginBottom:responsiveHeight(0.5)  }}>
                         {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
-                        <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} />
+                        {/* <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
 
 
@@ -304,7 +313,7 @@ const ProductsByBrand = ({ route }) => {
 
                 <Box flexDirection='row' alignItems='center' h={40} px={10} borderWidth={1} borderColor={colors.gray4} borderRadius={5} flex={0.9} >
                     <TextInput
-                        placeholder={strings.searchPlaceHolder}
+                        placeholder={'Search for brands'}
                         value={searchText}
                         numberOfLines={1}
                         onChangeText={handleSearch}

@@ -21,6 +21,7 @@ import CButton from '../common/CButton';
 import {StackNav} from '../../navigation/NavigationKeys';
 // import {DoctorSpecListAPI} from '../../api/homeApis';
 import { Spinner } from '@gluestack-ui/themed';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
 
 const RenderDSpecialities = memo(({item, onPressDoctorSpeciality}: any) => {
   
@@ -83,14 +84,15 @@ export default function ADoctorHealthIssue({data}:any) {
         contentContainerStyle={styles.ph20}
         numColumns={4}
         scrollEnabled={false}
+        style={{marginVertical:responsiveHeight(1)}}
       /> : <Spinner size={'small'} color={colors.primary} />}
-      <CButton
+      {/* <CButton
         title={strings.viewAllSymptoms}
         onPress={() => {}}
         containerStyle={localStyles.viewAllBtnStyle}
         bgColor={colors.white}
         color={colors.black}
-      />
+      /> */}
       <TouchableOpacity style={localStyles.bannerContaienr}>
         <Image
           source={images.exclusiveTherapyImage}

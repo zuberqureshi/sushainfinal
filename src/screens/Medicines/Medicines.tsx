@@ -68,6 +68,8 @@ const Medicines = ({ route, navigation }: any) => {
   const [mediType, setMediType] = useState<string>('')
   const [searchText, setSearchText] = useState('')
   const [searchDataList, setSearchDataList] = useState([])
+  const [searchBrandDataList, setSearchBrandDataList] = useState([])
+  const [searchBrandText, setSearchBrandText] = useState('')
 
   const { data: bestSellerData, isLoading: bestSellerIsLoading } = useGetMedicinesBestSeller({ masterCat: mediType, personalCareType: personalCareType })
   const { data: brandListData, isLoading: brandListIsLoading } = useGetMedicinesBrandList({ masterCat: mediType, personalCareType: personalCareType })
@@ -144,6 +146,41 @@ const Medicines = ({ route, navigation }: any) => {
     debouncedSearch(text);
   };
 
+  const fetchSearchBrandResults = async (term) => {
+    
+    try {
+
+      const searchData = brandListData?.data?.result[0]?.brandList?.filter(item => {
+        const searchTerm = term.toLocaleLowerCase()
+        const fullName = item?.name?.toLocaleLowerCase()
+    
+        return searchTerm && fullName.startsWith(searchTerm)
+      })
+
+      // console.log({searchData});
+      
+  
+     await setSearchBrandDataList(searchData)
+      
+      // setSearchResults(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Handle the error, e.g., show an error message to the user
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const debouncedBrandSearch = debounce(fetchSearchBrandResults, 500);
+
+  const handleBrandSearch = (text) => {
+    setSearchBrandText(text);
+    // setLoading(true);
+    debouncedBrandSearch(text);
+  };
+
+
+
   if (bestSellerIsLoading || brandListIsLoading || combosDataIsLoading || recommendedIsLoading || brandDataIsLoading) {
     return (
       <Container statusBarStyle='dark-content' >
@@ -200,11 +237,11 @@ const Medicines = ({ route, navigation }: any) => {
 
 
         <Box gap={5} flexDirection='row' alignItems='center' >
-          <TouchableOpacity
+          {/* <TouchableOpacity
 
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.Cart) }} >
             <Box>
               <Cart height={iconSize} width={iconSize} />
@@ -280,15 +317,39 @@ const Medicines = ({ route, navigation }: any) => {
 
         <Box flexDirection='row' alignItems='center' justifyContent='space-between' px={10} >
           <CText type='s14' >Shop by Brand</CText>
-          <Box flexDirection='row' alignItems='center' borderWidth={1} borderColor={colors.green1} borderRadius={5} w={100} h={35} pl={3} >
+          <Box flexDirection='row' alignItems='center' borderWidth={1} borderColor={colors.green1} borderRadius={5} w={100} h={38} pl={3} overflow='hidden' >
             <Search />
             <TextInput
               placeholder='Search any brand'
               placeholderTextColor={colors.placeHolderColor}
+              onChangeText={handleBrandSearch}
+              value={searchBrandText}
               numberOfLines={1}
-              style={{ ...typography.fontWeights.Regular, ...typography.fontSizes.f10, flex: 1, lineHeight: 12 }}
+              style={{ ...typography.fontWeights.Regular, ...typography.fontSizes.f10, flex: 1, lineHeight: 12 ,}}
             />
           </Box>
+          {!!searchBrandDataList?.length && (
+          <View style={localStyles.searchBrandSuggestionContainer}>
+            <FlatList
+              data={searchBrandDataList}
+              renderItem={({item}:any)=>{
+                return(
+                      <TouchableOpacity style={styles.p10} onPress={async () => {
+                        navigation.navigate(StackNav.ProductsByBrand, { brandName: item?.name , masterCat: mediType , personalCareType : personalCareType })
+                      }} >
+                        <CText type="s10" numberOfLines={1} color={colors.black}>
+                          {item?.name}
+                        </CText>
+                      </TouchableOpacity>
+                )
+              }}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              ItemSeparatorComponent={() => <RenderSeparator />}
+            // estimatedItemSize={100}
+            />
+          </View>
+        )}
 
         </Box>
 
@@ -315,7 +376,7 @@ const Medicines = ({ route, navigation }: any) => {
                 <>
                   {!!item?.img ?
                     <TouchableOpacity activeOpacity={0.6} onPress={() => {
-                      navigation.navigate(StackNav.ProductsByBrand, { brandName: item?.name })
+                      navigation.navigate(StackNav.ProductsByBrand, { brandName: item?.name , masterCat: mediType , personalCareType : personalCareType })
                     }} >
                       <Image
                         source={{ uri: `${API_IMAGE_BASE_URL}${item?.img}` }}
@@ -514,7 +575,8 @@ const localStyles = StyleSheet.create({
     ...styles.itemsCenter,
     position: 'relative',
     zIndex: 100,
-    ...styles.mt10
+    ...styles.mt10,
+    ...styles.pb5
   },
   searchSuggestionContainer: {
     position: 'absolute',
@@ -524,6 +586,20 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.white,
     ...styles.selfCenter,
     left: '19%',
+    borderWidth: moderateScale(1),
+    borderRadius: moderateScale(5),
+    borderColor: colors.gray6,
+    zIndex: 10,
+    ...styles.shadowStyle,
+  },
+  searchBrandSuggestionContainer: {
+    position: 'absolute',
+    top: moderateScale(40),
+    width: '30%',
+    // height: getHeight(150),
+    backgroundColor: colors.white,
+    ...styles.selfCenter,
+    right: '2%',
     borderWidth: moderateScale(1),
     borderRadius: moderateScale(5),
     borderColor: colors.gray6,

@@ -31,7 +31,7 @@ import { StackNav } from '../../navigation/NavigationKeys';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice';
 import { decreaseQty, deleteProductItem, increaseQty } from '../../redux/productSlice';
-import { Text, Toast, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
+import { Box, Text, Toast, ToastTitle, VStack, useToast } from '@gluestack-ui/themed';
 import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { useFormik } from 'formik';
 import useCheckCouponCode from '../../hooks/booking/check-coupon-code';
@@ -55,13 +55,13 @@ const Cart = ({ navigation }) => {
 
   //api call
   const useCheckCouponCodeMutation = useCheckCouponCode()
-  const {data : settingData , isLoading : settingIsLoading } = useGetSetting()
+  const { data: settingData, isLoading: settingIsLoading } = useGetSetting()
   // console.log(settingData?.data?.result[0]?.generalSettings?.cod_charges);
-  
+
 
   const cartData = useSelector(state => state.cart);
 
- 
+
   const labels = ["Cart", "Address", "Payment", "Summary"];
   const customStyles = {
     stepIndicatorSize: 25,
@@ -371,7 +371,41 @@ const Cart = ({ navigation }) => {
           </View>
 
         </View>
+        <Box backgroundColor='#F5F1F1' h={8} ></Box>
+          <Box px={20} py={10} >
+            <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >Best Offers For You</Text>
 
+            <Box borderWidth={1} borderColor='#E9E3E3' borderRadius={10} gap={10} overflow='hidden'  mt={10} >
+
+            <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={14} lineHeight={17} px={10} pt={10}  >FLAT 5% OFF</Text>
+            <Text fontFamily='$InterMedium' color={colors.gray4} fontSize={11} lineHeight={14} px={10} >Use Paytm UPI</Text>
+
+            <Box flexDirection='row' alignItems='center' justifyContent='space-between' px={10} >
+              <Box  borderWidth={1} borderColor='#E6E1E1' borderRadius={10} px={10} py={5} >
+              <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >MED5D</Text>
+              </Box>
+              <Text fontFamily='$InterSemiBold' color={colors.gray6} fontSize={12} lineHeight={15} >Hide Details</Text>
+            </Box>
+
+            <Box borderBottomWidth={1} borderColor='#CBCACA' mx={10} ></Box>
+
+            <Box px={10} gap={5} >
+            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Valid on total value of items worth 200 or more</Text>
+            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Maximum discount: 2000</Text>
+            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Offer valid once per user during offer period</Text>
+            </Box>
+            
+            <TouchableOpacity onPress={()=>{formik.setFieldValue('couponcode','RL50')}}  activeOpacity={0.6} >
+            <Box backgroundColor='#FFEDED' py={15} alignItems='center' >
+            <Text fontFamily='$InterMedium' color={'#F64444'} fontSize={14} lineHeight={17} >TAP TO APPLY</Text>
+            </Box>
+              
+            </TouchableOpacity>
+       
+
+            </Box>
+          </Box>
+        <Box backgroundColor='#F5F1F1' h={8} ></Box>
 
         <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
 
@@ -432,7 +466,7 @@ const Cart = ({ navigation }) => {
 
           </View>
 
-          {( settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() ) &&  <View style={{}} >
+          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart()) && <View style={{}} >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }} >
               <TouchableOpacity onPress={() => {
                 setCOD(true)
@@ -444,9 +478,9 @@ const Cart = ({ navigation }) => {
 
           </View>}
 
-          { ( settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD ) &&  <View style={{ borderBottomWidth: 1, borderBottomColor: '#E9E1E1', marginTop: responsiveHeight(1.5) }} ></View>}
-          
-        { ( settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD ) &&  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: responsiveHeight(1.5) }} >
+          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD) && <View style={{ borderBottomWidth: 1, borderBottomColor: '#E9E1E1', marginTop: responsiveHeight(1.5) }} ></View>}
+
+          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD) && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: responsiveHeight(1.5) }} >
             <CText type='m14' >COD charges</CText>
             <CText type='s14' >{'\u20B9'}{settingData?.data?.result[0]?.generalSettings?.cod_charges}</CText>
           </View>}

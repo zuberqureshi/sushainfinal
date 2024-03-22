@@ -128,17 +128,17 @@ export default function CategoryDoctorList(props: Props) {
         </TouchableOpacity>
 
         <TextInput
-          placeholder={strings.searchPlaceHolder}
+          placeholder={'Search for doctor by disease'}
           value={searchText}
           onChangeText={handleSearch}
           style={localStyles.inputContainerStyle}
         />
         <Box flexDirection='row' alignItems='center' gap={4} >
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => { }}
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={localStyles.cartBtnStyle}>
             <Cart height={iconSize} width={iconSize} />
           </TouchableOpacity>

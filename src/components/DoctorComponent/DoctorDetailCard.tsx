@@ -198,7 +198,7 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
             {'Toxin-Free Natural Medications '}
           </CText>
         </View>
-        <View style={localStyles.buttonContinerStyle}>
+        {/* <View style={localStyles.buttonContinerStyle}>
           <CButton
             title={strings.sort}
             onPress={() => { }}
@@ -219,7 +219,7 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
             type="r12"
             frontIcon={<FilterIcon />}
           />
-        </View>
+        </View> */}
       </View>
 
     )
