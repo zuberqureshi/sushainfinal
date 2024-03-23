@@ -35,6 +35,7 @@ import { ProgressView } from '@react-native-community/progress-view';
 import typography from '../../themes/typography';
 import useDeleteReportById from '../../hooks/appointment/delete-report';
 import useRatingAndReviewAppointment from '../../hooks/appointment/submit-rating-review-appointment';
+import useGetSetting from '../../hooks/home/get-setting';
 
 
 
@@ -59,6 +60,7 @@ const Appointments = ({ navigation }) => {
   const { data: completedAppointmentData, isLoading: isLoadingCompletedAppointment } = useGetCompletedAppointments({ userid: authContext?.userInfo?.userId })
   const { data: todayAppointmentsData, isLoading: isLoadingTodayAppointments } = useGetTodayAppointments({ userid: authContext?.userInfo?.userId })
   const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(selectedAppId)
+  const { data: settingData, isLoading: settingIsLoading } = useGetSetting()
   const useDeleteReportMutation = useDeleteReportById()
   const useRatingAndReviewAppointmentMutation = useRatingAndReviewAppointment()
 
@@ -213,80 +215,81 @@ const Appointments = ({ navigation }) => {
   const onSubmitReport = async () => {
     console.log({ selectedAppId });
 
- if(slectedFileData?.uri !== ''){  setReportUploadIsLoading(true)
-    const formData = new FormData()
-
-
-    formData.append('app_id', selectedAppId)
     if (slectedFileData?.uri !== '') {
-      formData.append('images', {
-        uri: slectedFileData.uri as string,
-        type: slectedFileData.type,
-        name: parseUri(slectedFileData.uri).name,
-      });
-    }
-    formData.append('report_name', `${parseUri(slectedFileData.uri).name.substring(0, parseUri(slectedFileData.uri).name.lastIndexOf('.'))}`)
-    formData.append('tab', 'virtual')
+      setReportUploadIsLoading(true)
+      const formData = new FormData()
 
-    const obj = Object.fromEntries(formData?._parts);
 
-    console.log('Submit File', obj);
+      formData.append('app_id', selectedAppId)
+      if (slectedFileData?.uri !== '') {
+        formData.append('images', {
+          uri: slectedFileData.uri as string,
+          type: slectedFileData.type,
+          name: parseUri(slectedFileData.uri).name,
+        });
+      }
+      formData.append('report_name', `${parseUri(slectedFileData.uri).name.substring(0, parseUri(slectedFileData.uri).name.lastIndexOf('.'))}`)
+      formData.append('tab', 'virtual')
 
-    const updateReportPayload: any = {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        // Authorization: token ? `Bearer ${token}` : undefined,
-      },
-    }
+      const obj = Object.fromEntries(formData?._parts);
 
-    try {
-      const response = await fetch('http://13.232.170.16:3006/api/v1/video/reportupload', updateReportPayload);
-      const responseJson = await response.json()
-      console.log('uplao', responseJson);
+      console.log('Submit File', obj);
 
-      queryClient.invalidateQueries({
-        queryKey: [appointmentService.queryKeys.getReportByAppointmentId + selectedAppId]
-      })
+      const updateReportPayload: any = {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      }
 
-      if (responseJson?.success) {
+      try {
+        const response = await fetch('http://13.232.170.16:3006/api/v1/video/reportupload', updateReportPayload);
+        const responseJson = await response.json()
+        console.log('uplao', responseJson);
+
+        queryClient.invalidateQueries({
+          queryKey: [appointmentService.queryKeys.getReportByAppointmentId + selectedAppId]
+        })
+
+        if (responseJson?.success) {
+          setModalReportUploadVisible(false)
+          toast.show({
+            placement: "bottom",
+            render: ({ id }) => {
+              const toastId = "toast-" + id
+              return (
+                <Toast nativeID={toastId} variant="accent" action="success">
+                  <ToastTitle>Report uploaded successfully.</ToastTitle>
+                </Toast>
+              );
+            },
+          })
+
+          setSlectedFileData({ uri: '', type: '' })
+
+        }
+
+
+        setReportUploadIsLoading(false)
+      } catch (error) {
+        console.log('err', error);
         setModalReportUploadVisible(false)
+        setReportUploadIsLoading(false)
         toast.show({
           placement: "bottom",
           render: ({ id }) => {
             const toastId = "toast-" + id
             return (
-              <Toast nativeID={toastId} variant="accent" action="success">
-                <ToastTitle>Report uploaded successfully.</ToastTitle>
+              <Toast nativeID={toastId} variant="accent" action="error">
+                <ToastTitle>Something went wrong please try again later.</ToastTitle>
               </Toast>
             );
           },
         })
-
-        setSlectedFileData({ uri: '', type: '' })
-
       }
-
-
-      setReportUploadIsLoading(false)
-    } catch (error) {
-      console.log('err', error);
-      setModalReportUploadVisible(false)
-      setReportUploadIsLoading(false)
-      toast.show({
-        placement: "bottom",
-        render: ({ id }) => {
-          const toastId = "toast-" + id
-          return (
-            <Toast nativeID={toastId} variant="accent" action="error">
-              <ToastTitle>Something went wrong please try again later.</ToastTitle>
-            </Toast>
-          );
-        },
-      })
-    }
-    }else{
+    } else {
       toast.show({
         placement: "bottom",
         render: ({ id }) => {
@@ -364,19 +367,19 @@ const Appointments = ({ navigation }) => {
     })
   }
 
-  const onPressJoinVC = async() => {
+  const onPressJoinVC = async () => {
 
-    try { 
+    try {
       const permissionStatus = await androidCameraAudioPermission()
       // setPermissionGet(permissionStatus)
-      if(permissionStatus || Platform.OS === 'ios' ){
+      if (permissionStatus || Platform.OS === 'ios') {
         console.log('in PERMISSIONSTATUS');
-        
+
         setTimeout(() => {
           navigation.navigate(StackNav.VideoCall)
 
         }, 500);
-      }else{
+      } else {
         console.log(permissionStatus, 'Not GRANTED videocall');
       }
       console.log(permissionStatus, 'tryy videocall');
@@ -461,7 +464,7 @@ const Appointments = ({ navigation }) => {
               </Box>
 
               <View style={localStyles.btnContainer}>
-                <TouchableOpacity onPress={()=>{onPressJoinVC() }} style={localStyles.videoCallBtn}>
+                <TouchableOpacity onPress={() => { onPressJoinVC() }} style={localStyles.videoCallBtn}>
                   {status ? (
                     <BuyPrescription
                       width={moderateScale(14)}
@@ -480,8 +483,8 @@ const Appointments = ({ navigation }) => {
                     {status ? 'Buy Prescription' : 'Join Video call'}
                   </CText>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: todayAppointmentsData?.data?.result[0]?.consultationDetail?.type, appid: todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId }) }} style={localStyles.resheduleBtn}>
-                  <CText type="r12" color={colors.primary2}>
+                <TouchableOpacity onPress={() => { !(!!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule) && navigation.navigate(StackNav.RescheduleAppointment, { type: todayAppointmentsData?.data?.result[0]?.consultationDetail?.type, appid: todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId }) }} style={[localStyles.resheduleBtn, { borderColor: !!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule ? colors.placeHolderColor : colors.primary }]}>
+                  <CText type="r12" color={!!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule ? colors.placeHolderColor : colors.primary}>
                     {status ? 'Book Follow Up' : 'Reschedule'}
                   </CText>
                 </TouchableOpacity>
@@ -498,9 +501,9 @@ const Appointments = ({ navigation }) => {
                   </CText>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={async () => {
-                              setModalReportViewVisible(true)
-                              await setSelectedAppId(todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId)
-                            }} style={localStyles.docViewStyle}>
+                  setModalReportViewVisible(true)
+                  await setSelectedAppId(todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId)
+                }} style={localStyles.docViewStyle}>
                   <CText type="m10" color={colors.textColor4}>
                     {'View'}
                   </CText>
@@ -537,7 +540,6 @@ const Appointments = ({ navigation }) => {
 
                   const date = new Date(item?.start_time);
 
-
                   // Specify Indian Standard Time zone offset
                   const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
 
@@ -549,6 +551,30 @@ const Appointments = ({ navigation }) => {
 
                   // Get formatted time in Indian Standard Time
                   const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+
+
+                  // Given time
+                  const givenTime = new Date(item?.start_time).getUTCHours();
+                  const givenDate = new Date(item?.start_time)
+
+                  const currentDate = moment().format('YYYY-M-DD')
+                  const currentTime = moment().hours()
+
+                  // Calculate the time difference in milliseconds
+                  const timeDifference = currentTime - givenTime;
+                  const cancelCondition = `${givenDate.getUTCFullYear()}-${(givenDate.getMonth()) + 1}-${givenDate.getUTCDate()}` == currentDate
+                  let cancelShow = true
+                  if (cancelCondition) {
+                    cancelShow = settingData?.data?.result[0]?.generalSettings?.cancel_virtual_booking_hours <= timeDifference
+
+                  }
+                  // // Convert milliseconds to hours
+                  // const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 6(0));
+
+
+                  // console.log('Hours difference:', currentTime,givenTime,timeDifference,settingData?.data?.result[0]?.generalSettings?.cancel_virtual_booking_hours,cancelShow);
+
+
 
                   return (
                     <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{ ...styles.shadowStyle }} >
@@ -567,7 +593,7 @@ const Appointments = ({ navigation }) => {
 
                           </Box>
 
-                          <TouchableOpacity onPress={()=>{ onPressJoinVC() }} >
+                          <TouchableOpacity onPress={() => { onPressJoinVC() }} >
                             <Box backgroundColor={colors.success} w={175} borderRadius={5} flexDirection='row' alignItems='center' justifyContent='center' gap={5} py={3} >
                               <VideoCallIcon
                                 width={moderateScale(15)}
@@ -579,11 +605,11 @@ const Appointments = ({ navigation }) => {
 
 
                           <View style={localStyles.btnContainer}>
-                            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.AppointmentCancellation, { type: item?.type, appid: item?.orderId }) }} style={localStyles.resheduleBtn}>
-                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={15} >Cancel</Text>
+                            <TouchableOpacity onPress={() => { cancelShow && navigation.navigate(StackNav.AppointmentCancellation, { type: item?.type, appid: item?.orderId }) }} style={[localStyles.resheduleBtn, { borderColor: cancelShow ? colors.primary : colors.placeHolderColor, }]}>
+                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={cancelShow ? colors.primary : colors.placeHolderColor} textAlign='center' px={15} >Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: item?.type, appid: item?.orderId }) }} style={localStyles.resheduleBtn}>
-                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={4}>Reschedule</Text>
+                            <TouchableOpacity onPress={() => { !(!!item?.reshedule) && navigation.navigate(StackNav.RescheduleAppointment, { type: item?.type, appid: item?.orderId }) }} style={[localStyles.resheduleBtn, { borderColor: !!item?.reshedule ? colors.placeHolderColor : colors.primary, }]}>
+                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={!!item?.reshedule ? colors.placeHolderColor : colors.primary} textAlign='center' px={4}>Reschedule</Text>
                             </TouchableOpacity>
                           </View>
 
@@ -708,7 +734,7 @@ const Appointments = ({ navigation }) => {
                             <TouchableOpacity onPress={async () => {
                               setModalReportViewVisible(true)
                               await setSelectedAppId(item?.orderId)
-                            }}style={localStyles.uploadBtnStyle}>
+                            }} style={localStyles.uploadBtnStyle}>
                               <ViewBlackEyeIcon
                                 width={moderateScale(16)}
                                 height={moderateScale(16)}
@@ -869,8 +895,8 @@ const Appointments = ({ navigation }) => {
         onRequestClose={() => setModalReportUploadVisible(false)}
       >
         <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
-          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5}  p={5} >
-            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end',  marginTop: responsiveHeight(1) }} >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' elevation={5} p={5} >
+            <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportUploadVisible(false)} style={{ alignSelf: 'flex-end', marginTop: responsiveHeight(1) }} >
               <CloseIcon />
             </TouchableOpacity>
 
@@ -887,7 +913,7 @@ const Appointments = ({ navigation }) => {
                 paddingHorizontal: responsiveWidth(1),
                 width: responsiveWidth(70),
                 height: responsiveHeight(17),
-                marginHorizontal:responsiveWidth(1.5)
+                marginHorizontal: responsiveWidth(1.5)
               }}>
 
               {slectedFileData?.uri === '' && <TouchableOpacity style={{ alignSelf: 'center' }} activeOpacity={0.6} onPress={selectDoc} >
@@ -941,69 +967,69 @@ const Appointments = ({ navigation }) => {
             <TouchableOpacity activeOpacity={0.6} onPress={() => setModalReportViewVisible(false)} style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(2), marginTop: responsiveHeight(1) }} >
               <CloseIcon />
             </TouchableOpacity>
-            
+
             {
-              reportByAppointmentIdData?.data?.result[0]?.reportView?.length !== 0 ?    <FlatList
-              data={reportByAppointmentIdData?.data?.result[0]?.reportView}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                return (
+              reportByAppointmentIdData?.data?.result[0]?.reportView?.length !== 0 ? <FlatList
+                data={reportByAppointmentIdData?.data?.result[0]?.reportView}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  return (
 
-                  <View key={index.toString()} style={localStyles.reportWrapper} >
-                    <PrescriptionDrawerIconFilled />
-                    <View style={{ marginLeft: responsiveWidth(1) }} >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} w={150} numberOfLines={1} >{item?.report_name}</Text>
-                        <ReportTick />
-                      </View>
+                    <View key={index.toString()} style={localStyles.reportWrapper} >
+                      <PrescriptionDrawerIconFilled />
+                      <View style={{ marginLeft: responsiveWidth(1) }} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                          <Text style={{ color: colors.black, ...typography.fontSizes.f10, ...typography.fontWeights.SemiBold, }} w={150} numberOfLines={1} >{item?.report_name}</Text>
+                          <ReportTick />
+                        </View>
 
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <ProgressView
-                          progressTintColor={colors.primary}
-                          // trackTintColor="blue"
-                          progress={1}
-                          style={{ width: responsiveWidth(60) }}
-                        />
-                        <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                          <ProgressView
+                            progressTintColor={colors.primary}
+                            // trackTintColor="blue"
+                            progress={1}
+                            style={{ width: responsiveWidth(60) }}
+                          />
+                          <Text style={{ color: colors.black, ...typography.fontSizes.f8, ...typography.fontWeights.Medium, marginLeft: responsiveWidth(2.5) }} >100%</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
 
-                        <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
+                          <View style={{ flexDirection: 'row', gap: responsiveWidth(3) }} >
 
-                          <TouchableOpacity onPress={() => { openPdfInBrowser(item?.report) }} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
-                            <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
+                            <TouchableOpacity onPress={() => { openPdfInBrowser(item?.report) }} style={{ borderWidth: 1, borderColor: colors.primary, borderRadius: responsiveWidth(1.5), paddingHorizontal: responsiveWidth(1.5) }} >
+                              <Text style={{ color: colors.primary, ...typography.fontSizes.f10, ...typography.fontWeights.Medium }} >{strings.download}</Text>
+                            </TouchableOpacity>
+
+
+
+                          </View>
+
+                          <TouchableOpacity onPress={() => { deleteReport(item?.id) }} activeOpacity={0.6} >
+                            <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
                           </TouchableOpacity>
-
 
 
                         </View>
 
-                        <TouchableOpacity onPress={() => { deleteReport(item?.id) }} activeOpacity={0.6} >
-                          <ReportDeleteIcon width={responsiveWidth(8)} height={responsiveWidth(5)} />
-                        </TouchableOpacity>
-
 
                       </View>
-
-
                     </View>
-                  </View>
 
-                )
-              }}
-              keyExtractor={({ item, index }) => index?.toString()}
-            /> :
+                  )
+                }}
+                keyExtractor={({ item, index }) => index?.toString()}
+              /> :
 
-           <Box flex={1} justifyContent='center' alignItems='center' >
-                 <OppsIcon/>
-                <CText type='m14' >No Found Data</CText>
-                {/* <Spinner alignSelf='center' size={'small'} color={colors.primary} /> */}
-              </Box>
+                <Box flex={1} justifyContent='center' alignItems='center' >
+                  <OppsIcon />
+                  <CText type='m14' >No Found Data</CText>
+                  {/* <Spinner alignSelf='center' size={'small'} color={colors.primary} /> */}
+                </Box>
             }
 
-            {isLoadingReportByAppointmentId &&   <Box flex={1} justifyContent='center' alignItems='center' >
-            <Spinner size={'small'} color={colors.primary} />
-              </Box> }
+            {isLoadingReportByAppointmentId && <Box flex={1} justifyContent='center' alignItems='center' >
+              <Spinner size={'small'} color={colors.primary} />
+            </Box>}
 
 
 
@@ -1019,10 +1045,10 @@ const Appointments = ({ navigation }) => {
       >
         <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
           <Box backgroundColor='#fff' borderRadius={10} alignItems='center' justifyContent='center' elevation={5} w={'55%'} h={'15%'} gap={10} >
-        
+
             <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Please wait</Text>
 
-   
+
             <Spinner size={'large'} color={colors.primary} />
           </Box>
         </Box>
@@ -1062,7 +1088,7 @@ const localStyles = StyleSheet.create({
     ...styles.rowCenter,
     borderRadius: moderateScale(5),
     borderWidth: moderateScale(1),
-    borderColor: colors.primary,
+
     paddingHorizontal: responsiveWidth(1.5)
   },
   leftTextStyle: {

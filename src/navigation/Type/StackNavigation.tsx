@@ -169,6 +169,11 @@ export default function StackNavigation() {
         component={StackRoute.OrderDetails}
       />
 
+      <Stack.Screen
+        name={StackNav.Profile}
+        component={StackRoute.Profile}
+      />
+
 
     </Stack.Navigator>
   );

@@ -37,7 +37,8 @@ export default {
     enterMobileNumber: 'Enter mobile number',
     enterEmail: 'Enter Email',
     chooseNewPassword: 'Choose New Password',
-    confirmPassword: 'Confirm New Password',
+    confirmPassword: 'Confirm Password',
+    ChoosePassword : 'Choose Password',
     referralCode: 'Referral code (Optional)',
     alreadyHaveAccount: 'Already have an account ? ',
     signIn: 'Sign in',
@@ -217,6 +218,7 @@ export default {
   gasAcidity:'Gas & Acidity',
   pepticulcers:'Peptic Ulcers',
   BeautyPersonalCare:'Beauty & Personal Care',
+  AboutUs : 'AboutUs',
 
   
   };

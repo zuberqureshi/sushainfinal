@@ -47,5 +47,7 @@ export const StackNav = {
   MyOrders : 'MyOrders',
   OrderDetails : 'OrderDetails',
   ProductsByBrand : 'ProductsByBrand',
+  AboutUs : 'AboutUs',
+  Profile : 'Profile',
 
 };

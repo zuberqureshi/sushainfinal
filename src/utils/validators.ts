@@ -65,7 +65,10 @@ export const signUpSchema = yup.object().shape({
   password:yup.string()
     .required('password is must')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,'Enter Strong Password'),
-    cpassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),   
+    cpassword: yup
+    .string()
+    .required('Please enter confirm password')
+    .oneOf([yup.ref('password')], 'Your passwords do not match.')  
 })
 
 export const signUpWithEmailSchema = yup.object().shape({
@@ -76,7 +79,10 @@ export const signUpWithEmailSchema = yup.object().shape({
   password:yup.string()
     .required('password is must')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,'Enter Strong Password'),
-    cpassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),   
+    cpassword: yup
+    .string()
+    .required('Please enter confirm password')
+    .oneOf([yup.ref('password')], 'Your passwords do not match.'),   
 })
 
 export const addressAddSchema = yup.object().shape({

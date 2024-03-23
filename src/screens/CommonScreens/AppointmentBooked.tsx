@@ -67,7 +67,7 @@ const AppointmentBooked = ({ route }) => {
   const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(appid)
   const { data: appointmentDetailData, isLoading: appointmentDetailIsLoading } = useGetAppointmentDetail({ type: 'virtual', appId: appid })
   const useDeleteReportMutation = useDeleteReportById()
-  console.log('repoooo datt', userinfo);
+  // console.log('repoooo datt', appointmentDetailData?.data?.result[0]?.orderDetail);
 
   if (isLoadingReportByAppointmentId) {
     return (
@@ -790,7 +790,7 @@ const AppointmentBooked = ({ route }) => {
                     //     setVisibleAppointment(false);
                     //   }}
                     activeOpacity={0.6}
-                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: 'virtual', appid: '86391634831916' }) }}
+                    onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: 'virtual', appid: appid }) }}
                   >
                     <CText
                       type="m14"
@@ -914,7 +914,7 @@ const AppointmentBooked = ({ route }) => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation, { type: 'virtual', appid: '86391634831916' }) }}
+                onPress={() => { navigation.navigate(StackNav.AppointmentCancellation, { type: 'virtual', appid: appid }) }}
                 style={[localStyles.btn]}
               //   onPress={() => {
               //     navigation.navigate(StackNav.AppointmentCancellation);

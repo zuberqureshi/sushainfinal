@@ -427,8 +427,8 @@ export default function UpcomingAppointment({ isFollowUp, data }: { isFollowUp: 
               </TouchableOpacity>
             }
 
-            {data?.visited === 1 ? <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: data?.type, appid: data?.orderId }) }} style={localStyles.resheduleBtn}>
-              <CText type="r10" color={colors.primary2}>
+            {data?.visited === 1 ? <TouchableOpacity onPress={() => { !(!!data?.reshedule ) && navigation.navigate(StackNav.RescheduleAppointment, { type: data?.type, appid: data?.orderId }) }} style={[localStyles.resheduleBtn,{borderColor:!!data?.reshedule ? colors.placeHolderColor : colors.primary}]}>
+              <CText type="r10" color={!!data?.reshedule ? colors.placeHolderColor : colors.primary}>
                 {'Reschedule'}
               </CText>
             </TouchableOpacity> :

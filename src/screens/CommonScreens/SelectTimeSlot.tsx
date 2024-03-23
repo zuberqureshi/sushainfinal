@@ -22,7 +22,7 @@ import { BottomIcon, EveningSlotIcon, MorningSlotIcon, BottomIconWhite, CrossIco
 import CText from '../../components/common/CText';
 import { colors, styles } from '../../themes';
 import typography from '../../themes/typography';
-import { deviceHeight, deviceWidth, moderateScale } from '../../common/constants';
+import { deviceHeight, deviceWidth, getCountryCode, getDeviceIp, getDeviceName, moderateScale } from '../../common/constants';
 import { Formik, useFormik } from 'formik'
 
 
@@ -46,6 +46,7 @@ import useCreateConsultation from '../../hooks/booking/create-consultation';
 import Loader from '../../components/Loader/Loader';
 import { getAccessToken } from '../../utils/network';
 import useCheckPayment from '../../hooks/booking/verify-payment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 // import RNPgReactNativeSDK from 'react-native-pg-react-native-sdk';
@@ -79,7 +80,7 @@ export default function SelectTimeSlot({ route, }: Props) {
   const toast = useToast()
   const currentDate = moment();
 
-  const doctorSlotsArray = doctorslots.split(',').map(Number)
+  const doctorSlotsArray = doctorslots?.split(',')?.map(Number)
   const today = new Date()
   const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
 
@@ -87,11 +88,16 @@ export default function SelectTimeSlot({ route, }: Props) {
     enableReinitialize: true,
     initialValues: instantconsultation === 'NO' ? { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "", slotdateday: startDate, slottimeid: "", couponcode: "" } : { bookingfor: "", patientname: "", patientnumber: "", patientage: "", patientweight: "", patientgender: "",slotdateday: startDate , couponcode: "" },
     validationSchema: patientBookingValidationSchema,
-    onSubmit: values => {
+    onSubmit: async(values) => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
       // console.log('updatePatient', values);
       // action.resetForm()
       // loadUserInfo();
+
+      // let deviceIp = await getDeviceIp()
+      // let fcmToken = await AsyncStorage.getItem('fcmToken')
+      let Code = await getCountryCode()
+      let deviceName = await getDeviceName()
      
       if(coloredCheckBoxValue){
 
@@ -121,7 +127,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             instant_consultation: instantconsultation,  // YES , NO 
             bookingspecilization: "",
             usercity: "Gwalior",
-            country_code: "IN",
+            country_code: Code?.toUpperCase(),
             person_name: formik.values.patientname,
             person: formik.values.bookingfor,
             person_age: formik.values.patientage,
@@ -130,7 +136,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             person_gender: formik.values.patientgender,
             followup:"NO"  ,   //YES , NO
             type:"virtual", // virtual , CLINIC
-            device_name:"Android honor7x",
+            device_name:deviceName,
             device_type:"NATIVEAPP"
           } : {
             userId: userInfo?.userId,
@@ -141,7 +147,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             instant_consultation: instantconsultation,  // YES , NO 
             bookingspecilization: "",
             usercity: "Gwalior",
-            country_code: "IN",
+            country_code: Code?.toUpperCase(),
             person_name: formik.values.patientname,
             person: formik.values.bookingfor,
             person_age: formik.values.patientage,
@@ -150,7 +156,7 @@ export default function SelectTimeSlot({ route, }: Props) {
             person_gender: formik.values.patientgender,
             followup:"NO"  ,   //YES , NO
             type:"virtual", // virtual , CLINIC
-            device_name:"Android honor7x",
+            device_name:deviceName,
             device_type:"NATIVEAPP"
           } 
   
@@ -231,21 +237,23 @@ export default function SelectTimeSlot({ route, }: Props) {
 
   });
 
-  const slotListMorningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
-    const startTime = moment(appointment.slot_start_time);
-    const appointmentHour = startTime.hours();
-
+  const slotListMorningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)?.filter(appointment => {
+    const startTime = new Date(appointment.slot_start_time);
+    const appointmentHour = startTime?.getUTCHours();
+    
     // Compare the hours
     return appointmentHour > currentDate.hours();
-  }) : allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item)
+  }) : allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)
 
-  const slotListEveningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
-    const startTime = moment(appointment.slot_start_time);
-    const appointmentHour = startTime.hours();
+  const slotListEveningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)?.filter(appointment => {
+    const startTime = new Date(appointment.slot_start_time);
+    const appointmentHour = startTime?.getUTCHours();
 
     // Compare the hours
-    return appointmentHour > currentDate.hours();
-  }) : allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item)
+    // console.log(appointmentHour,startTime?.getUTCHours(),startTime,'<',currentDate?.hours());
+    
+    return appointmentHour > currentDate?.hours();
+  }) : allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray?.includes(item?.id))?.map(item => item)
 
   useEffect(() => {
     const fetchData = async () => {
