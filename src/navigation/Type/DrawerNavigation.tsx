@@ -196,7 +196,7 @@ const DrawerView = () => {
         <View style={localStyles.userDetailStyle}>
           <View style={localStyles.userPicStyle}>
            { !!authContext?.userInfo?.userName ?    <Avatar bgColor='$amber600' size='md' borderRadius="$full" >
-          <AvatarFallbackText>{  authContext?.userInfo?.userName}</AvatarFallbackText>
+          <AvatarFallbackText>{authContext?.userInfo?.userName}</AvatarFallbackText>
         </Avatar> : <Image
               source={images.yogaImage}
               style={localStyles.userProfileStyle}
@@ -213,7 +213,7 @@ const DrawerView = () => {
               </CText>
             </View>
           </View>
-          <TouchableOpacity style={styles.rowCenter}>
+          <TouchableOpacity onPress={()=>{navigation.navigate(StackNav.Profile)}}  style={styles.rowCenter}>
             <CText type="r12" style={styles.mr5} color={colors.primary}>
               Edit
             </CText>
@@ -290,7 +290,8 @@ const DrawerView = () => {
           />
           <DrawerContentComponent
             icon={<VideoCallDrawerIcon />}
-            title={strings.buyMedicine}
+            title={strings.AboutUs}
+            onPress={() => { navigation.navigate(StackNav.AboutUs) }}
           />
         </View>
         <View style={localStyles.bottomStyle}>
@@ -344,6 +345,7 @@ export default function DrawerNavigation() {
       <Drawer.Screen name={StackNav.MyOrders} component={StackRoute.MyOrders} />
 
       <Drawer.Screen name={StackNav.LifeStyleDrawer} component={StackRoute.LifeStyle} />
+      <Drawer.Screen name={StackNav.AboutUs} component={StackRoute.AboutUs} />
     </Drawer.Navigator>
   );
 }

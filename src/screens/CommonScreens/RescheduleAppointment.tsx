@@ -43,11 +43,12 @@ const RescheduleAppointment = ({ route }) => {
   const authContext: any = useContext(AuthContext);
 
   //api call
-  const { data: doctorsProfileData, isLoading: doctorsProfileIsLoading } = useGetDoctorsProfile(181) //doctorId
-  const { data: allSlotsData, isLoading: allSlotsIsLoading } = useGetDoctorsAllSlots()
   const { data: appointmentDetailData, isLoading: appointmentDetailIsLoading } = useGetAppointmentDetail({ type: type, appId: appid })
+  const { data: doctorsProfileData, isLoading: doctorsProfileIsLoading } = useGetDoctorsProfile(appointmentDetailData?.data?.result[0]?.orderDetail?.doc_id) //doctorId
+  const { data: allSlotsData, isLoading: allSlotsIsLoading } = useGetDoctorsAllSlots()
+ 
   const useRescheduleConsultationMutation = useRescheduleConsultation()
-  // console.log('appointmentDetailData',appointmentDetailData?.data?.result[0]?.orderDetail);
+  // console.log('appointmentDetailData',appointmentDetailData?.data?.result[0]?.orderDetail?.doc_id);
 
   const today = new Date(appointmentDetailData?.data?.result[0]?.orderDetail?.date)
   const startDate = getFormatedDate(today.setDate(today.getDate()), 'YYYY-MM-DD')
@@ -76,7 +77,7 @@ const RescheduleAppointment = ({ route }) => {
       useRescheduleConsultationMutation.mutate(payload, {
         onSuccess: (data) => {
 
-          console.log('resssshdule DATA', data?.data);
+          // console.log('resssshdule DATA', data?.data);
 
           if (data?.data?.success) {
             toast.show({
@@ -115,7 +116,7 @@ const RescheduleAppointment = ({ route }) => {
           // setAddNewAddress(true)
         },
         onError: (error) => {
-          console.log(error);
+          // console.log(error);
 
           toast.show({
             placement: "bottom",
@@ -134,28 +135,34 @@ const RescheduleAppointment = ({ route }) => {
 
   })
 
-  const doctorSlotsArray = doctorsProfileData?.data?.result[0]?.doctorProfileDetail?.slots.split(',').map(Number)
-  const slotListMorningArray = allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
-    const startTime = moment(appointment.slot_start_time);
-    const appointmentHour = startTime.hours();
+  const doctorSlotsArray = doctorsProfileData?.data?.result[0]?.doctorProfileDetail?.slots?.split(',')?.map(Number)
 
+  const slotListMorningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)?.filter(appointment => {
+    const startTime = new Date(appointment.slot_start_time);
+    const appointmentHour = startTime?.getUTCHours();
+     
     // Compare the hours
     return appointmentHour > currentDate.hours();
-  })
-  const slotListEveningArray = allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray.includes(item?.id)).map(item => item).filter(appointment => {
-    const startTime = moment(appointment.slot_start_time);
-    const appointmentHour = startTime.hours();
+  }) : allSlotsData?.data?.result[0]?.slotListMorning?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)
+
+  const slotListEveningArray = startDate === formik.values.slotdateday ? allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray?.includes(item?.id)).map(item => item)?.filter(appointment => {
+    const startTime = new Date(appointment.slot_start_time);
+    const appointmentHour = startTime?.getUTCHours();
 
     // Compare the hours
-    return appointmentHour > currentDate.hours();
-  });
+    // console.log(appointmentHour,startTime?.getUTCHours(),startTime,'<',currentDate?.hours());
+    
+    return appointmentHour > currentDate?.hours();
+  }) : allSlotsData?.data?.result[0]?.slotListEvening?.filter(item => doctorSlotsArray?.includes(item?.id))?.map(item => item)
 
-  console.log('SLOT MM', slotListMorningArray);
+  // console.log('SLOT MM', slotListMorningArray);
 
 
 
 
   const renderSlotItem = ({ item, index }: any) => {
+    // console.log(item?.slot,'slooot');
+    
     const date = new Date(item?.slot_start_time);
 
 
@@ -171,13 +178,21 @@ const RescheduleAppointment = ({ route }) => {
     // Get formatted time in Indian Standard Time
     const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
     // console.log('sss hour',currentDate.format('A'));
-    return (
+    // return (
+    //   <>
+    //     {(item?.slot === 'MORNING' && (currentDate.hours() <= date.getHours())) && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+    //       <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{formattedTime}</CText>
+    //     </TouchableOpacity>}
+
+
+    //   </>
+
+    // );
+    return item?.slot === 'MORNING' && (
       <>
-        {(item?.slot === 'MORNING' && (currentDate.hours() <= date.getHours())) && <TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
-          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black}>{formattedTime}</CText>
+        {<TouchableOpacity onPress={() => { formik.setFieldValue('slottimeid', item?.id) }} style={[localStyles.slotContainer, { backgroundColor: formik.values.slottimeid === item?.id ? colors.primary : colors.white }]}>
+          <CText type="m10" color={formik.values.slottimeid === item?.id ? colors.white : colors.black} >{formattedTime}</CText>
         </TouchableOpacity>}
-
-
       </>
 
     );
@@ -361,7 +376,7 @@ const RescheduleAppointment = ({ route }) => {
             numColumns={5}
             ListEmptyComponent={() => {
               return (
-                <CText type="r14" numberOfLines={1} color={colors.success}>
+                <CText type="r14" numberOfLines={1} color={colors.success} style={styles.ph20} >
                   No Slots Available
                 </CText>)
             }}
@@ -384,7 +399,7 @@ const RescheduleAppointment = ({ route }) => {
             numColumns={5}
             ListEmptyComponent={() => {
               return (
-                <CText type="r14" numberOfLines={1} color={colors.success}>
+                <CText type="r14" numberOfLines={1} color={colors.success} style={styles.ph20}>
                   No Slots Available
                 </CText>)
             }}

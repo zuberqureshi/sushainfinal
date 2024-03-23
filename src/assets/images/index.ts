@@ -68,6 +68,22 @@ export default {
   expertTherapists: require('./expertTherapists.png'),
   trustedBrand: require('./trustedBrand.png'),
   yoga: require('./yoga.png'),
- 
+  aboutFirst : require('./aboutFirst.jpg'),
+  about1: require('./about1.png'),
+  about2: require('./about2.png'),
+  about3: require('./about3.png'),
+  about4: require('./about4.png'),
+  drImg: require('./drImg.png'),
+  drImg2: require('./drImg3.jpeg'),
+  award : require('./award.png'),
+  about21: require('./about21.png'),
+  about22: require('./about22.png'),
+  about23: require('./about23.png'),
+  about24: require('./about24.png'),
+  joinus1: require('./joinus1.png'),
+  joinus2: require('./joinus2.png'),
+  Sustainability: require('./Sustainability.png'),
+  RD: require('./R&D.jpg'),
+  splashIcon: require('./splashIcon.png'),
 
 };

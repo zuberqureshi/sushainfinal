@@ -89,7 +89,7 @@ const LoginScreen = () => {
       
 
         onSuccess: async (data) => {
-          console.log('afterlogindata', data?.data);
+          console.log('afterlogindata', data?.data?.result[0]?.user);
 
           if(data?.data?.success){
 
@@ -104,10 +104,10 @@ const LoginScreen = () => {
 
                         await setAccessToken('userInfo',
                           JSON.stringify({
-                            userUniqueId: data?.data?.result[0]?.user.user_unique_id,
-                            userId: data?.data?.result[0]?.user.id,
-                            userName: data?.data?.result[0]?.user.first_name,
-                            userMobile: data?.data?.result[0]?.user.mobile,
+                            userUniqueId: data?.data?.result[0]?.user?.user_unique_id,
+                            userId: data?.data?.result[0]?.user?.id,
+                            userName: data?.data?.result[0]?.user?.first_name,
+                            userMobile: data?.data?.result[0]?.user?.mobile,
                           }))
 
                             authContext.setUserInfo({
@@ -230,7 +230,7 @@ const LoginScreen = () => {
   const onPressSignInWithOtp = async () => {
 
     let deviceInfo = await getDeviceDataFetch()
-    console.log({deviceInfo});
+    // console.log({deviceInfo});
     
    
    if(isTenDigitNumber(formik.values.userid)){
@@ -243,7 +243,7 @@ const LoginScreen = () => {
       // email: values.email,
       device_type: "MOBILEAPP",     //  MOBILEAPP
       device_data: "duii",
-      login_ip: deviceInfo?.fcmToken,
+      login_ip: deviceInfo?.ip,
       country_code: "IN", // country code ISO
       app_fcm_token: deviceInfo?.fcmToken
   }

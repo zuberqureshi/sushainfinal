@@ -152,6 +152,7 @@ const HomeMain = () => {
       }, delay);
     };
   };
+// console.log(authContext?.userInfo?.userName,'USERNAA');
 
   const fetchSearchResults = async (term) => {
     // console.log({term});
@@ -255,6 +256,7 @@ const HomeMain = () => {
               </Pressable>
             </View>
           </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigationDrawer?.navigate(StackNav.Profile)}} >
           <View style={localStyles.iconContainer}>
             {/* <Icon icon={<Heart />} onPress={onPressLike} />
             <Icon icon={<Notification />} onPress={onPressNotification} /> */}
@@ -262,6 +264,7 @@ const HomeMain = () => {
           <AvatarFallbackText>{  authContext?.userInfo?.userName}</AvatarFallbackText>
         </Avatar> :<Icon icon={<User />} onPress={onPressUser} />}
           </View>
+          </TouchableOpacity>
         </View>
         <View style={localStyles.searchContainer}>
           <TouchableOpacity onPress={() => { navigationDrawer.openDrawer() }}>

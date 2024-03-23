@@ -382,7 +382,7 @@ const ProductsByBrand = ({ route }) => {
                     ListFooterComponent={() => {
                         if (showLoad) {
                             return (
-                                <Box h={100} pt={20}>
+                                <Box h={50} pt={20}>
                                     <Spinner color={colors.primary} size={'small'} />
                                 </Box>
                             )

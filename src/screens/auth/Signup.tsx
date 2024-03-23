@@ -7,7 +7,7 @@ import {
   View,
   ViewStyle, Text
 } from 'react-native';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ParamListBase } from '@react-navigation/native';
 
@@ -20,6 +20,9 @@ import CText from '../../components/common/CText';
 import strings from '../../i18n/strings';
 import images from '../../assets/images';
 import {
+  getCountryCode,
+  getDeviceIp,
+  getDeviceName,
   // getDeviceIp,
   // getDeviceName,
   // getDeviceOS,
@@ -52,6 +55,7 @@ import PrimaryButton from '../../components/common/Button/PrimaryButton';
 import { useFormik } from 'formik';
 import * as RNLocalize from "react-native-localize";
 import useUserRegister from '../../hooks/auth/user-register';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const BlurredStyle: StyleProp<ViewStyle> = {
@@ -75,6 +79,8 @@ const Signup = ({ route, navigation }) => {
 
   const [countryCode, setCountryCode] = useState('+91');
   const [isByEmail, setIsByEmail] = useState(false);
+  const [fcm, setFcm] = useState<String>('')
+  const [countryCodeE, setCountryCodeE] = useState('')
  
   //api call
   const useUserRegisterMutation = useUserRegister()
@@ -83,27 +89,47 @@ const Signup = ({ route, navigation }) => {
   // show Password states
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+  const getFcmToken = async() => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken')
+    let Code = await getCountryCode()
+    setFcm(fcmToken)
+    setCountryCodeE(Code)
+  } 
+
+
+  
+  useEffect(() => {
+        getFcmToken()
+  }, [])
+  
+
+ 
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { firstname: "", lastname: "", number: "", email: "", password: "", cpassword: "", referralcode: "" },
     validationSchema: isByEmail ? signUpWithEmailSchema : signUpSchema,
-    onSubmit: values => {
+    onSubmit: async(values) => {
       // updateProfile(values.country,values.address,values.name,values.mobile)
       // console.warn('formsubmit', values);
-
+    let deviceIp = await getDeviceIp()
+    let fcmToken = await AsyncStorage.getItem('fcmToken')
+    let Code = await getCountryCode()
+    let deviceName = await getDeviceName()
        const payload = {
         mobile: values.number,  // mandatory 
-        device_name:"duii",
+        device_name:deviceName,
         name :`${values.firstname} ${values.lastname}`,
         password:values.password,
         email: values.email,
         device_type:"MOBILEAPP",     //  MOBILEAPP
-        device_data:"duii",         
-        login_ip:"duii",
-        country_code:"IN", // country code ISO
-        app_fcm_token:"ffjjj"
+        device_data:deviceName,         
+        login_ip:deviceIp,
+        country_code:Code?.toUpperCase(), // country code ISO
+        app_fcm_token:fcmToken
         }
+  // console.log({payload});
+  
         // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number})
       useUserRegisterMutation.mutate(payload, {
         onSuccess: (data) => {
@@ -195,11 +221,11 @@ const Signup = ({ route, navigation }) => {
               {strings.signUp}
             </CText>
           </View>
-          <TouchableOpacity onPress={onPressSkip}>
+          {/* <TouchableOpacity onPress={onPressSkip}>
             <CText type="m12" color={colors.primary}>
               {strings.skip}
             </CText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.center}>
           <Image style={localStyles.imageStyle} source={images.signupImage} />
@@ -207,6 +233,8 @@ const Signup = ({ route, navigation }) => {
 
         <View style={{ gap: responsiveHeight(2.5) }} >
 
+         <View>
+     
           <View style={{
             borderWidth: moderateScale(1),
             borderRadius: moderateScale(6),
@@ -230,6 +258,8 @@ const Signup = ({ route, navigation }) => {
             />
           </View>
           {(formik.errors.firstname && formik.touched.firstname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.firstname}</Text> : null}
+          </View>
+          <View>
           <View style={{
             borderWidth: moderateScale(1),
             borderRadius: moderateScale(6),
@@ -253,6 +283,7 @@ const Signup = ({ route, navigation }) => {
             />
           </View>
           {(formik.errors.lastname && formik.touched.lastname) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.lastname}</Text> : null}
+          </View>
         </View>
 
         <View style={localStyles.btnContainer}>
@@ -298,9 +329,9 @@ const Signup = ({ route, navigation }) => {
 
 
         )}
-
-        <View
-          style={[localStyles.countryCodeContainer, !isByEmail && styles.mt20]}>
+        
+        <Box mb={10} >
+        <View style={[localStyles.countryCodeContainer, !isByEmail && styles.mt20]}>
           <View style={localStyles.countryCodeStyle}>
             <CText type={'r12'} color={colors.gray7}>
               {countryCode}
@@ -328,7 +359,7 @@ const Signup = ({ route, navigation }) => {
 
         </View>
         {(formik.errors.number && formik.touched.number) ? <Text style={{ color: 'red', paddingHorizontal: responsiveWidth(0.7) }}>{formik.errors.number}</Text> : null}
-
+        </Box>
         <View style={{
           borderWidth: moderateScale(1),
           borderRadius: moderateScale(6),
@@ -341,7 +372,7 @@ const Signup = ({ route, navigation }) => {
             onChangeText={formik.handleChange('password')}
             onBlur={formik.handleBlur('password')}
             value={formik.values.password}
-            placeholder={strings.chooseNewPassword}
+            placeholder={strings.ChoosePassword}
             placeholderTextColor={colors.placeHolderColor}
             secureTextEntry={showPassword}
 
@@ -371,7 +402,7 @@ const Signup = ({ route, navigation }) => {
             onChangeText={formik.handleChange('cpassword')}
             onBlur={formik.handleBlur('cpassword')}
             value={formik.values.cpassword}
-            placeholder={strings.confirmNewPassword}
+            placeholder={strings.confirmPassword}
             placeholderTextColor={colors.placeHolderColor}
             secureTextEntry={showPassword}
 
@@ -511,7 +542,7 @@ const localStyles = StyleSheet.create({
     ...styles.rowSpaceBetween,
     width: '100%',
     ...styles.mt10,
-    ...styles.mb10,
+    // ...styles.mb10,
   },
   signInContainer: {
     ...styles.mv10,

@@ -35,6 +35,7 @@ import { ProgressView } from '@react-native-community/progress-view';
 import typography from '../../themes/typography';
 import useDeleteReportById from '../../hooks/appointment/delete-report';
 import useRatingAndReviewAppointment from '../../hooks/appointment/submit-rating-review-appointment';
+import useGetSetting from '../../hooks/home/get-setting';
 
 
 
@@ -59,6 +60,7 @@ const Appointments = ({ navigation }) => {
   const { data: completedAppointmentData, isLoading: isLoadingCompletedAppointment } = useGetCompletedAppointments({ userid: authContext?.userInfo?.userId })
   const { data: todayAppointmentsData, isLoading: isLoadingTodayAppointments } = useGetTodayAppointments({ userid: authContext?.userInfo?.userId })
   const { data: reportByAppointmentIdData, isLoading: isLoadingReportByAppointmentId } = useGetReportByAppointmentId(selectedAppId)
+  const { data: settingData, isLoading: settingIsLoading } = useGetSetting()
   const useDeleteReportMutation = useDeleteReportById()
   const useRatingAndReviewAppointmentMutation = useRatingAndReviewAppointment()
 
@@ -480,8 +482,8 @@ const Appointments = ({ navigation }) => {
                     {status ? 'Buy Prescription' : 'Join Video call'}
                   </CText>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: todayAppointmentsData?.data?.result[0]?.consultationDetail?.type, appid: todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId }) }} style={localStyles.resheduleBtn}>
-                  <CText type="r12" color={colors.primary2}>
+                <TouchableOpacity onPress={() => { !(!!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule) && navigation.navigate(StackNav.RescheduleAppointment, { type: todayAppointmentsData?.data?.result[0]?.consultationDetail?.type, appid: todayAppointmentsData?.data?.result[0]?.consultationDetail?.orderId }) }} style={[localStyles.resheduleBtn,{borderColor:!!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule ? colors.placeHolderColor : colors.primary}]}>
+                  <CText type="r12" color={!!todayAppointmentsData?.data?.result[0]?.consultationDetail?.reshedule ? colors.placeHolderColor : colors.primary}>
                     {status ? 'Book Follow Up' : 'Reschedule'}
                   </CText>
                 </TouchableOpacity>
@@ -537,7 +539,6 @@ const Appointments = ({ navigation }) => {
 
                   const date = new Date(item?.start_time);
 
-
                   // Specify Indian Standard Time zone offset
                   const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
 
@@ -550,6 +551,30 @@ const Appointments = ({ navigation }) => {
                   // Get formatted time in Indian Standard Time
                   const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
 
+                  
+                  // Given time
+const givenTime = new Date(item?.start_time).getUTCHours();
+const givenDate = new Date(item?.start_time)
+
+const currentDate = moment().format('YYYY-M-DD')
+const currentTime = moment().hours()
+
+// Calculate the time difference in milliseconds
+const timeDifference = currentTime - givenTime;
+const cancelCondition = `${givenDate.getUTCFullYear()}-${(givenDate.getMonth())+1}-${givenDate.getUTCDate()}` == currentDate
+let cancelShow = true
+if(cancelCondition){
+   cancelShow = settingData?.data?.result[0]?.generalSettings?.cancel_virtual_booking_hours <= timeDifference
+   
+}
+// // Convert milliseconds to hours
+// const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 6(0));
+
+
+console.log('Hours difference:', currentTime,givenTime,timeDifference,settingData?.data?.result[0]?.generalSettings?.cancel_virtual_booking_hours,cancelShow);
+
+
+                  
                   return (
                     <Box key={index} flexDirection='row' backgroundColor='#FCFFFF' alignItems='center' gap={14} mt={20} borderRadius={10} overflow='hidden' pl={10} justifyContent='space-between' style={{ ...styles.shadowStyle }} >
                       <Box flex={1} flexDirection='row' alignItems='center' gap={14} py={10}>
@@ -579,11 +604,11 @@ const Appointments = ({ navigation }) => {
 
 
                           <View style={localStyles.btnContainer}>
-                            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.AppointmentCancellation, { type: item?.type, appid: item?.orderId }) }} style={localStyles.resheduleBtn}>
-                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={15} >Cancel</Text>
+                            <TouchableOpacity onPress={() => { cancelShow && navigation.navigate(StackNav.AppointmentCancellation, { type: item?.type, appid: item?.orderId }) }} style={[localStyles.resheduleBtn,{ borderColor: cancelShow ? colors.primary :colors.placeHolderColor ,}]}>
+                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={cancelShow ? colors.primary :colors.placeHolderColor } textAlign='center' px={15} >Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.RescheduleAppointment, { type: item?.type, appid: item?.orderId }) }} style={localStyles.resheduleBtn}>
-                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={colors.primary} textAlign='center' px={4}>Reschedule</Text>
+                            <TouchableOpacity onPress={() => { !(!!item?.reshedule) && navigation.navigate(StackNav.RescheduleAppointment, { type: item?.type, appid: item?.orderId }) }} style={[localStyles.resheduleBtn,{ borderColor: !!item?.reshedule ? colors.placeHolderColor : colors.primary ,}]}>
+                              <Text fontFamily='$InikaRegular' lineHeight={13} fontSize={11} color={!!item?.reshedule ? colors.placeHolderColor : colors.primary } textAlign='center' px={4}>Reschedule</Text>
                             </TouchableOpacity>
                           </View>
 
@@ -1062,7 +1087,7 @@ const localStyles = StyleSheet.create({
     ...styles.rowCenter,
     borderRadius: moderateScale(5),
     borderWidth: moderateScale(1),
-    borderColor: colors.primary,
+ 
     paddingHorizontal: responsiveWidth(1.5)
   },
   leftTextStyle: {

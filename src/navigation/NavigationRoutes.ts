@@ -59,6 +59,8 @@ import VideoCompleted from "../screens/CommonScreens/VideoCompleted";
 import MyOrders from "../screens/OrderSummery/MyOrders";
 import OrderDetails from "../screens/OrderSummery/OrderDetails";
 import ProductsByBrand from "../screens/Medicines/ProductsByBrand";
+import AboutUs from "../screens/CommonScreens/AboutUs";
+import Profile from "../screens/CommonScreens/Profile";
 
 
 export const TabRoute = {
@@ -104,6 +106,8 @@ export const StackRoute = {
   MyOrders,
   OrderDetails,
   ProductsByBrand,
+  AboutUs,
+  Profile,
 
 
 };

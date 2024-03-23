@@ -77,7 +77,7 @@ export default function MedicinesByCategory({ data, loading, selectedProductSubC
 
 
   return (
-    <View style={{ marginVertical: responsiveHeight(1.5) }}>
+    <View style={{ marginVertical: responsiveHeight(0.5) }}>
 
       {data?.length > 0 ? <FlatList
         data={data}

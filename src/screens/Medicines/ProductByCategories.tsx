@@ -24,7 +24,7 @@ import { Container } from '../../components/Container'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { addProducts, clearProducts, decreaseQty, increaseQty } from '../../redux/productSlice'
-import { Box, Text } from '@gluestack-ui/themed'
+import { Box, Spinner, Text } from '@gluestack-ui/themed'
 import Loader from '../../components/Loader/Loader'
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice'
 import { FlashList } from 'react-native-actions-sheet'
@@ -38,14 +38,14 @@ import useGetMedicinesSubCategory from '../../hooks/medicine/get-medicine-sub-ca
 const ProductByCategories = ({ route, navigation }: any) => {
 
   //  console.log(route.params);
-  const { categoryName, bannerImg , personalCareType } = route.params
+  const { categoryName, bannerImg, personalCareType } = route.params
 
   const debounce = (func, delay) => {
     let timeoutId;
-  
+
     return (...args) => {
       clearTimeout(timeoutId);
-  
+
       timeoutId = setTimeout(() => {
         func.apply(this, args);
       }, delay);
@@ -73,9 +73,9 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const [filterData1, setFilterData1] = useState([{ title: 'By Rating', isSelected: false }, { title: 'Price - Low High', isSelected: false }, { title: 'Price - High To Low', isSelected: false }])
   const [filterData2, setFilterData2] = useState([{ title: 'Dabur', isSelected: false }, { title: 'Sushain', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }, { title: 'Boheco', isSelected: false }, { title: 'Nagarjuna', isSelected: false }, { title: 'Himalaya', isSelected: false }])
 
-  const { data: medicinesHealthConcernsData, isLoading: medicinesHealthConcernsIsLoading } = useGetMedicinesHealthConcerns({masterCat:mediType,personalCareType:personalCareType})
-  const { data: medicinesSubCategoryData, isLoading: medicinesSubCategoryIsLoading } = useGetMedicinesSubCategory({masterCat:mediType,personalCareType:personalCareType,category:selectedProductCategory})
-  
+  const { data: medicinesHealthConcernsData, isLoading: medicinesHealthConcernsIsLoading } = useGetMedicinesHealthConcerns({ masterCat: mediType, personalCareType: personalCareType })
+  const { data: medicinesSubCategoryData, isLoading: medicinesSubCategoryIsLoading } = useGetMedicinesSubCategory({ masterCat: mediType, personalCareType: personalCareType, category: selectedProductCategory })
+
   const dispatch = useDispatch()
 
   const cartData = useSelector(state => state.cart);
@@ -90,28 +90,28 @@ const ProductByCategories = ({ route, navigation }: any) => {
     dispatch(clearProducts())
 
     queryClient.invalidateQueries({
-      queryKey: [medicinesService.queryKeys.getMedicinesHealthConcerns + {masterCat:mediType,personalCareType:personalCareType}]
+      queryKey: [medicinesService.queryKeys.getMedicinesHealthConcerns + { masterCat: mediType, personalCareType: personalCareType }]
     })
-  
+
     if (medicinesHealthConcernsData?.data && !medicinesHealthConcernsIsLoading) {
       const updatedData = medicinesHealthConcernsData?.data?.result[0].categroyList?.map((item: any) => {
         return { label: item?.name, value: item?.name }
       })
       setProductCategory(updatedData)
     }
-    console.log(selectedProductCategory,mediType,personalCareType,selectedProductSubCategory);
+    console.log(selectedProductCategory, mediType, personalCareType, selectedProductSubCategory);
   }
 
   useEffect(() => {
     dispatch(clearProducts())
     fetchType()
-    
-  }, [categoryName,personalCareType])
-  
 
-  
+  }, [categoryName, personalCareType])
 
-  
+
+
+
+
 
   const onProductCategoryChange = (item: any) => {
     setPageNum(1)
@@ -191,7 +191,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
     dispatch(clearProducts())
     fetchData()
 
-  }, [selectedProductCategory,selectedProductSubCategory])
+  }, [selectedProductCategory, selectedProductSubCategory])
 
   useEffect(() => {
     if (medicinesHealthConcernsData?.data && !medicinesHealthConcernsIsLoading) {
@@ -214,7 +214,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
       <Pressable onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} >
         <View style={[localStyles.cardMainContainer, { marginLeft: index % 2 && responsiveWidth(2.4) }]} >
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end',marginBottom:responsiveHeight(0.5) }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end', marginBottom: responsiveHeight(0.5) }}>
             {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
             {/* <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
@@ -222,17 +222,17 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
           </View>
 
-         { !!item?.images ? <Image source={{ uri: `${API_IMAGE_BASE_URL}${item?.images}` }} style={localStyles.itemImg} /> : <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}>Opps! sorry</Text>}
+          {!!item?.images ? <Image source={{ uri: `${API_IMAGE_BASE_URL}${item?.images}` }} style={localStyles.itemImg} /> : <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}>Opps! sorry</Text>}
 
           <View style={{ paddingLeft: responsiveWidth(1.5), marginTop: responsiveHeight(0.5), gap: moderateScale(2), height: responsiveHeight(4) }} >
             <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}  >{item?.name}</Text>
             <Text fontFamily='$InterRegular' color={colors.black} fontSize={8} w='90%' numberOfLines={1} lineHeight={10}  >Use In {item?.category?.split(',')[0]}</Text>
           </View>
 
-          <View style={{ paddingHorizontal: responsiveWidth(1.5), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  }}  >
+          <View style={{ paddingHorizontal: responsiveWidth(1.5), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', }}  >
 
             <View style={{ gap: moderateScale(2), marginTop: responsiveHeight(1) }} >
-              <Text fontFamily='$InterBold' color={colors.black} fontSize={12} lineHeight={12} >{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
+              <Text fontFamily='$InterBold' color={colors.black} fontSize={12} lineHeight={12} >{'\u20B9'} {item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(0.5) }} >
                 <Image source={images.startFilled} style={{ resizeMode: 'contain', width: responsiveWidth(2.5), height: responsiveHeight(1.25) }} />
                 <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} lineHeight={10} >{!!item?.rating ? item?.rating : 5}|5 reviews</Text>
@@ -378,15 +378,15 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
   const fetchSearchResults = async (term) => {
     // console.log({term});
-    
+
     try {
 
       const url = `http://13.232.170.16:3006/api/v1/order/productsearch?name=${term}`
       let result = await fetch(url);
       result = await result.json();
       // console.log(result?.result,'SERCH DATTT');
-      
-       
+
+
       // Perform an API request based on the search term
       // const response = await fetch(`YOUR_API_ENDPOINT?q=${term}`);
       // const data = await response.json();
@@ -421,12 +421,12 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
   const renderSearchResult = ({ item }: any) => {
     // console.log(item,'serch ITEm');
-    
+
     return (
-      <TouchableOpacity style={styles.p10} onPress={async() => { 
-      navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 }})
+      <TouchableOpacity style={styles.p10} onPress={async () => {
+        navigation.navigate(StackNav.ProductDetail, { productDetail: { ...item, qty: 0 } })
       }} >
-        <CText type="s10" numberOfLines={1}  color={colors.black}>
+        <CText type="s10" numberOfLines={1} color={colors.black}>
           {item?.name}
         </CText>
       </TouchableOpacity>
@@ -480,38 +480,39 @@ const ProductByCategories = ({ route, navigation }: any) => {
         <TouchableOpacity onPress={() => { navigation.openDrawer() }}>
           <Menu />
         </TouchableOpacity>
-        
+
         <Box flexDirection='row' alignItems='center' h={40} px={10} borderWidth={1} borderColor={colors.gray4} borderRadius={5} flex={0.9} >
-        <TextInput
-          placeholder={strings.searchPlaceHolder}
-          value={searchText}
-          numberOfLines={1}
-          onChangeText={handleSearch}
-          style={localStyles.inputContainerStyle}
-        />
-        { !!searchDataList.length && <Pressable onPress={()=>{
-          setSearchDataList([])
-          setSearchText('')}} >
-          <CrossBottomTab/>
-        </Pressable> }
+          <TextInput
+            placeholder={strings.searchPlaceHolder}
+            value={searchText}
+            numberOfLines={1}
+            onChangeText={handleSearch}
+            style={localStyles.inputContainerStyle}
+          />
+          {!!searchDataList.length && <Pressable onPress={() => {
+            setSearchDataList([])
+            setSearchText('')
+          }} >
+            <CrossBottomTab />
+          </Pressable>}
         </Box>
 
-        
+
         <Box gap={5} flexDirection='row' alignItems='center' >
           {/* <TouchableOpacity
             style={localStyles.cartBtnStyle}>
             <LikeIcon height={iconSize} width={iconSize} />
           </TouchableOpacity> */}
-          <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigation.navigate(StackNav.Cart)}} >
-        <Box>
-        <Cart height={iconSize} width={iconSize} />
-     { cartData?.length !=0 &&  <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{width:0,height:1}} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
-          <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
-        </Box>}
-        </Box>
-       
-      </TouchableOpacity>
-    
+          <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.Cart) }} >
+            <Box>
+              <Cart height={iconSize} width={iconSize} />
+              {cartData?.length != 0 && <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{ width: 0, height: 1 }} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
+                <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
+              </Box>}
+            </Box>
+
+          </TouchableOpacity>
+
 
         </Box>
 
@@ -529,9 +530,9 @@ const ProductByCategories = ({ route, navigation }: any) => {
         )}
       </View>
 
-      <KeyBoardAvoidWrapper>
+      {/* <KeyBoardAvoidWrapper> */}
 
-        {/* <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', paddingRight: responsiveWidth(4), marginTop: responsiveHeight(1), }} >
+      {/* <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', paddingRight: responsiveWidth(4), marginTop: responsiveHeight(1), }} >
           <CButton
             title={strings.sort}
             onPress={() => { StackNav.ProductDetail }}
@@ -554,49 +555,56 @@ const ProductByCategories = ({ route, navigation }: any) => {
           />
         </View> */}
 
-        <MedicinesByCategory selectedProductSubCategory={selectedProductSubCategory} setSelectedProductSubCtegory={setSelectedProductSubCtegory}  data={medicinesSubCategoryData?.data?.result[0]?.subCategroyList} loading={medicinesSubCategoryIsLoading} />
-
-     { !!bannerImg &&  <TouchableOpacity activeOpacity={0.6} style={localStyles.bannerContaienr}>
-          <Image
-            source={{ uri: `${API_IMAGE_BASE_URL}${bannerImg}` }}
-            style={localStyles.bannerImageStyle}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-}
+      <MedicinesByCategory selectedProductSubCategory={selectedProductSubCategory} setSelectedProductSubCtegory={setSelectedProductSubCtegory} data={medicinesSubCategoryData?.data?.result[0]?.subCategroyList} loading={medicinesSubCategoryIsLoading} />
 
 
-        <FlatList
-          style={{ flex: 1, alignSelf: 'center',marginTop:responsiveHeight(1.5) }}
-          data={products}
-          renderItem={renderCardItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2}
-          // justifyContent="space-between"
-          contentContainerStyle={{}}
 
-          //  ListEmptyComponent={()=>{
-          //   return(
-          //     <Loader/>
-          //   )
-          //  }}
-          onEndReached={onEndReached}
-        //  ListFooterComponent={() => {
-        //    if (useGetMedicinesByCategoryQuery?.isFetching) {
-        //      return (
-        //        <Box h={100} pt={20}>
-        //          <Spinner color={colors.primary} size={'small'} />
-        //        </Box>
-        //      )
-        //    }
+      <FlatList
+        style={{ flex: 1, alignSelf: 'center', }}
+        data={products}
+        renderItem={renderCardItem}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={2}
+        // justifyContent="space-between"
+        contentContainerStyle={{}}
+        ListHeaderComponent={() => {
+          return (
+            <>
+              {!!bannerImg && <TouchableOpacity activeOpacity={0.6} style={localStyles.bannerContaienr}>
+                <Image
+                  source={{ uri: `${API_IMAGE_BASE_URL}${bannerImg}` }}
+                  style={localStyles.bannerImageStyle}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+              }
+
+            </>
+          )
+        }}
+        showsVerticalScrollIndicator={false}
+        //  ListEmptyComponent={()=>{
+        //   return(
+        //     <Loader/>
+        //   )
         //  }}
-        />
+        onEndReached={onEndReached}
+       ListFooterComponent={() => {
+         if (showLoad) {
+           return (
+             <Box h={50} pt={20}>
+               <Spinner color={colors.primary} size={'small'} />
+             </Box>
+           )
+         }
+       }}
+      />
+{/* 
+      {showLoad && <Box mt={!!products ? 20 : 50} mb={20}>
+        <Loader />
+      </Box>} */}
 
-        {showLoad && <Box mt={!!products ? 20 : 50} mb={20}>
-          <Loader />
-        </Box>}
-
-      </KeyBoardAvoidWrapper>
+      {/* </KeyBoardAvoidWrapper> */}
 
 
 
@@ -808,7 +816,7 @@ const localStyles = StyleSheet.create({
     height: responsiveHeight(27),
     borderRadius: responsiveWidth(3),
     marginBottom: responsiveHeight(1),
-    paddingBottom:responsiveHeight(0.5)
+    paddingBottom: responsiveHeight(0.5)
 
   },
   bestsellerText: {
