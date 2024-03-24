@@ -51,7 +51,7 @@ const ImageCarousel = ({ item, onPressItem }: any) => {
 };
 
 const ManagementTeam = ({ bannerData }: any) => {
-    console.log({ bannerData });
+    // console.log({ bannerData });
 
     const [index, setIndex] = useState(0);
 
