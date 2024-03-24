@@ -76,7 +76,8 @@ export default function ExclusiveTherapy({bannerData}: any) {
         title="Want to Visit Clinic ?"
         image={images.hospitalImage}
         style={[styles.mh20, styles.mb10]}
-        onPress={()=>{navigation.navigate(StackNav.ClinicConsultation)}}
+        // onPress={()=>{navigation.navigate(StackNav.ClinicConsultation)}}
+        
       />
       <BannerList bannerData={bannerData} type={'bottom'} />
     </View>
