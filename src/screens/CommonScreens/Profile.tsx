@@ -23,10 +23,17 @@ import moment from 'moment'
 
 const Profile = () => {
 
+  //init
   const [countryList, setCountryList] = useState([])
   const [stateList, setStateList] = useState([])
   const [citiesList, setCitiesList] = useState([])
   const [datePickerModel, setDatePickerModel] = useState(false)
+
+   //api call
+   const { data: addressCountriesData, isLoading: addressCountriesDataIsLoading } = useGetAddressCountries()
+   const { data: stateByCountryData, isLoading: stateByCountryDataIsLoading, isFetching: stateByCountryDataIsFetching } = useGetStateByCountry({ countryId: formik?.values?.country?.id })
+   const { data: citiesByStateData, isLoading: citiesByStateDataIsLoading, isFetching: citiesByStateDataIsFetching } = useGetCitiesByState({ stateId: formik?.values?.state?.id })
+ 
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -41,11 +48,7 @@ const Profile = () => {
 
   });
 
-  //api call
-  const { data: addressCountriesData, isLoading: addressCountriesDataIsLoading } = useGetAddressCountries()
-  const { data: stateByCountryData, isLoading: stateByCountryDataIsLoading, isFetching: stateByCountryDataIsFetching } = useGetStateByCountry({ countryId: formik?.values?.country?.id })
-  const { data: citiesByStateData, isLoading: citiesByStateDataIsLoading, isFetching: citiesByStateDataIsFetching } = useGetCitiesByState({ stateId: formik?.values?.state?.id })
-
+ 
   const onChangeCountry = async (item: any) => {
     await formik.setFieldValue('country', { id: item.value, name: item.label })
 

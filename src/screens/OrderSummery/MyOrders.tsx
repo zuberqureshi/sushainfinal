@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Container } from '../../components/Container'
 import CHeader from '../../components/common/CHeader'
 import { BillBigIconGreen, Cart, GreenDot, LikeIcon, Menu } from '../../assets/svgs'
@@ -14,7 +14,10 @@ import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimen
 import CText from '../../components/common/CText'
 import { medicineCartDate } from '../../api/constant'
 import Body from '../../components/Body/Body'
-
+import useGetMyOrders from '../../hooks/order/get-my-orders'
+import { AuthContext } from '../../context/AuthContext'
+import Loader from '../../components/Loader/Loader'
+import moment from 'moment'
 
 const MyOrders = ({ navigation }) => {
 
@@ -22,6 +25,18 @@ const MyOrders = ({ navigation }) => {
 
     const [searchText, setSearchText] = useState('')
     const [selectedOrderType, setSelectedOrderType] = useState('all')
+    const authContext: any = useContext(AuthContext);
+
+    const {data:myOrderData , isLoading : myOrderIsLoading} = useGetMyOrders(authContext?.userInfo?.userUniqueId)
+
+    if (myOrderIsLoading) {
+        return(
+            <Container statusBarStyle='dark-content'>
+                <CHeader title='MyOrders' />
+                <Loader/>
+            </Container>
+        )
+    }
 
 
     return (
@@ -86,7 +101,7 @@ const MyOrders = ({ navigation }) => {
                     <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'cancelled' ? colors.primary : '#BFBCBC'} textAlign='center' >Cancelled</Text>
                 </TouchableOpacity>
             </Box>
-            <Box flexDirection='row' justifyContent='space-between' gap={10} paddingHorizontal={25} mt={10} >
+            <Box flexDirection='row' justifyContent='space-between' gap={10} paddingHorizontal={25} mt={10} mb={15} >
                 <TouchableOpacity onPress={() => { setSelectedOrderType('return') }} activeOpacity={0.6} style={{ flex: 1, borderWidth: selectedOrderType === 'return' ? 1 : 0, borderColor: colors.primary, borderRadius: responsiveWidth(3), overflow: 'hidden', backgroundColor: selectedOrderType === 'return' ? '#F2FDFF' : '#F4F2F2' }} >
                     <Text fontFamily='$InterMedium' fontSize={12} color={selectedOrderType === 'return' ? colors.primary : '#BFBCBC'} textAlign='center'  >Return</Text>
                 </TouchableOpacity>
@@ -99,56 +114,45 @@ const MyOrders = ({ navigation }) => {
             </Box>
 
             <Body>
-                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginVertical: responsiveHeight(2.5) }} >
+                
+               {
+                myOrderData?.data?.result[0]?.orderList?.map((item,index)=>{
+                   
+                    const cDate = moment(item?.dt_createddate)?.format('DD MMM,YYYY')
+                    console.log({cDate});
+                    
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <View>
-                            <CText type='m12' color='#B3B0B0' >ORDER CREATED</CText>
-                            <CText type='m12' >31 July,2023</CText>
+                    return(
+                        <View key={index?.toString()} style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginBottom:responsiveHeight(1.5) }} >
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+                            <View>
+                                <CText type='m12' color='#B3B0B0' >ORDER CREATED</CText>
+                                <CText type='m12' >{cDate}</CText>
+                            </View>
+                            <BillBigIconGreen />
                         </View>
-                        <BillBigIconGreen />
-                    </View>
-
-                    <View style={{ marginTop: responsiveHeight(1.7) }} >
-                        <CText type='m12' color={colors.primary} >Order ID: #12345609</CText>
-                        <CText type='m10' color='#B5B4B4' >3 of 3 item(s)</CText>
-                    </View>
-                    {/* <View>
-                        {
-                            medicineCartDate.map((item, index) => {
-                                return (
-                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: responsiveHeight(1.6), gap: responsiveWidth(5) }} >
-                                        <View style={{ height: responsiveHeight(8), width: responsiveWidth(15), borderRadius: responsiveWidth(3), borderWidth: 1, borderColor: '#CDC9C9' }} >
-                                            <Image source={item.img} style={{ resizeMode: 'contain', height: '100%', width: '90%' }} />
-                                        </View>
-                                        <View style={{ gap: responsiveHeight(0.3) }} >
-                                            <CText type='s10' >{item.title}</CText>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(3) }} >
-                                                <CText type='m10' color='#676666' >Confirmed</CText>
-                                                <TouchableOpacity activeOpacity={0.6} >
-                                                    <CText type='m10' color={colors.primary} >Cancel</CText>
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    </View>
-                                )
-                            })
-                        }
-                    </View> */}
-                    {/* <CText type='s10' style={{ alignSelf: 'flex-end', marginRight: responsiveWidth(7) }} >Total: {'\u20B9'} 5,280</CText> */}
-                    <View style={{ borderBottomColor: '#E5E4E4', borderBottomWidth: 1, marginVertical: responsiveHeight(1) }} ></View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(1) }} >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5) }}>
-                            <GreenDot />
-                            <CText type='m10' color='#676666' >Delivery by 15 July,2023</CText>
+    
+                        <View style={{ marginTop: responsiveHeight(1.7) }} >
+                            <CText type='m12' color={colors.primary} >Order ID: {item?.order_id}</CText>
+                            <CText type='m10' color='#B5B4B4' >3 of 3 item(s)</CText>
                         </View>
-                        <TouchableOpacity onPress={() => { navigation.navigate(StackNav.OrderDetails) }} activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
-                            <CText type='m12' color={colors.white} >Track Order</CText>
-                        </TouchableOpacity>
+                        <View style={{ borderBottomColor: '#E5E4E4', borderBottomWidth: 1, marginVertical: responsiveHeight(1) }} ></View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(1) }} >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5) }}>
+                                <GreenDot />
+                                <CText type='m10' color='#676666' >Delivery by 15 July,2023</CText>
+                            </View>
+                            <TouchableOpacity onPress={() => { navigation.navigate(StackNav.OrderDetails,{orderId:item?.order_id,userName:item?.username,orderAddress:item?.useraddress,userMob:item?.usermobile}) }} activeOpacity={0.6} style={{ paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(0.5), borderRadius: responsiveWidth(3), backgroundColor: colors.success }} >
+                                <CText type='m12' color={colors.white} >Track Order</CText>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
+                    )
+                })
+               }
 
-                <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), }} >
+                {/* <View style={{ borderWidth: 1, borderColor: '#D1D6D7', borderRadius: responsiveWidth(5), paddingHorizontal: responsiveWidth(5), marginHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), }} >
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
                         <View>
@@ -173,7 +177,7 @@ const MyOrders = ({ navigation }) => {
                             <CText type='m12' color={colors.white} >Track Order</CText>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </View> */}
 
 
 
