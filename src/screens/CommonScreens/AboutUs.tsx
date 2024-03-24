@@ -73,7 +73,7 @@ const AboutUs = () => {
         <Container statusBarStyle='dark-content' >
             <CHeader title='About Us' />
             <Body>
-                <Image alt='icon' source={images.aboutFirst} resizeMode='contain' w={'100%'} h={112} />
+                <Image alt='icon' source={images.aboutFirst} resizeMode='cover' w={'100%'} h={112} />
                 <Box gap={10} py={15} alignItems='center' >
                     <Text fontFamily='$InterSemiBold' color={colors.primary} fontSize={18} lineHeight={22} >Our Vision</Text>
                     <Text fontFamily='$InterMedium' color={'#65952F'} fontSize={15} lineHeight={18}  >“ Celebrating Wholeness ”</Text>
@@ -140,7 +140,7 @@ const AboutUs = () => {
 
                 <Text fontFamily='$InterSemiBold' color={colors.primary} fontSize={18} lineHeight={22} alignSelf='center' pb={15} >Sustainability</Text>
 
-                <Box mx={30} py={10} backgroundColor='#FFFEFE' borderRadius={10} style={[styles.shadowStyle,]}  >
+                <Box alignSelf='center' w={360} mx={30} py={10} backgroundColor='#FFFEFE' borderRadius={10} style={[styles.shadowStyle,]}  >
                     <Image alt='icon' source={images?.Sustainability} w={'100%'} h={190} resizeMode='contain' mb={10} borderRadius={10} />
                     <Box gap={10} px={15} >
                         <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15}  >Paperless Documentation:</Text>

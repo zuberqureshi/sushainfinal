@@ -9,6 +9,7 @@ class DoctorService {
     getDoctorsProfile: 'getDoctorsProfile',
     getDoctorsReview: 'getDoctorsReview',
     getDoctorsAllSlots: 'getDoctorsAllSlots',
+    getDoctorsListBySpeclization : 'getDoctorsListBySpeclization',
     
   };
 
@@ -24,6 +25,16 @@ class DoctorService {
     
     return fetcher({
       url: `booking/doclistingspec?specialization=${specialization}&type=${type}`,
+      method: 'GET',
+    });
+  }
+
+  getDoctorsListBySpeclization = async (data:{specialization:string,type:string,pageParam:number}) => {
+    const { specialization , type , pageParam } = data
+      console.log({pageParam});
+      
+    return fetcher({
+      url: `booking/doclistingspec?specialization=${specialization}&type=${type}&skip=${pageParam}`,
       method: 'GET',
     });
   }

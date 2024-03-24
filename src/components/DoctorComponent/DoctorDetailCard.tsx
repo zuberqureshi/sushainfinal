@@ -2,7 +2,7 @@ import { Image, StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react
 import React, { useEffect, useState } from 'react';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Spinner } from '@gluestack-ui/themed';
+import { Box, Spinner } from '@gluestack-ui/themed';
 import { responsiveHeight, responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 import { colors, styles } from '../../themes';
@@ -20,6 +20,7 @@ import Loader from '../../components/Loader/Loader';
 import useGetDoctorBySpeclization from '../../hooks/doctor/get-doctors-by-speclization';
 import moment from 'moment';
 import { getAccessToken } from '../../utils/network';
+import useGetDoctorsListBySpeclization from '../../hooks/doctor/get-doctor-list-by-speclization';
 
 export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultation }: any) {
 
@@ -44,11 +45,15 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
   }, [])
 
   //api call
-  const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title, type: mediType })
+  // const { data: doctorBySpeclizationData, isLoading: doctorBySpeclizationIsLoading, isPending } = useGetDoctorBySpeclization({ specialization: title, type: mediType })
+  const useGetDoctorsListBySpeclizationInfinity = useGetDoctorsListBySpeclization({ specialization: title, type: mediType })
    // console.log(isPending, doctorBySpeclizationIsLoading, !!(doctorBySpeclizationData?.data?.result[0]?.doctorList), 'DOCTORCARD');
 
+  //  console.log(useGetDoctorsListBySpeclizationInfinity?.data?.pages,'infntyyy DAT');
+   
+
   //Loader
-  if (doctorBySpeclizationIsLoading) {
+  if (useGetDoctorsListBySpeclizationInfinity?.isLoading) {
     return (
       <Loader />
     )
@@ -60,12 +65,15 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
   const renderItem = ({ item, index }: any) => {
     // console.log(item?.id);
 
-    const practicingDate = moment(moment(item?.practicing_since).format('YYYY-MM-DD'));
-    const yearsOfEXP = moment().diff(practicingDate, 'years');
-    
+   
+ 
 
-    return (
-      <View style={localStyles.cardMainContainer}>
+    return item?.data?.result[0]?.doctorList.map((item: any, index: number) => {
+      // console.log(item,'itrrrrr');
+      const practicingDate = moment(moment(item?.practicing_since).format('YYYY-MM-DD'));
+      const yearsOfEXP = moment().diff(practicingDate, 'years');
+      return (
+        <View key={index?.toString()} style={localStyles.cardMainContainer}>
         <View style={[styles.flexRow, styles.justifyBetween]}>
           <View style={localStyles.leftContainer}>
             <Image
@@ -90,9 +98,9 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
           </View>
           <View>
             <View style={{ alignSelf: 'flex-end' }}>
-              <TouchableOpacity style={styles.ph5}>
+              {/* <TouchableOpacity style={styles.ph5}>
                 <ShareIcon />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               {/* <TouchableOpacity style={styles.ph5}>
                 <LikeIcon />
               </TouchableOpacity> */}
@@ -120,7 +128,7 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
               type="r10"
               color={colors.textColor2}
               style={localStyles.leftTextStyle}>
-              {item?.top_doc_review_per + ' reviews'}
+              {!!item?.top_doc_review_per ? item?.top_doc_review_per : 'N/A' } reviews 
             </CText>
           </View>
           <View style={localStyles.bottomBtnContainer}>
@@ -143,7 +151,9 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
           </View>
         </View>
       </View>
-    );
+      // <Text>{item?.name}</Text>
+      )
+    })
   };
 
 
@@ -227,14 +237,24 @@ export default function DoctorDetailCard({ title = 'diabetes' , ClinicConsultati
 
   return (
     <>
-      {(!!(doctorBySpeclizationData?.data?.result[0]?.doctorList)) ? <FlatList
-        data={doctorBySpeclizationData?.data?.result[0]?.doctorList}
+      { useGetDoctorsListBySpeclizationInfinity?.data?.pages?.length ? <FlatList
+        // data={doctorBySpeclizationData?.data?.result[0]?.doctorList}
+        data={useGetDoctorsListBySpeclizationInfinity?.data?.pages}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}
+        onEndReached={() => useGetDoctorsListBySpeclizationInfinity?.fetchNextPage()}
         // estimatedItemSize={100}
         ListHeaderComponent={  ListHeaderComponent  }
-        ListFooterComponent={() => { return (<View style={{ height: responsiveHeight(10) }} />) }}
+        ListFooterComponent={() => {
+          if (useGetDoctorsListBySpeclizationInfinity?.isFetching) {
+            return (
+              <Box h={50} justifyContent='center' >
+                <Spinner color={colors.primary} size={'small'} />
+              </Box>
+            )
+          }
+        }}
         ListEmptyComponent={EmptyListMessage}
 
 

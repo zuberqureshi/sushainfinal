@@ -30,9 +30,9 @@ interface Top_Rate_Doctor_Data {
 export default function TopDoctor({data}:any) {
 
    const RenderItem = ({item,index}:{item:Top_Rate_Doctor_Data,index:number}) => {
-    console.log(item?.name,index,'lllkkk');
+    // console.log(item?.id,index,'lllkkk');
     return (
-      <View key={item?.photo?.toString()} style={localStyles.cardMainContainer}>
+      <View key={index?.toString()} style={localStyles.cardMainContainer}>
         <View style={styles.flexRow}>
           <Image
             source={{uri:`${API_IMAGE_BASE_URL}${item?.photo}`}}
@@ -65,8 +65,8 @@ export default function TopDoctor({data}:any) {
 
    <FlashList
         data={data}
-        renderItem={({item,index}:any) => <RenderItem item={item} index={index} />}
-        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item,index}:any) => <RenderItem key={index?.toString()} item={item} index={index} />}
+        keyExtractor={(item, index) => index?.toString()}
         contentContainerStyle={styles.ph20}
         horizontal
         showsHorizontalScrollIndicator={false}

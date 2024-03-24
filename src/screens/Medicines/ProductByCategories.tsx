@@ -148,7 +148,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
     console.log(products.length, pageNum, selectedProductCategory, 'DATA LEE');
 
     setShowLoad(true)
-    fetch(`http://13.232.170.16:3006/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&sub_category=${selectedProductSubCategory}&personal_care=${personalCareType}`).then(res => res.json())
+    fetch(`https://prod-api.sushainclinic.com/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&sub_category=${selectedProductSubCategory}&personal_care=${personalCareType}`).then(res => res.json())
       .then(async (res) => {
         // console.log(res?.result[0]?.productList?.length, pageNum, 'APIII DATAAA')
         // await dispatch(clearProducts())

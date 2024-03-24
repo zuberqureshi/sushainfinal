@@ -12,6 +12,7 @@ class MedicinesService {
     getMedicinesRecommended : 'getMedicinesRecommended',
     getMedicinesByBrand : 'getMedicinesByBrand',
     getMedicinesSubCategory : 'getMedicinesSubCategory',
+    getSimilarProductsBySKU : 'getSimilarProductsBySKU',
   };
 
   getMedicinesHealthConcerns = async (data:any) => {
@@ -82,6 +83,16 @@ class MedicinesService {
     
     return fetcher({
       url: `order/productbybrand?brand=${brand}&skip=1`,
+      method: 'GET',
+    });
+   }
+
+   getSimilarProductsBySKU = async (data:any) => {
+   
+    // console.log(userId,'Recommmm');
+    
+    return fetcher({
+      url: `order/similarproduct?skuId=${data}&skip=2`,
       method: 'GET',
     });
    }
