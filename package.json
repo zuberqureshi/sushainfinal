@@ -40,6 +40,7 @@
     "react-native-actions-sheet": "^0.9.0-alpha.24",
     "react-native-cashfree-pg-sdk": "^2.1.8",
     "react-native-check-box": "^2.1.7",
+    "react-native-code-push": "^8.2.1",
     "react-native-countdown-component": "^2.7.1",
     "react-native-curved-bottom-bar": "^3.2.6",
     "react-native-device-country": "^1.0.4",

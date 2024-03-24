@@ -335,7 +335,7 @@ const LoginScreen = () => {
         </TouchableOpacity> */}
         <Image style={localStyles.imageStyle} source={images.signupImage} />
         <View style={localStyles.userSignInContainer}>
-          <Text fontFamily='$InterSemiBold' fontSize={16}>{strings.userSignIn}</Text>
+          <Text fontFamily='$InterSemiBold' fontSize={16}>{strings.userSignIn} Immedate 2 </Text>
           <View style={localStyles.newMenberContainer}>
             <Text fontFamily='$InterRegular' fontSize={14}>{strings.newMember}</Text>
             <TouchableOpacity onPress={() => { navigation.navigate(StackNav.Signup) }}>

@@ -12,6 +12,8 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.flipper.ReactNativeFlipper
 import com.facebook.soloader.SoLoader
 
+import com.microsoft.codepush.react.CodePush
+
 import live.videosdk.rnwebrtc.WebRTCModulePackage;
 import live.videosdk.rnfgservice.ForegroundServicePackage;
 
@@ -26,7 +28,9 @@ class MainApplication : Application(), ReactApplication {
                    add(ForegroundServicePackage());
                     add(WebRTCModulePackage());
             }
-
+            override fun getJSBundleFile(): String {
+            return CodePush.getJSBundleFile() 
+        }
         override fun getJSMainModuleName(): String = "index"
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG

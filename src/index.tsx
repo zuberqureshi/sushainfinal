@@ -12,10 +12,11 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store'
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore } from 'redux-persist';
+import CodePush from 'react-native-code-push'
 
 const persistor = persistStore(store);
 
-const App = () => {
+let App = () => {
 
   useEffect(() => {
     requestUserPermission()
@@ -45,6 +46,8 @@ const App = () => {
   )
 }
 
+let codePushOptions = { checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME, installMode : CodePush.InstallMode.IMMEDIATE ,mandatoryInstallMode : CodePush.InstallMode.IMMEDIATE };
+App = CodePush(codePushOptions)(App)
 export default App
 
 const styles = StyleSheet.create({})

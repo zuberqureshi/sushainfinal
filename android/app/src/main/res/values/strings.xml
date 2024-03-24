@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">sushain</string>
+       <string moduleConfig="true" name="CodePushDeploymentKey">TvxBazlUE064PPChN79P3le_vdJCZ5y-Ta4Bl</string>
 </resources>
