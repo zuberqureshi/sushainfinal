@@ -85,8 +85,8 @@ const OrderDetails = ({ route }) => {
               </Box>
             </TouchableOpacity>
             <TouchableOpacity style={{ flex: 0.3 }} >
-              <Box flexDirection='row' alignItems='center' justifyContent='center' borderWidth={1} borderColor={colors.primary} borderRadius={10} py={8} >
-                <ShareIcon />
+              <Box flexDirection='row' alignItems='center' justifyContent='center' borderWidth={1} borderColor={colors.primary} borderRadius={10} py={8} px={5} >
+                <ShareIcon width={moderateScale(15)} height={moderateScale(15)} />
                 <Text px={20} fontFamily='$InterMedium' color={colors.primary} fontSize={12} lineHeight={15} >Share</Text>
               </Box>
             </TouchableOpacity>

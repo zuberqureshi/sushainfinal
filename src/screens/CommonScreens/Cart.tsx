@@ -280,7 +280,7 @@ const Cart = ({ navigation }) => {
                     {/* <Text fontFamily='$InterRegular' color={colors.black} fontSize={10} numberOfLines={3} w={'85%'} lineHeight={11} >{item?.single_description}</Text> */}
 
                     <View style={{ ...styles.flexRow, alignItems: 'baseline' }} >
-                      <Text fontFamily='$InterBold' color={colors.black} fontSize={14} lineHeight={16} >{item?.symbol}{item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price} </Text>
+                      <Text fontFamily='$InterBold' color={colors.black} fontSize={14} lineHeight={16} >{item?.symbol}{item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
                       <CText type='m12' color='#454444' style={{ textDecorationLine: 'line-through' }} >{item?.product_pricing?.length > 0 && item?.product_pricing[0]?.buying_price}</CText>
                       {item?.product_pricing?.length > 0 && <CText type='m10' style={{ marginTop: responsiveHeight(0.3) }} >  {offPer}%off</CText>}
                     </View>
@@ -332,7 +332,7 @@ const Cart = ({ navigation }) => {
             <CText type='s12' color='#149C5C' >View All</CText>
           </View>
 
-          <SimilarProduct data={sushainProductData} />
+          {/* <SimilarProduct data={sushainProductData} /> */}
 
 
         </View>

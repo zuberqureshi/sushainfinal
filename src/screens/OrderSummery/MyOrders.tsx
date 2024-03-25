@@ -64,11 +64,11 @@ const MyOrders = ({ navigation }) => {
 
 
                 <Box gap={5} flexDirection='row' alignItems='center' >
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
 
                         style={localStyles.cartBtnStyle}>
                         <LikeIcon height={iconSize} width={iconSize} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <TouchableOpacity
                         onPress={() => { navigation.navigate(StackNav.Cart) }}
                         style={localStyles.cartBtnStyle}>
@@ -119,7 +119,7 @@ const MyOrders = ({ navigation }) => {
                 myOrderData?.data?.result[0]?.orderList?.map((item,index)=>{
                    
                     const cDate = moment(item?.dt_createddate)?.format('DD MMM,YYYY')
-                    console.log({cDate});
+                    // console.log({cDate});
                     
 
                     return(
