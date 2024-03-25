@@ -25,6 +25,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addProductsToCart } from '../../redux/cartSlice'
 import { increaseQty } from '../../redux/productSlice'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
+import useGetSimilarProductsBySKU from '../../hooks/medicine/get-similar-products'
+import Loader from '../../components/Loader/Loader'
 // import { ScrollView } from 'react-native-virtualized-view'
 
 const wWidht = Dimensions.get('screen').width;
@@ -40,9 +42,20 @@ const ProductDetail = ({ route, navigation }) => {
 
   const toast = useToast()
 
+  const {data:similarProductsData , isLoading : similarProductsIsLoading} = useGetSimilarProductsBySKU(productDetail?.sku)
+
   const animatedY = useSharedValue(0)
   const animatedX = useSharedValue(0)
   const scale = useSharedValue(1)
+
+  // if (similarProductsIsLoading) {
+  //   return(
+  //     <Container statusBarStyle='dark-content'>
+  //       <CHeader/>
+  //       <Loader/>
+  //     </Container>
+  //   )
+  // }
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -102,8 +115,8 @@ const ProductDetail = ({ route, navigation }) => {
 
     return (
       <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(2.5) }} >
-        <ShareIconBlack />
-        <LikeIcon />
+        {/* <ShareIconBlack />
+        <LikeIcon /> */}
 
         <Pressable onPress={() => { navigation.navigate(StackNav.Cart) }} >
           <CartBlack />
@@ -111,9 +124,10 @@ const ProductDetail = ({ route, navigation }) => {
           {/* <Box position='absolute' top={0} right={0} backgroundColor={colors.white} borderRadius={10} px={6} py={3} mt={-8} mr={-4}  >
         <CText type='b8' >{cartData?.length}</CText>
         </Box> */}
-          <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5.5), height:responsiveHeight(2.5) }, animatedStyle]} >
+       
+      { cartData?.length != 0 &&  <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5.5), height:responsiveHeight(2.5) }, animatedStyle]} >
             <CText type='b8' style={{ textAlign: 'center' }} numberOfLines={1} >{cartData?.length}</CText>
-          </Animated.View>
+          </Animated.View>}
 
         </Pressable>
 
@@ -157,6 +171,7 @@ const ProductDetail = ({ route, navigation }) => {
     })
   }
 
+  let offPer = ((productDetail?.product_pricing[0]?.selling_price / productDetail?.product_pricing[0]?.buying_price) * 100).toFixed(0)
 
   return (
     <Container statusBarStyle='dark-content' >
@@ -166,12 +181,15 @@ const ProductDetail = ({ route, navigation }) => {
 
       {/* <CHeader  rightIcon={<HeaderRightIcon />} /> */}
       <Box backgroundColor={colors.primary3} py={15} px={15} flexDirection='row' justifyContent='space-between' alignItems='center'  >
+        <Pressable onPress={()=>{navigation.goBack()}} >
         <BackArrow />
+        </Pressable>
+
         <HeaderRightIcon />
 
       </Box>
       <Body>
-        <View style={{ ...styles.flexRow, ...styles.itemsCenter, ...styles.justifyBetween, marginHorizontal: responsiveWidth(4), marginTop: responsiveHeight(1.5), overflow: 'hidden' }} >
+        {/* <View style={{ ...styles.flexRow, ...styles.itemsCenter, ...styles.justifyBetween, marginHorizontal: responsiveWidth(4), marginTop: responsiveHeight(1.5), overflow: 'hidden' }} >
           <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(1.5) }} >
             <Location />
             <CText type='m14' style={{ alignSelf: 'flex-end' }}  > Deliver to- Pune</CText>
@@ -179,7 +197,7 @@ const ProductDetail = ({ route, navigation }) => {
 
           <CText type='m12' style={{ borderBottomWidth: 1, borderBottomColor: colors.black }} >Change</CText>
 
-        </View>
+        </View> */}
 
 
         <View style={{ width: wWidht * 0.9, height: wHeight * 0.22, alignSelf: 'center', borderWidth: 1, marginHorizontal: responsiveWidth(5), borderColor: '#E3DBDB', borderRadius: responsiveWidth(5), paddingTop: responsiveHeight(1.8), marginTop: responsiveHeight(2) }} >
@@ -232,7 +250,7 @@ const ProductDetail = ({ route, navigation }) => {
 
               horizontal
               // justifyContent="space-between"
-
+              showsHorizontalScrollIndicator={false}
               estimatedItemSize={200}
             />
 
@@ -251,6 +269,7 @@ const ProductDetail = ({ route, navigation }) => {
               // justifyContent="space-between"
               // contentContainerStyle={{}}
               estimatedItemSize={200}
+              showsHorizontalScrollIndicator={false}
             />
 
             <Pressable onPress={() => { navigation.navigate(StackNav.ProductsReview) }} >
@@ -293,7 +312,7 @@ const ProductDetail = ({ route, navigation }) => {
           </View>
 
 
-          <CText style={{ marginTop: responsiveHeight(1), paddingHorizontal: responsiveWidth(3) }} type='r12'  >MRP  <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black} >{productDetail?.symbol} {productDetail?.final_price}</Text></CText>
+          <CText style={{ marginTop: responsiveHeight(1), paddingHorizontal: responsiveWidth(3) }} type='r12'  >MRP  <Text fontFamily='$InterSemiBold' fontSize={16} lineHeight={20} color={colors.black} >{productDetail?.symbol} {productDetail?.product_pricing?.length > 0 ? productDetail?.product_pricing[0]?.selling_price : productDetail?.final_price}</Text></CText>
 
           <View style={{ ...styles.flexRow, marginTop: responsiveHeight(2), gap: responsiveWidth(3), paddingHorizontal: responsiveWidth(3) }}  >
             <TouchableOpacity onPress={() => {
@@ -323,25 +342,25 @@ const ProductDetail = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ backgroundColor: '#FEE7E7', paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginTop: responsiveHeight(2) }} >
+      {  productDetail?.product_pricing?.length > 0  &&  <View style={{ backgroundColor: '#FEE7E7', paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(2), marginTop: responsiveHeight(2) }} >
 
             <View style={{ ...styles.flexRow, }} >
-              <CText type='s10' style={{ alignSelf: 'flex-end' }} >MRP <CText type='r10' style={{ textDecorationLine: 'line-through', }} >{'\u20B9'} 690</CText></CText>
+              <CText type='s10' style={{ alignSelf: 'flex-end' }} >MRP <CText type='r10' style={{ textDecorationLine: 'line-through', }} >{'\u20B9'} {productDetail?.product_pricing[0]?.buying_price}</CText></CText>
 
               <View style={{ ...styles.flexRow, }} >
-                <CText type='s16'>  {'\u20B9'} 138 * </CText>
-                <CText type='s12' color='#F40909' >(20% OFF)</CText>
+                <CText type='s16'>  {'\u20B9'} {productDetail?.product_pricing[0]?.selling_price} * </CText>
+                <CText type='s12' color='#F40909' >({offPer}% OFF)</CText>
               </View>
             </View>
 
-            <View style={{ ...styles.flexRow, gap: responsiveWidth(2), marginTop: responsiveHeight(0.7) }} >
+            {/* <View style={{ ...styles.flexRow, gap: responsiveWidth(2), marginTop: responsiveHeight(0.7) }} >
               <CText type='s10' >Sale ends in</CText>
 
               <View style={{ backgroundColor: '#F6FFFB', borderRadius: responsiveWidth(2), paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.1) }} >
                 <CText type='m10' >01h:05m23s</CText>
               </View>
-            </View>
-          </View>
+            </View> */}
+          </View>}
 
         </View>
 
@@ -383,7 +402,7 @@ const ProductDetail = ({ route, navigation }) => {
 
           </View>
 
-          <Dropdown
+          {/* <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdownDetail}
             placeholderStyle={localStyles.placeholderStyleDetail}
@@ -397,14 +416,14 @@ const ProductDetail = ({ route, navigation }) => {
             renderRightIcon={() => <DownArrowBlack />}
             // itemTextStyle={styles.selectedTextStyle}
             itemContainerStyle={localStyles.itemContainerStyleDetail}
-          />
+          /> */}
 
           <Dropdown
             data={productAvailabilityData}
             style={localStyles.dropdownDetail}
             placeholderStyle={localStyles.placeholderStyleDetail}
             selectedTextStyle={localStyles.selectedTextStyleDetail}
-
+            disable
             labelField="label"
             valueField="value"
             placeholder={'Doctor’s Review'}
@@ -495,10 +514,10 @@ const ProductDetail = ({ route, navigation }) => {
 
           <View style={{ ...styles.flexRow, ...styles.justifyBetween, paddingHorizontal: responsiveWidth(3), marginBottom: responsiveHeight(1.5) }} >
             <CText type='s14' >Similar Products</CText>
-            <CText type='s12' color='#149C5C' >View All</CText>
+            {/* <CText type='s12' color='#149C5C' >View All</CText> */}
           </View>
 
-          <SimilarProduct title={'Similar Products'} data={medicineBestSellingData} bestSeller={false} />
+          <SimilarProduct title={'Similar Products'} data={similarProductsData?.data?.result[0]?.similarProducts} bestSeller={false} />
 
 
           <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: colors.success, alignSelf: 'center', paddingVertical: responsiveHeight(2), paddingHorizontal: responsiveWidth(8), borderRadius: responsiveWidth(5), marginTop: responsiveHeight(3.5) }} >

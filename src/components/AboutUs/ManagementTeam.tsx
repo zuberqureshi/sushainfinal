@@ -34,7 +34,7 @@ const RenderItemStar = ({ item, index }: any) => {
 
 const ImageCarousel = ({ item, onPressItem }: any) => {
     return (
-        <Box alignItems='center' px={20} mx={20} gap={17} pt={25} pb={40} mb={10} backgroundColor='#FFFEFE' borderRadius={10} overflow='hidden' borderColor='#DAD8D8' borderWidth={1} style={[styles.shadowStyle,]}  >
+        <Box alignItems='center' w={338} h={360} px={20} mx={20} gap={17} pt={25} pb={40} mb={10} backgroundColor='#FFFEFE' borderRadius={10} overflow='hidden' borderColor='#DAD8D8' borderWidth={1} style={[styles.shadowStyle,]}  >
 
             <Box w={100} h={100} p={5} borderWidth={1} borderColor={colors.primary} borderRadius={50} overflow='hidden' >
                 <Image source={item?.img} style={{ width: '100%', height: '100%', resizeMode:'cover',borderRadius:responsiveWidth(14)}} />
@@ -42,7 +42,7 @@ const ImageCarousel = ({ item, onPressItem }: any) => {
 
             <Text fontFamily='$InterSemiBold' fontSize={16} color={colors.black} lineHeight={20} >{item.name}</Text>
 
-            <Text fontFamily='$InterRegular' fontSize={12} color={colors.black} lineHeight={15} >{item.subHead}</Text>
+            <Text fontFamily='$InterRegular' fontSize={12} color={colors.black} lineHeight={15}  >{item.subHead}</Text>
 
             <Text fontFamily='$InterRegular' fontSize={13} color={colors.black} textAlign='center' w={300} lineHeight={16} numberOfLines={7}  >{item?.dis}</Text>
 
@@ -79,7 +79,7 @@ const ManagementTeam = ({ bannerData }: any) => {
                 autoplay={true}
                 loop={true}
             />
-            {/* <View style={[styles.justifyCenter]}>
+            <View style={[styles.justifyCenter]}>
                 <Pagination
                     dotsLength={bannerData?.length}
                     activeDotIndex={index}
@@ -100,7 +100,7 @@ const ManagementTeam = ({ bannerData }: any) => {
                     dotContainerStyle={styles.mh5}
                     containerStyle={localStyles.paginationContainerStyle}
                 />
-            </View> */}
+            </View>
         </View>
     );
 };
@@ -135,7 +135,7 @@ const localStyles = StyleSheet.create({
     paginationContainerStyle: {
         ...styles.ph10,
         ...styles.pv10,
-        ...styles.mt10,
+        // ...styles.mt10,
     },
     imgContainer: {
         ...styles.center,
