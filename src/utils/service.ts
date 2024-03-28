@@ -1,16 +1,15 @@
 import GetLocation from 'react-native-get-location'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PermissionsAndroid } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import { useEffect } from 'react';
 import { Toast,useToast,ToastTitle } from '@gluestack-ui/themed';
+import { isLocationEnabled, promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
 
 export const getLocation = async() => {
 
     // useEffect(() => {
     //   requestCameraPermission()
     // }, [])
-    
-
 
     const requestLocationPermission = async () => {
         try {
@@ -28,6 +27,7 @@ export const getLocation = async() => {
           );
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
             console.log('You can use the Location');
+            handleCheckPressed()
           } else {
             console.log('Location permission denied');
           }
@@ -36,9 +36,39 @@ export const getLocation = async() => {
         }
       };
 
-      await requestLocationPermission()
+      async function handleCheckPressed() {
+        if (Platform.OS === 'android') {
+          const checkEnabled: boolean = await isLocationEnabled();
+          console.log('checkEnabled', checkEnabled)
+          if(!checkEnabled){
+            try {
+              const enableResult = await promptForEnableLocationIfNeeded();
+              console.log('enableResult', enableResult);
+              // The user has accepted to enable the location services
+              // data can be :
+              //  - "already-enabled" if the location services has been already enabled
+              //  - "enabled" if user has clicked on OK button in the popup
+              
+ 
+            } catch (error: unknown) {
+              if (error instanceof Error) {
+                console.error(error.message);
+                // The user has not accepted to enable the location services or something went wrong during the process
+                // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
+                // codes :
+                //  - ERR00 : The user has clicked on Cancel button in the popup
+                //  - ERR01 : If the Settings change are unavailable
+                //  - ERR02 : If the popup has failed to open
+                //  - ERR03 : Internal error
+              }
+            }
+          }
+        }
+      }
 
-    GetLocation.getCurrentPosition({
+      await requestLocationPermission()
+   
+      GetLocation.getCurrentPosition({
         enableHighAccuracy: true,
         timeout: 60000,
     }).then(location => {
@@ -67,4 +97,5 @@ export const getLocation = async() => {
         // }
         console.warn(code, message,);
     })
+
 }

@@ -8,9 +8,10 @@ import {
   ScrollView,
   FlatList,
   Pressable,
-  TextInput
+  TextInput,
+  Modal
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { colors, styles } from '../../themes';
 import CHeader from '../../components/common/CHeader';
 import strings from '../../i18n/strings';
@@ -48,17 +49,19 @@ import { addressAddSchema } from '../../utils/validators';
 import Loader from '../../components/Loader/Loader';
 import useDeleteAddress from '../../hooks/address/delete-address';
 import UpdateUserAddress from '../../hooks/address/update-user-address';
+import { AuthContext } from '../../context/AuthContext'
 
 const Address = () => {
 
   const toast = useToast()
+  const authContext: any = useContext(AuthContext);
   const [stepCurrentPosition, setStepCurrentPosition] = useState(1)
 
   const [userAlternateNoShow, setUserAlternateNoShow] = useState(false);
 
   const [userInfo, setUserInfo] = useState();
   const [addressCheckBox, setAddressCheckBox] = useState(false)
-  const [selectedAddress, setSelectedAddress] = useState(0)
+ 
   const [addNewAddress, setAddNewAddress] = useState(true)
   const [countryList, setCountryList] = useState([])
   const [stateList, setStateList] = useState([])
@@ -127,7 +130,7 @@ const Address = () => {
 
 
       const payload = {
-        user_id: userInfo?.userUniqueId,
+        user_id: authContext?.userInfo?.userUniqueId ,
         type: formik.values.type,  // Home , Office
         name: formik.values.name,
         mobile_no: formik.values.mobile,
@@ -164,7 +167,7 @@ const Address = () => {
   
   
             queryClient.invalidateQueries({
-              queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+              queryKey: [addressService.queryKeys.getUserAddresses + authContext?.userInfo?.userUniqueId ]
             })
   
             // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
@@ -191,7 +194,7 @@ const Address = () => {
       }else if(isEdit){
 
         const payload = {
-          user_id: userInfo?.userUniqueId,
+          user_id: authContext?.userInfo?.userUniqueId ,
           type: formik.values.type,  // Home , Office
           name: formik.values.name,
           mobile_no: formik.values.mobile,
@@ -225,7 +228,7 @@ const Address = () => {
   
   
             queryClient.invalidateQueries({
-              queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+              queryKey: [addressService.queryKeys.getUserAddresses + authContext?.userInfo?.userUniqueId ]
             })
   
             // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
@@ -262,9 +265,9 @@ const Address = () => {
   });
 
 
-  async function load() {
-    setUserInfo(JSON.parse(await getAccessToken('userInfo')));
-  }
+  // async function load() {
+  //   setUserInfo(JSON.parse(await getAccessToken('userInfo')));
+  // }
 
   const deleteUserAddress = (id) => {
 
@@ -290,7 +293,7 @@ const Address = () => {
 
 
         queryClient.invalidateQueries({
-          queryKey: [addressService.queryKeys.getUserAddresses + userInfo?.userUniqueId]
+          queryKey: [addressService.queryKeys.getUserAddresses + authContext?.userInfo?.userUniqueId ]
         })
 
         // navigation.navigate(StackNav.VerifyLoginOtp,{mobile:values.number,screenType:'signup'})
@@ -334,18 +337,18 @@ const Address = () => {
 
   }
 
-  useEffect(() => {
-    load();
-  }, []);
+  // useEffect(() => {
+  //   load();
+  // }, []);
   // console.log('UserData....', userInfo?.userUniqueId);
 
   //api call
   const { data: addressCountriesData, isLoading: addressCountriesDataIsLoading } = useGetAddressCountries()
   const { data: stateByCountryData, isLoading: stateByCountryDataIsLoading, isFetching: stateByCountryDataIsFetching } = useGetStateByCountry({ countryId: formik?.values?.country?.id })
   const { data: citiesByStateData, isLoading: citiesByStateDataIsLoading, isFetching: citiesByStateDataIsFetching } = useGetCitiesByState({ stateId: formik?.values?.state?.id })
-  const { data: userAddressesData, isLoading: userAddressesDataIsLoading, isFetching: userAddressesDataIsFetching } = useGetUserAddresses({ userUniqueId: userInfo?.userUniqueId })
-  console.log('ADDRESS COTRY',stateByCountryData?.data?.result[0]?.statesList[0],'city',citiesByStateData?.data?.result[0]?.citiesList[0]);
-
+  const { data: userAddressesData, isLoading: userAddressesDataIsLoading, isFetching: userAddressesDataIsFetching } = useGetUserAddresses({ userUniqueId: authContext?.userInfo?.userUniqueId  })
+  // console.log('ADDRESS COTRY',stateByCountryData?.data?.result[0]?.statesList[0],'city',citiesByStateData?.data?.result[0]?.citiesList[0]);
+  const [selectedAddress, setSelectedAddress] = useState(userAddressesData?.data?.result[0]?.userAddressList[0]?.id)
 
 
   const onChangeCountry = async(item: any) => {
@@ -446,7 +449,9 @@ const Address = () => {
   }
 
   if (userAddressesDataIsLoading) {
+    setSelectedAddress(userAddressesData?.data?.result[0]?.userAddressList[0]?.id)
     return (<Container statusBarStyle='dark-content' >
+      <CHeader title='Add Address' />
       <Loader />
     </Container>)
   }
@@ -692,15 +697,15 @@ const Address = () => {
           {
             userAddressesData?.data?.result[0]?.userAddressList?.map((item, index) => {
               return (
-                <View key={index} style={{ paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(2.4), backgroundColor: selectedAddress === index ? '#FCE3D6' : colors.white, gap: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(0.5), borderBottomColor: '#DAD9D9' }} >
+                <View key={index} style={{ paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(2.4), backgroundColor: selectedAddress === item?.id ? '#FCE3D6' : colors.white, gap: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(0.5), borderBottomColor: '#DAD9D9' }} >
 
                   <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
                     <View style={{ ...styles.flexRow, alignItems: 'center', gap: responsiveWidth(2) }}  >
                       <CText type='s14' >{item?.name}</CText>
                       {item?.type && <CText type='m10' style={{ backgroundColor: '#F8F5F3', paddingHorizontal: responsiveWidth(2.5) }} >{item?.type}</CText>}
                     </View>
-                    <TouchableOpacity onPress={() => { setSelectedAddress(index) }} style={{ borderWidth: 1, borderColor: colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
-                      <View style={{ backgroundColor: selectedAddress === index ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
+                    <TouchableOpacity onPress={() => { setSelectedAddress(item?.id) }} style={{ borderWidth: 1, borderColor: colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
+                      <View style={{ backgroundColor: selectedAddress === item?.id ? colors.primary : colors.white, paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
                     </TouchableOpacity>
                   </View>
 
@@ -715,7 +720,7 @@ const Address = () => {
                       <CText type='s12' color='#F27636' >EDIT</CText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { deleteUserAddress(item?.id) }} >
-                      {useDeleteAddressMutation?.isPending ? <Spinner size={'small'} color={colors.primary} /> : <CText type='s12' color='#F27636' >REMOVE</CText>}
+                      <CText type='s12' color='#F27636' >REMOVE</CText>
                     </TouchableOpacity>
                     <TouchableOpacity>
                       <CText type='s12' color='#F27636' >SET AS DEFAULT</CText>
@@ -723,7 +728,7 @@ const Address = () => {
 
                   </View>
 
-                  {selectedAddress === index && <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: '#FF9B66', paddingVertical: responsiveHeight(1.8), borderRadius: responsiveWidth(3), marginHorizontal: responsiveWidth(1.5) }} >
+                  {selectedAddress === item?.id && <TouchableOpacity activeOpacity={0.6} style={{ backgroundColor: '#FF9B66', paddingVertical: responsiveHeight(1.8), borderRadius: responsiveWidth(3), marginHorizontal: responsiveWidth(1.5) }} >
                     <CText type='s12' color={colors.white} style={{ alignSelf: 'center' }} >Deliver to this Address</CText>
                   </TouchableOpacity>}
                 </View>
@@ -736,6 +741,42 @@ const Address = () => {
 
 
       </Body>
+      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBEADE', height: responsiveHeight(9), justifyContent: 'space-between', paddingHorizontal: responsiveWidth(3.5), borderTopLeftRadius: responsiveWidth(4), borderTopRightRadius: responsiveWidth(4) }}  >
+
+<Text style={{ color: colors.black, ...typography.fontSizes.f16, ...typography.fontWeights.Bold, }}>Total Price: {'\u20B9'}{}</Text>
+
+<TouchableOpacity activeOpacity={0.6} onPress={() => {  }}  >
+  <View style={{ backgroundColor: '#FD872E', paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5), borderRadius: responsiveWidth(3) }} >
+
+    <Text style={{ color: colors.white, ...typography.fontSizes.f12, ...typography.fontWeights.Bold, }} >Continue</Text>
+  </View>
+</TouchableOpacity>
+
+</View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={useDeleteAddressMutation.isPending}
+      // onRequestClose={() => setModalVisible(false)}
+      >
+        <Box flex={1} justifyContent='center' alignItems='center' backgroundColor='rgba(0, 0, 0, 0.5)' >
+          <Box backgroundColor='#fff' borderRadius={10} alignItems='center' justifyContent='center' elevation={5} w={'55%'} h={'15%'} gap={10} >
+            {/* <Box alignItems='center' gap={5} >
+              <OppsIcon />
+              <Text style={{ color: colors.white, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Done</Text>
+              <Text fontFamily='$InterSemiBold' color={colors.black} textAlign='center' fontSize={18} mt={3} >Oops!</Text>
+              <Text fontFamily='$InterRegular' color={'#767474'} textAlign='center' fontSize={13} >MeetID Not Found</Text>
+
+              <PrimaryButton onPress={() => { navigation.goBack() }} buttonText='Try again' height={35} />
+            </Box> */}
+            <Text style={{ color: colors.black, ...typography.fontSizes.f14, ...typography.fontWeights.Bold, }} >Please wait</Text>
+
+            {/* <Button title="Close" onPress={() => setModalVisible(false)} /> */}
+            <Spinner size={'large'} color={colors.primary} />
+          </Box>
+        </Box>
+      </Modal>
 
     </Container>
   )

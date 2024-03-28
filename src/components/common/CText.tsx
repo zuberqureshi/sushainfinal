@@ -10,9 +10,10 @@ interface CTextProps extends TextProps {
   align?: 'left' | 'center' | 'right';
   color?: string;
   children?: React.ReactNode;
+  ref?:any
 }
 
-const CText = ({type, style, align, color, children, ...props}: CTextProps) => {
+const CText = ({type, style, align, color,ref, children, ...props}: CTextProps) => {
   const fontWeights = () => {
     switch (type?.charAt(0)?.toUpperCase()) {
       case 'R':
@@ -83,6 +84,7 @@ const CText = ({type, style, align, color, children, ...props}: CTextProps) => {
         align && {textAlign: align},
         style,
       ]}
+      ref={ref}
       {...props}>
       {children}
     </Text>

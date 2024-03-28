@@ -1,15 +1,13 @@
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
 import React, { useContext, useEffect } from 'react';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
+import { isLocationEnabled, promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
 
 // local imports
-import CSafeAreaView from '../../components/common/CSafeAreaView';
 import { styles } from '../../themes';
 import { StackNav } from '../../navigation/NavigationKeys';
-// import {getRefreshToken, getToken, getUserDetail} from '../utils/asyncstorage';
-// import {userSettingAPI} from '../api/authApi';
 import { AuthContext } from '../../context/AuthContext'
 
 import { getAccessToken, setAccessToken, CallApiJson, refreshTokenFetch } from '../../utils/network'
@@ -22,8 +20,37 @@ export default function Splash() {
   var loginstatus = false;
   useEffect(() => {
     SplashScreen.hide();
+    // handleCheckPressed()
     asyncProcess();
   }, [navigation]);
+
+  async function handleCheckPressed() {
+    if (Platform.OS === 'android') {
+      const checkEnabled: boolean = await isLocationEnabled();
+      console.log('checkEnabled', checkEnabled)
+      if(!checkEnabled){
+        try {
+          const enableResult = await promptForEnableLocationIfNeeded();
+          console.log('enableResult', enableResult);
+          // The user has accepted to enable the location services
+          // data can be :
+          //  - "already-enabled" if the location services has been already enabled
+          //  - "enabled" if user has clicked on OK button in the popup
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error(error.message);
+            // The user has not accepted to enable the location services or something went wrong during the process
+            // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
+            // codes :
+            //  - ERR00 : The user has clicked on Cancel button in the popup
+            //  - ERR01 : If the Settings change are unavailable
+            //  - ERR02 : If the popup has failed to open
+            //  - ERR03 : Internal error
+          }
+        }
+      }
+    }
+  }
 
   async function load() {
     console.log('APP aload splash')

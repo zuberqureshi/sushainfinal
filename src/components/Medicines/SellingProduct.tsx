@@ -10,27 +10,30 @@ import images from '../../assets/images'
 import { API_IMAGE_BASE_URL, moderateScale } from '../../common/constants'
 import strings from '../../themes/strings'
 import { Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
-import { useNavigation } from '@react-navigation/native'
+import { ParamListBase, useNavigation } from '@react-navigation/native'
 import { StackNav } from '../../navigation/NavigationKeys'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addProductsToCart } from '../../redux/cartSlice'
 import { increaseQty } from '../../redux/productSlice'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 
-const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSeller:boolean}) => {
+const SellingProduct = ({title,data}: {title: string,data:any,}) => {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const toast = useToast()
 
   const [load, setLoad] = useState(false)
 
   const dispatch = useDispatch()
+  const cartData = useSelector(state => state.cart);
+
 
   const onClickAddToCart = (item) => {
 
 
-    dispatch(addProductsToCart(item))
-    dispatch(increaseQty(item?.id))
+    dispatch(addProductsToCart({ id: item?.id, sku: item?.sku, name: item?.name, images: item?.images, image_third_party: item?.image_third_party, other_img: item?.other_img, product_pricing: item?.product_pricing, final_price: item?.final_price,handling_price:item?.handling_price, qty: 0 }))
+    // dispatch(increaseQty(item?.id))
 
     // scale.value = withSpring(1.5)
     // setTimeout(() => {
@@ -53,14 +56,41 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
 
     const RenderDSpecialities = ({item}: any) => {
         // console.log({item});
+
+        const [addedText, setAddedText] = useState('ADD')
+        // console.log(item?.qty,'item qty');
+    
+        function isValuePresent(arrayOfObjects, searchValue) {
+          // Iterate through the array of objects
+          for (let i = 0; i < arrayOfObjects.length; i++) {
+            // Access the current object
+            const obj = arrayOfObjects[i];
+    
+            // Check if the search value exists in the current object
+            for (let key in obj) {
+              if (obj[key] === searchValue) {
+                // If the value is found, return true
+                return true;
+              }
+            }
+          }
+    
+          // If the value is not found in any object, return false
+          return false;
+        }
+    
+        // Example usage
+        const arrayOfObjects = cartData;
+        const searchValue = item?.sku;
+        let isPresentItem = isValuePresent(arrayOfObjects, searchValue);
         
       return (
         <View style={localStyles.bestSellingWrapper} >
 
             <Pressable  onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 } }) }} style={localStyles.imgContainer} >
 
-              <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:bestSeller?'none':'flex-end'}} >
-                {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
+              <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginHorizontal:responsiveWidth(1.5),marginTop:responsiveHeight(0),alignSelf:'flex-end'}} >
+                <Text style={localStyles.bestsellerText} >{item?.type_lifestyle_product}</Text>
               {/* <HeartLightBlue style={{alignSelf:'flex-end'}} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
 
@@ -69,11 +99,11 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
                
                 <Image source={{uri: item?.image_third_party === 'NO' ? `${API_IMAGE_BASE_URL}${item?.images}` : `${item?.images}`}} style={localStyles.itemImg}  />
 
-              { !bestSeller && <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(2.3),marginLeft:responsiveWidth(2.4)}} >
+             <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(2.3),marginLeft:responsiveWidth(2.4)}} >
                     <Text style={localStyles.ratingText}  >{!!item?.rating ? item?.rating : 5}</Text>
                     <Image source={images.starBlack} style={localStyles.starBlack} />
                     <Text style={localStyles.ratingText}  >/5</Text>
-                </View>}
+                </View>
               
             </Pressable>
 
@@ -83,8 +113,13 @@ const SellingProduct = ({title,data,bestSeller}: {title: string,data:any,bestSel
 
                 <Text style={localStyles.priceText}>{'\u20B9'} { item?.product_pricing?.length > 0 ? item?.product_pricing[0]?.selling_price : item?.final_price}</Text>
 
-                <TouchableOpacity onPress={()=>{onClickAddToCart({...item,qty:0 })}} activeOpacity={0.6} style={localStyles.addButtomWrapper} >
-                   <Text style={localStyles.addButtomText} >ADD</Text>
+                <TouchableOpacity onPress={()=>{
+                  if (!isPresentItem && addedText === 'ADD') {
+                    setAddedText('Go to Cart')
+                    onClickAddToCart(item)
+                  }
+                 }} activeOpacity={0.6} style={localStyles.addButtomWrapper} >
+                   <Text fontFamily='$InterSemiBold' fontSize={12} color={colors.success} lineHeight={17} >{isPresentItem ? 'Go to Cart' : addedText}</Text>
                 </TouchableOpacity>
 
             </View>
@@ -146,7 +181,7 @@ const localStyles = StyleSheet.create({
       borderWidth:1,
       borderColor:'#D9D9D9',
       width:responsiveWidth(43),
-      height:moderateScale(170),
+      height:moderateScale(180),
       borderRadius:responsiveWidth(3),
 
     },
@@ -188,7 +223,7 @@ const localStyles = StyleSheet.create({
       borderRadius:responsiveWidth(1),
       backgroundColor:colors.lightSuccess,
       marginRight:responsiveWidth(4),
-      paddingHorizontal:responsiveWidth(6),
+      paddingHorizontal:responsiveWidth(3),
       paddingVertical:responsiveHeight(0.3)
 
     },

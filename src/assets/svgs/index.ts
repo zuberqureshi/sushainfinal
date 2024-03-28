@@ -136,6 +136,16 @@ import MuteRedIcon from './muteRedIcon.svg'
 import NoVideoRedIcon from './noVideoRedIcon.svg'
 import CartPayIcon from './cartPay.svg'
 import CancelColorIcon from './cancelColorIcon.svg'
+import CallBlackIcon from './callBlackIcon.svg'
+import MailBlackIcon from './mailBlackIcon.svg'
+import PersonContactUsIcon from './personContactUsIcon.svg'
+import CallContactUs from './callContactUs.svg'
+import MailContactUs from './mailContactUs.svg'
+import FacebookContactUs from './facebookContactUs.svg'
+import InstaContactUs from './instaContactUs.svg'
+import YouTubeContactUs from './youTubeContactUs.svg'
+
+
 
 export {
   Home,
@@ -273,6 +283,14 @@ export {
   NoVideoRedIcon,
   CartPayIcon,
   CancelColorIcon,
+  CallBlackIcon,
+  MailBlackIcon,
+  MailContactUs,
+  CallContactUs,
+  PersonContactUsIcon,
+  YouTubeContactUs,
+  InstaContactUs,
+  FacebookContactUs,
   
 
 

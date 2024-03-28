@@ -55,6 +55,7 @@ import useGetTodayAppointments from '../../hooks/appointment/get-today-appointme
 import { useNetInfo } from '@react-native-community/netinfo';
 import { StackNav } from '../../navigation/NavigationKeys';
 import CategoryListNew from '../../components/HomeComponent/CategoryListNew';
+import { useSelector } from 'react-redux';
 
 type Props = {
   icon: React.JSX.Element;
@@ -80,6 +81,8 @@ const HomeMain = () => {
   // const [homeBannerData, setResultData] = useState<any>([]);
 
   const [slectedTypeNeed, setSlectedTypeNeed] = useState<string>('ayurvedic')
+
+  const cartData = useSelector(state => state.cart);
 
   //api call
   const { data, isLoading } = useGetHomeData()
@@ -143,28 +146,28 @@ const HomeMain = () => {
   //   const onPressDrawer = () => navigation.openDrawer();
   const debounce = (func, delay) => {
     let timeoutId;
-  
+
     return (...args) => {
       clearTimeout(timeoutId);
-  
+
       timeoutId = setTimeout(() => {
         func.apply(this, args);
       }, delay);
     };
   };
-// console.log(authContext?.userInfo?.userName,'USERNAA');
+  // console.log(authContext?.userInfo?.userName,'USERNAA');
 
   const fetchSearchResults = async (term) => {
     // console.log({term});
-    
+
     try {
 
       const url = `http://13.232.170.16:3006/api/v1/order/productsearch?name=${term}`
       let result = await fetch(url);
       result = await result.json();
       // console.log(result?.result,'SERCH DATTT');
-      
-       
+
+
       // Perform an API request based on the search term
       // const response = await fetch(`YOUR_API_ENDPOINT?q=${term}`);
       // const data = await response.json();
@@ -218,12 +221,12 @@ const HomeMain = () => {
 
   const renderSearchResult = ({ item }: any) => {
     // console.log(item,'serch ITEm');
-    
+
     return (
-      <TouchableOpacity style={styles.p10} onPress={async() => { 
-      navigationDrawer.navigate(StackNav.ProductDetail, { productDetail: {...item,qty:0 }})
+      <TouchableOpacity style={styles.p10} onPress={async () => {
+        navigationDrawer.navigate(StackNav.ProductDetail, { productDetail: { ...item, qty: 0 } })
       }} >
-        <CText type="s10" numberOfLines={1}  color={colors.black}>
+        <CText type="s10" numberOfLines={1} color={colors.black}>
           {item?.name}
         </CText>
       </TouchableOpacity>
@@ -256,14 +259,14 @@ const HomeMain = () => {
               </Pressable>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.6} onPress={()=>{navigationDrawer?.navigate(StackNav.Profile)}} >
-          <View style={localStyles.iconContainer}>
-            {/* <Icon icon={<Heart />} onPress={onPressLike} />
+          <TouchableOpacity activeOpacity={0.6} onPress={() => { navigationDrawer?.navigate(StackNav.Profile) }} >
+            <View style={localStyles.iconContainer}>
+              {/* <Icon icon={<Heart />} onPress={onPressLike} />
             <Icon icon={<Notification />} onPress={onPressNotification} /> */}
-           { !!authContext?.userInfo?.userName ?    <Avatar bgColor='$amber600' size='xs' borderRadius="$full" >
-          <AvatarFallbackText>{  authContext?.userInfo?.userName}</AvatarFallbackText>
-        </Avatar> :<Icon icon={<User />} onPress={onPressUser} />}
-          </View>
+              {!!authContext?.userInfo?.userName ? <Avatar bgColor='$amber600' size='xs' borderRadius="$full" >
+                <AvatarFallbackText>{authContext?.userInfo?.userName}</AvatarFallbackText>
+              </Avatar> : <Icon icon={<User />} onPress={onPressUser} />}
+            </View>
           </TouchableOpacity>
         </View>
         <View style={localStyles.searchContainer}>
@@ -281,36 +284,41 @@ const HomeMain = () => {
             // rightAccessory={rightAccessory}
             inputStyle={localStyles.inputStyle}
           /> */}
-            <Box flexDirection='row' alignItems='center' h={40} px={10} borderWidth={1} borderColor={colors.gray4} borderRadius={5} flex={0.9} >
-          <Search/>
-        <TextInput
-          placeholder={strings.searchPlaceHolder}
-          value={searchText}
-          numberOfLines={1}
-          onChangeText={handleSearch}
-          style={localStyles.inputContainerStyle}
-        />
-        { !!searchDataList.length && <TouchableOpacity activeOpacity={0.7} onPress={()=>{
-          setSearchDataList([])
-          setSearchText('')}} >
-          <CrossBottomTab/>
-        </TouchableOpacity> }
-        </Box>
-          <TouchableOpacity onPress={() => { navigationDrawer.navigate(StackNav.Cart) }} activeOpacity={0.6} style={localStyles.cartBtnStyle}>
-            <Cart height={moderateScale(21)} width={moderateScale(21)} />
-          </TouchableOpacity>
-           {!!searchDataList.length && (
-          <View style={localStyles.searchSuggestionContainer}>
-            <FlatList
-              data={searchDataList}
-              renderItem={renderSearchResult}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item, index) => index.toString()}
-              ItemSeparatorComponent={() => <RenderSeparator />}
-            // estimatedItemSize={100}
+          <Box flexDirection='row' alignItems='center' h={40} px={10} borderWidth={1} borderColor={colors.gray4} borderRadius={5} flex={0.9} >
+            <Search />
+            <TextInput
+              placeholder={strings.searchPlaceHolder}
+              value={searchText}
+              numberOfLines={1}
+              onChangeText={handleSearch}
+              style={localStyles.inputContainerStyle}
             />
-          </View>
-        )}
+            {!!searchDataList.length && <TouchableOpacity activeOpacity={0.7} onPress={() => {
+              setSearchDataList([])
+              setSearchText('')
+            }} >
+              <CrossBottomTab />
+            </TouchableOpacity>}
+          </Box>
+          <TouchableOpacity onPress={() => { navigationDrawer.navigate(StackNav.Cart) }} activeOpacity={0.6} style={localStyles.cartBtnStyle}>
+            <Box>
+              <Cart height={moderateScale(21)} width={moderateScale(21)} />
+              {cartData?.length !== 0 && <Box position='absolute' bg={colors.white} alignItems='center' justifyContent='center' borderRadius={15} style={styles.shadowStyle} px={7} right={0} mr={-18} mt={-18} ><Text fontFamily='$InterMedium' color={colors.black} fontSize={12} >{cartData?.length}</Text></Box>}
+            </Box>
+
+          </TouchableOpacity>
+          {!!searchDataList.length && (
+            <View style={localStyles.searchSuggestionContainer}>
+              <FlatList
+                data={searchDataList}
+                renderItem={renderSearchResult}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                ItemSeparatorComponent={() => <RenderSeparator />}
+              // estimatedItemSize={100}
+              />
+            </View>
+          )}
         </View>
         <Box alignSelf='flex-end' flexDirection='row' gap={10} mr={20} mt={5} >
           <Pressable onPress={async () => {
@@ -417,7 +425,7 @@ const localStyles = StyleSheet.create({
     ...typography.fontSizes.f10,
     ...typography.fontWeights.SemiBold,
     flex: 1,
-    paddingRight:responsiveWidth(0.3),
+    paddingRight: responsiveWidth(0.3),
   },
   inputBoxStyle: {
     ...typography.fontSizes.f12,

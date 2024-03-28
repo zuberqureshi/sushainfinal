@@ -3,11 +3,11 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Container } from '../../components/Container'
 import CHeader from '../../components/common/CHeader'
 import { Cart, CartIconWhite, CrossBottomTab, HeartLightBlue, LikeIcon, Menu } from '../../assets/svgs'
-import { Box, Spinner, Text } from '@gluestack-ui/themed'
+import { Box, Spinner, Text, Toast, ToastTitle, useToast, useToken } from '@gluestack-ui/themed'
 import { StackNav } from '../../navigation/NavigationKeys'
 import CText from '../../components/common/CText'
 import { colors, styles } from '../../themes'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
 import strings from '../../i18n/strings'
 import { API_IMAGE_BASE_URL, getHeight, moderateScale } from '../../common/constants'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
@@ -18,22 +18,25 @@ import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/c
 import images from '../../assets/images'
 import Loader from '../../components/Loader/Loader'
 import useGetMedicinesBrandList from '../../hooks/medicine/get-medicines-brand-list'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 
 const ProductsByBrand = ({ route }) => {
 
-    const navigation = useNavigation()
+    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const iconSize = moderateScale(21);
     const { brandName , masterCat , personalCareType } = route.params
     const loadMore = true;
 
     const [searchText, setSearchText] = useState('')
+    const [apiData, setApiData] = useState<any[]>([])
     const [searchDataList, setSearchDataList] = useState([])
     const [showLoad, setShowLoad] = useState(false)
     const [pageNum, setPageNum] = useState(1)
     const [brandNameState, setbrandNameState] = useState(brandName)
 
     const dispatch = useDispatch()
+    const toast = useToast()
 
     const cartData = useSelector(state => state.cart);
     const products = useSelector(state => state.product);
@@ -56,7 +59,8 @@ const ProductsByBrand = ({ route }) => {
 
     const fecthFirst = async () => {
         await setPageNum(1)
-     await dispatch(clearProducts())
+    //  await dispatch(clearProducts())
+    await setApiData([])
   
         fetchData()
         console.log('first',brandNameState);
@@ -138,7 +142,7 @@ const ProductsByBrand = ({ route }) => {
 
     const RenderSeparator = () => <View style={localStyles.dividerStyle} />;
     const fetchData = () => {
-        console.log(products.length, pageNum, brandNameState, 'DATA LEE');
+        console.log(apiData.length, pageNum, brandNameState, 'DATA LEE');
 
         setShowLoad(true)
         fetch(`http://13.232.170.16:3006/api/v1/order/productbybrand?brand=${brandNameState}&skip=${pageNum}`).then(res => res.json())
@@ -154,14 +158,21 @@ const ProductsByBrand = ({ route }) => {
 
                 // await setApiData([...apiData,...res?.result[0]?.productList])
 
-                await res?.result[0]?.productDetail?.map(item => {
-                    // Assuming each item is an object
-                    // return {
-                    //   ...item,
-                    //   qty: 0, // Add your new value here
-                    // };
-                    dispatch(addProducts({ ...item, qty: 0 }))
-                });
+                // await res?.result[0]?.productDetail?.map(item => {
+                //     // Assuming each item is an object
+                //     // return {
+                //     //   ...item,
+                //     //   qty: 0, // Add your new value here
+                //     // };
+                //     dispatch(addProducts({ ...item, qty: 0 }))
+                // });
+                if (res?.result[0]?.productDetail?.length !== 0) {
+                    // setPageNum(10)
+          
+                    setApiData([...apiData, ...res?.result[0]?.productDetail])
+                    setShowLoad(false)
+                    await setPageNum(pageNum + 1)
+                  }
                 // console.log(products[0].qty,'productt map ADD QTY');
 
                 //     modifiedData.map(item => {
@@ -170,7 +181,7 @@ const ProductsByBrand = ({ route }) => {
                 // setApiData(res?.result[0]?.productList);
                 // dispatch(addProducts(res?.result[0]?.productList))
                 setShowLoad(false)
-                await setPageNum(pageNum + 1)
+                // await setPageNum(pageNum + 1)
 
             }).catch((error => {
                 console.log('erooor API PRODCC', error);
@@ -184,8 +195,10 @@ const ProductsByBrand = ({ route }) => {
 
         return (
             <TouchableOpacity style={styles.p10} onPress={async () => {
-                await   dispatch(clearProducts())
+                // await   dispatch(clearProducts())
+                await setApiData([])
                  setbrandNameState(item?.name)
+                 setSearchDataList([])
             }} >
                 <CText type="s10" numberOfLines={1} color={colors.black}>
                     {item?.name}
@@ -194,10 +207,37 @@ const ProductsByBrand = ({ route }) => {
         );
     };
 
-    const renderCardItem = ({ item, index }: any) => {
+    const RenderCardItem = ({ item, index }: any) => {
 
         //  console.log('qty',item?.id);
         const bestSeller = true
+
+        const [addedText, setAddedText] = useState('ADD')
+        // console.log(item?.qty,'item qty');
+    
+        function isValuePresent(arrayOfObjects, searchValue) {
+          // Iterate through the array of objects
+          for (let i = 0; i < arrayOfObjects.length; i++) {
+            // Access the current object
+            const obj = arrayOfObjects[i];
+    
+            // Check if the search value exists in the current object
+            for (let key in obj) {
+              if (obj[key] === searchValue) {
+                // If the value is found, return true
+                return true;
+              }
+            }
+          }
+    
+          // If the value is not found in any object, return false
+          return false;
+        }
+    
+        // Example usage
+        const arrayOfObjects = cartData;
+        const searchValue = item?.sku;
+        let isPresentItem = isValuePresent(arrayOfObjects, searchValue);
         return (
             <Pressable onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} >
                 <View style={[localStyles.cardMainContainer, { marginLeft: index % 2 && responsiveWidth(2.4) }]} >
@@ -229,17 +269,33 @@ const ProductsByBrand = ({ route }) => {
 
                         </View>
 
-                        {item?.qty == 0 ? (
-                            <TouchableOpacity activeOpacity={0.6} onPress={() => {
-                                dispatch(addProductsToCart(item))
-                                dispatch(increaseQty(item?.id))
+                        {(
+              <TouchableOpacity activeOpacity={0.6} onPress={() => {
+                if (!isPresentItem && addedText === 'ADD') {
+                  setAddedText('ADDED')
+                  dispatch(addProductsToCart({ id: item?.id, sku: item?.sku, name: item?.name, images: item?.images, image_third_party: item?.image_third_party, other_img: item?.other_img, product_pricing: item?.product_pricing, final_price: item?.final_price,handling_price:item?.handling_price, qty: 0 }))
+                  toast.show({
+                    placement: 'bottom',
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant='accent' action='success'>
+                          <ToastTitle>Add To Cart</ToastTitle>
+                        </Toast>
+                      )
+                    }
+                  })
 
-                            }} style={{ backgroundColor: colors.lightSuccess, borderColor: colors.success, borderWidth: responsiveWidth(0.2), borderRadius: responsiveWidth(1.5) }} >
-                                <Text fontFamily='$InterMedium' color={colors.success} fontSize={12} px={16} py={1} >ADD</Text>
-                            </TouchableOpacity>
-                        ) : null}
+                }
+                // dispatch(increaseQty(item?.id))
 
-                        {item?.qty !== 0 &&
+              }} style={{ backgroundColor: colors.lightSuccess, borderColor: colors.success, borderWidth: responsiveWidth(0.2), borderRadius: responsiveWidth(1.5) }} >
+                <Text fontFamily='$InterMedium' color={colors.success} fontSize={12} px={16} py={1} >{isPresentItem ? 'ADDED' : addedText}</Text>
+
+              </TouchableOpacity>
+            )}
+
+                        {/* {item?.qty !== 0 &&
 
 
                             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.lightSuccess, borderColor: colors.success, borderWidth: responsiveWidth(0.2), borderRadius: responsiveWidth(1.5) }} >
@@ -271,7 +327,7 @@ const ProductsByBrand = ({ route }) => {
 
 
 
-                        }
+                        } */}
                     </View>
 
 
@@ -329,11 +385,11 @@ const ProductsByBrand = ({ route }) => {
 
 
                 <Box gap={5} flexDirection='row' alignItems='center' >
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
 
                         style={localStyles.cartBtnStyle}>
                         <LikeIcon height={iconSize} width={iconSize} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.Cart) }} >
                         <Box>
                             <Cart height={iconSize} width={iconSize} />
@@ -365,8 +421,8 @@ const ProductsByBrand = ({ route }) => {
 
                 {<FlatList
                     style={{ flex: 1, alignSelf: 'center', marginTop: responsiveHeight(2) }}
-                    data={products}
-                    renderItem={renderCardItem}
+                    data={apiData}
+                    renderItem={({item,index})=>{return <RenderCardItem item={item} index={index}/>}}
                     keyExtractor={(item, index) => index.toString()}
                     numColumns={2}
                     // justifyContent="space-between"

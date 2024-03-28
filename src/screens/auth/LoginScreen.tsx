@@ -432,7 +432,7 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity> */}
 
-          <PrimaryButton disabled={loading} loading={loading} onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(34)} marginTop={responsiveHeight(2.5)} marginBottom={responsiveHeight(3)} />
+          <PrimaryButton disabled={loading} loading={loading} onPress={formik.handleSubmit} buttonText={strings.signInNow} height={getHeight(40)} marginTop={responsiveHeight(2.5)} marginBottom={responsiveHeight(3)} />
         </View>
 
         <View style={localStyles.dividerContainer}>

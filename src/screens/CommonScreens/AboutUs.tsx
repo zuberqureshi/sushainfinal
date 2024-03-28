@@ -140,8 +140,8 @@ const AboutUs = () => {
 
                 <Text fontFamily='$InterSemiBold' color={colors.primary} fontSize={18} lineHeight={22} alignSelf='center' pb={15} >Sustainability</Text>
 
-                <Box alignSelf='center' w={360} mx={30} py={10} backgroundColor='#FFFEFE' borderRadius={10} style={[styles.shadowStyle,]}  >
-                    <Image alt='icon' source={images?.Sustainability} w={'100%'} h={190} resizeMode='contain' mb={10} borderRadius={10} />
+                <Box alignSelf='center'  mx={30} py={10} backgroundColor='#FFFEFE' borderRadius={10} style={[styles.shadowStyle,]}  >
+                    <Image alt='icon' source={images?.Sustainability} w={400} h={190} resizeMode='contain' mb={10} borderRadius={10} />
                     <Box gap={10} px={15} >
                         <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15}  >Paperless Documentation:</Text>
                         <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} lineHeight={12}  >Ayurvedic online platforms can embrace digital documentation, reducing the reliance on paper and contributing to a more eco-friendly approach.</Text>

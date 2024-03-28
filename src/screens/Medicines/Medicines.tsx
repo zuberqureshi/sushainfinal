@@ -305,7 +305,7 @@ const Medicines = ({ route, navigation }: any) => {
 
         <MedicinesConcerns title={strings.medicinesbyHealthConcerns} mediType={mediType} personalCare={personalCareType} />
 
-        <SellingProduct title={strings.bestSelling} data={bestSellerData?.data?.result[0]?.productDetail} bestSeller={true} />
+        <SellingProduct title={strings.bestSelling} data={bestSellerData?.data?.result[0]?.productDetail}  />
 
         <TouchableOpacity style={localStyles.bannerContaienr}>
           <Image
@@ -408,7 +408,7 @@ const Medicines = ({ route, navigation }: any) => {
           </View>
         </TouchableOpacity>
 
-        <SellingProduct title={'Save Big With Combos'} data={combosData?.data?.result[0]?.productDetail} bestSeller={true} />
+        <SellingProduct title={'Save Big With Combos'} data={combosData?.data?.result[0]?.productDetail} />
 
         {/* <SubHeader title={'Value Deals Under'} isViewHide={false} /> */}
 
@@ -449,7 +449,7 @@ const Medicines = ({ route, navigation }: any) => {
         </View> */}
 
 
-        <SellingProduct title={'Recommended For You'} data={recommendedData?.data?.result[0]?.productDetail} bestSeller={true} />
+        <SellingProduct title={'Recommended For You'} data={recommendedData?.data?.result[0]?.productDetail}  />
 
         <TouchableOpacity style={[localStyles.bannerContaienr, { marginVertical: responsiveHeight(1) }]}>
           <Image
@@ -461,7 +461,7 @@ const Medicines = ({ route, navigation }: any) => {
 
         {/* <SellingProduct title={'Top Ayurveda Product'} data={saveBigData} bestSeller={true} /> */}
 
-        <SellingProduct title={'Sushain Products '} data={brandData?.data?.result[0]?.productDetail} bestSeller={false} />
+        <SellingProduct title={'Sushain Products '} data={brandData?.data?.result[0]?.productDetail}  />
 
         <View style={localStyles.bottomContainer}>
           <View style={localStyles.rowStyle}>

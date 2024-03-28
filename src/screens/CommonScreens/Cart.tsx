@@ -10,7 +10,7 @@ import {
   Pressable,
   TextInput
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { colors, styles } from '../../themes';
 import CHeader from '../../components/common/CHeader';
 
@@ -39,22 +39,26 @@ import Body from '../../components/Body/Body';
 import { Container } from '../../components/Container';
 import useGetSetting from '../../hooks/home/get-setting';
 import Loader from '../../components/Loader/Loader';
-
+import useOrderCreate from '../../hooks/order/order-create';
+import { AuthContext } from '../../context/AuthContext'
 
 const Cart = ({ navigation }) => {
 
   const dispatch = useDispatch()
   const toast = useToast()
+  const authContext: any = useContext(AuthContext);
 
   const [stepCurrentPosition, setStepCurrentPosition] = useState(0)
 
   const [selectedShippingOption, setSelectedShippingOption] = useState(55)
-  const [COD, setCOD] = useState(false)
+  const [COD, setCOD] = useState(0)
   const [applyCoupon, setApplyCoupon] = useState(false)
   const [payPrice, setPayPrice] = useState('')
+  const [disCount, setDisCount] = useState(0)
 
   //api call
   const useCheckCouponCodeMutation = useCheckCouponCode()
+  const useOrderCreateMutation = useOrderCreate()
   const { data: settingData, isLoading: settingIsLoading } = useGetSetting()
   // console.log(settingData?.data?.result[0]?.generalSettings?.cod_charges);
 
@@ -117,9 +121,10 @@ const Cart = ({ navigation }) => {
   const getTotalPriceFinal = (shpiChr) => {
     let total = 0
     if (COD) {
-      total = total + getTotalPriceCart() + shpiChr + 10 + settingData?.data?.result[0]?.generalSettings?.cod_charges;
+      let Cod = (settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart()) ? COD : 0
+      total = total + getTotalPriceCart() + shpiChr + getTotalPriceHandlingCharge() + Cod - disCount
     } else {
-      total = total + getTotalPriceCart() + shpiChr + getTotalPriceHandlingCharge();
+      total = total + getTotalPriceCart() + shpiChr + getTotalPriceHandlingCharge() - disCount
     }
 
 
@@ -156,6 +161,63 @@ const Cart = ({ navigation }) => {
 
   );
 
+
+  const createOrder = () => {
+
+    let shippingCharge = getTotalPriceHandlingCharge() + selectedShippingOption
+
+
+
+    const payload = {
+      user_id: authContext?.userInfo?.userId,
+      products: cartData,
+      couon_code: formik?.values.couponcode,
+      cod_charges: (settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart()) ? COD : 0,
+      shippingcharges: shippingCharge,
+      shippingmode: selectedShippingOption === 55 ? 'NORMAL' : 'EXPRESS'
+    }
+    // console.log({ payload });
+    // navigation.navigate(StackNav.Address)
+
+    // useOrderCreateMutation.mutate(payload, {
+    //   onSuccess: (data) => {
+
+    //     // console.log('SUGNUPP DATA',data?.data);
+
+    //     toast.show({
+    //       placement: "bottom",
+    //       render: ({ id }: { id: string }) => {
+    //         const toastId = "toast-" + id
+    //         return (
+    //           <Toast nativeID={toastId} variant="accent" action="success">
+    //             <ToastTitle>order create successfully</ToastTitle>
+    //           </Toast>
+    //         );
+    //       },
+    //     })
+
+
+
+
+    //   },
+    //   onError: (error) => {
+    //     // console.log(error);
+
+    //     toast.show({
+    //       placement: "bottom",
+    //       render: ({ id }: { id: string }) => {
+    //         const toastId = "toast-" + id
+    //         return (
+    //           <Toast nativeID={toastId} variant="accent" action="error">
+    //             <ToastTitle>Something went wrong, please try again later</ToastTitle>
+    //           </Toast>
+    //         )
+    //       }
+    //     })
+    //   }
+    // })
+  }
+
   const onClickCheckCoupon = () => {
     if (formik.values.couponcode.length <= 0 || formik.values.couponcode === '') {
       toast.show({
@@ -171,17 +233,21 @@ const Cart = ({ navigation }) => {
       })
     }
     else {
+      let mrp = getTotalPriceFinal(selectedShippingOption)
       const payload = {
         coupon_code: formik.values.couponcode,
         type: "APPOINTMENT",
-        userid: '',
+        userid: authContext?.userInfo?.userId,
         displayMode: "NATIVEAPP",
-        Totalmrp: '715'
+        Totalmrp: mrp
       }
+
+
+
 
       useCheckCouponCodeMutation.mutate(payload, {
         onSuccess: (data) => {
-          console.log(data?.data?.result[0]?.finalPrice);
+          // console.log(data?.data,'Copn');
 
           toast.show({
             placement: "bottom",
@@ -194,7 +260,8 @@ const Cart = ({ navigation }) => {
               );
             },
           })
-          setPayPrice(data?.data?.result[0]?.finalPrice)
+          setDisCount(data?.data?.result[0]?.discount)
+
           setApplyCoupon(true)
 
         },
@@ -348,7 +415,7 @@ const Cart = ({ navigation }) => {
               <CText type='m12' color={colors.primary} >{formik?.values?.couponcode}</CText>
               <Pressable onPress={() => {
                 setApplyCoupon(false)
-                setPayPrice('')
+                setDisCount(0)
                 formik.setFieldValue('couponcode', '')
               }} >
                 <CrossBottomTab />
@@ -372,17 +439,17 @@ const Cart = ({ navigation }) => {
 
         </View>
         <Box backgroundColor='#F5F1F1' h={8} ></Box>
-          <Box px={20} py={10} >
-            <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >Best Offers For You</Text>
+        <Box px={20} py={10} >
+          <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >Best Offers For You</Text>
 
-            <Box borderWidth={1} borderColor='#E9E3E3' borderRadius={10} gap={10} overflow='hidden'  mt={10} >
+          <Box borderWidth={1} borderColor='#E9E3E3' borderRadius={10} gap={10} overflow='hidden' mt={10} >
 
             <Text fontFamily='$InterSemiBold' color={colors.black} fontSize={14} lineHeight={17} px={10} pt={10}  >FLAT 5% OFF</Text>
             <Text fontFamily='$InterMedium' color={colors.gray4} fontSize={11} lineHeight={14} px={10} >Use Paytm UPI</Text>
 
             <Box flexDirection='row' alignItems='center' justifyContent='space-between' px={10} >
-              <Box  borderWidth={1} borderColor='#E6E1E1' borderRadius={10} px={10} py={5} >
-              <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >MED5D</Text>
+              <Box borderWidth={1} borderColor='#E6E1E1' borderRadius={10} px={10} py={5} >
+                <Text fontFamily='$InterMedium' color={colors.black} fontSize={12} lineHeight={15} >MED5D</Text>
               </Box>
               <Text fontFamily='$InterSemiBold' color={colors.gray6} fontSize={12} lineHeight={15} >Hide Details</Text>
             </Box>
@@ -390,21 +457,21 @@ const Cart = ({ navigation }) => {
             <Box borderBottomWidth={1} borderColor='#CBCACA' mx={10} ></Box>
 
             <Box px={10} gap={5} >
-            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Valid on total value of items worth 200 or more</Text>
-            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Maximum discount: 2000</Text>
-            <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Offer valid once per user during offer period</Text>
+              <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Valid on total value of items worth 200 or more</Text>
+              <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Maximum discount: 2000</Text>
+              <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={11} lineHeight={14} >● Offer valid once per user during offer period</Text>
             </Box>
-            
-            <TouchableOpacity onPress={()=>{formik.setFieldValue('couponcode','RL50')}}  activeOpacity={0.6} >
-            <Box backgroundColor='#FFEDED' py={15} alignItems='center' >
-            <Text fontFamily='$InterMedium' color={'#F64444'} fontSize={14} lineHeight={17} >TAP TO APPLY</Text>
-            </Box>
-              
-            </TouchableOpacity>
-       
 
-            </Box>
+            <TouchableOpacity onPress={() => { formik.setFieldValue('couponcode', 'RL50') }} activeOpacity={0.6} >
+              <Box backgroundColor='#FFEDED' py={15} alignItems='center' >
+                <Text fontFamily='$InterMedium' color={'#F64444'} fontSize={14} lineHeight={17} >TAP TO APPLY</Text>
+              </Box>
+
+            </TouchableOpacity>
+
+
           </Box>
+        </Box>
         <Box backgroundColor='#F5F1F1' h={8} ></Box>
 
         <View style={{ paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(1.5), borderBottomWidth: responsiveWidth(1.5), borderBottomColor: '#F5F1F1' }} >
@@ -457,9 +524,9 @@ const Cart = ({ navigation }) => {
           <View style={{ marginBottom: responsiveHeight(1) }} >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }} >
               <TouchableOpacity onPress={() => {
-                setCOD(false)
-              }} style={{ borderWidth: 1, borderColor: !COD ? colors.primary : colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
-                <View style={{ backgroundColor: !COD ? colors.primary : '#F7F9F9', paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
+                setCOD(0)
+              }} style={{ borderWidth: 1, borderColor: !(!!COD) ? colors.primary : colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
+                <View style={{ backgroundColor: !(!!COD) ? colors.primary : '#F7F9F9', paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
               </TouchableOpacity>
               <CText type='m14' >Pre-Paid</CText>
             </View>
@@ -469,18 +536,18 @@ const Cart = ({ navigation }) => {
           {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart()) && <View style={{}} >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }} >
               <TouchableOpacity onPress={() => {
-                setCOD(true)
-              }} style={{ borderWidth: 1, borderColor: COD ? colors.primary : colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
-                <View style={{ backgroundColor: COD ? colors.primary : '#F7F9F9', paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
+                setCOD(settingData?.data?.result[0]?.generalSettings?.cod_charges)
+              }} style={{ borderWidth: 1, borderColor: !!COD ? colors.primary : colors.primary, paddingHorizontal: responsiveWidth(0.8), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(4) }} >
+                <View style={{ backgroundColor: !!COD ? colors.primary : '#F7F9F9', paddingHorizontal: responsiveWidth(1.4), paddingVertical: responsiveHeight(0.7), borderRadius: responsiveWidth(2) }} ></View>
               </TouchableOpacity>
               <CText type='m14' >Cash On Delivery</CText>
             </View>
 
           </View>}
 
-          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD) && <View style={{ borderBottomWidth: 1, borderBottomColor: '#E9E1E1', marginTop: responsiveHeight(1.5) }} ></View>}
+          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && !!COD) && <View style={{ borderBottomWidth: 1, borderBottomColor: '#E9E1E1', marginTop: responsiveHeight(1.5) }} ></View>}
 
-          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && COD) && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: responsiveHeight(1.5) }} >
+          {(settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart() && !!COD) && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: responsiveHeight(1.5) }} >
             <CText type='m14' >COD charges</CText>
             <CText type='s14' >{'\u20B9'}{settingData?.data?.result[0]?.generalSettings?.cod_charges}</CText>
           </View>}
@@ -498,15 +565,15 @@ const Cart = ({ navigation }) => {
             <CText type='m12' >{'\u20B9'} {getTotalPriceCart()}</CText>
           </View>
 
-          <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
+          {!!disCount && <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
             <CText type='r12' color='#565353' >Total Discount</CText>
-            <CText type='m12' >-50</CText>
-          </View>
+            <CText type='m12' >-{disCount}</CText>
+          </View>}
           <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
             <CText type='r12' color='#565353' >Shipping/ Handling Fee</CText>
             <CText type='m12' >{'\u20B9'}{selectedShippingOption + getTotalPriceHandlingCharge()}</CText>
           </View>
-          {COD && <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
+          {(!!COD && (settingData?.data?.result[0]?.generalSettings?.cod_min_amount < getTotalPriceCart() && settingData?.data?.result[0]?.generalSettings?.cod_max_amount > getTotalPriceCart())) && <View style={{ ...styles.flexRow, alignItems: 'center', justifyContent: 'space-between' }} >
             <CText type='r12' color='#565353' >COD Charges</CText>
             <CText type='m12' >{'\u20B9'}{55}</CText>
           </View>}
@@ -528,25 +595,19 @@ const Cart = ({ navigation }) => {
           <CText type='b12' color={colors.success} >{'\u20B9'} 50</CText>
         </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBEADE', height: responsiveHeight(9), justifyContent: 'space-between', paddingHorizontal: responsiveWidth(3.5), borderTopLeftRadius: responsiveWidth(4), borderTopRightRadius: responsiveWidth(4) }}  >
-
-          <Text style={{ color: colors.black, ...typography.fontSizes.f16, ...typography.fontWeights.Bold, }}>Total Price: {'\u20B9'}{getTotalPriceFinal(selectedShippingOption)}</Text>
-
-          <TouchableOpacity activeOpacity={0.6} onPress={() => { navigation.navigate(StackNav.OrderSummery) }}  >
-            <View style={{ backgroundColor: '#FD872E', paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5), borderRadius: responsiveWidth(3) }} >
-
-              <Text style={{ color: colors.white, ...typography.fontSizes.f12, ...typography.fontWeights.Bold, }} >Continue</Text>
-            </View>
-          </TouchableOpacity>
-
-        </View>
-
-
-
-
-
-
       </Body>
+      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBEADE', height: responsiveHeight(9), justifyContent: 'space-between', paddingHorizontal: responsiveWidth(3.5), borderTopLeftRadius: responsiveWidth(4), borderTopRightRadius: responsiveWidth(4) }}  >
+
+        <Text style={{ color: colors.black, ...typography.fontSizes.f16, ...typography.fontWeights.Bold, }}>Total Price: {'\u20B9'}{getTotalPriceFinal(selectedShippingOption)}</Text>
+
+        <TouchableOpacity activeOpacity={0.6} onPress={() => { createOrder() }}  >
+          <View style={{ backgroundColor: '#FD872E', paddingHorizontal: responsiveWidth(5), paddingVertical: responsiveHeight(1), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5), borderRadius: responsiveWidth(3) }} >
+
+            <Text style={{ color: colors.white, ...typography.fontSizes.f12, ...typography.fontWeights.Bold, }} >Continue</Text>
+          </View>
+        </TouchableOpacity>
+
+      </View>
     </Container>
   )
 }

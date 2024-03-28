@@ -34,6 +34,7 @@ const wHeight = Dimensions.get('screen').height;
 const ProductDetail = ({ route, navigation }) => {
 
   const { productDetail } = route.params
+  const iconSize = moderateScale(21);
   const [sliderImgActive, setSliderImgActive] = useState(0)
   const [productTypeActive, setProductTypeActive] = useState(0)
 
@@ -48,14 +49,29 @@ const ProductDetail = ({ route, navigation }) => {
   const animatedX = useSharedValue(0)
   const scale = useSharedValue(1)
 
-  // if (similarProductsIsLoading) {
-  //   return(
-  //     <Container statusBarStyle='dark-content'>
-  //       <CHeader/>
-  //       <Loader/>
-  //     </Container>
-  //   )
-  // }
+  function isValuePresent(arrayOfObjects, searchValue) {
+    // Iterate through the array of objects
+    for (let i = 0; i < arrayOfObjects.length; i++) {
+      // Access the current object
+      const obj = arrayOfObjects[i];
+
+      // Check if the search value exists in the current object
+      for (let key in obj) {
+        if (obj[key] === searchValue) {
+          // If the value is found, return true
+          return true;
+        }
+      }
+    }
+
+    // If the value is not found in any object, return false
+    return false;
+  }
+
+  // Example usage
+  const arrayOfObjects = cartData;
+  const searchValue = productDetail?.sku;
+  let isPresentItem = isValuePresent(arrayOfObjects, searchValue);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -114,24 +130,30 @@ const ProductDetail = ({ route, navigation }) => {
   const HeaderRightIcon = () => {
 
     return (
-      <View style={{ ...styles.flexRow, ...styles.itemsCenter, gap: responsiveWidth(2.5) }} >
+      <Box gap={5} flexDirection='row' alignItems='center' >
         {/* <ShareIconBlack />
         <LikeIcon /> */}
 
         <Pressable onPress={() => { navigation.navigate(StackNav.Cart) }} >
-          <CartBlack />
+          {/* <CartBlack /> */}
 
           {/* <Box position='absolute' top={0} right={0} backgroundColor={colors.white} borderRadius={10} px={6} py={3} mt={-8} mr={-4}  >
         <CText type='b8' >{cartData?.length}</CText>
         </Box> */}
        
-      { cartData?.length != 0 &&  <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5.5), height:responsiveHeight(2.5) }, animatedStyle]} >
+      {/* { cartData?.length != 0 &&  <Animated.View style={[{ backgroundColor: colors.white, position: 'absolute', top: 0, right: 0, paddingHorizontal: responsiveWidth(1.5), paddingVertical: responsiveHeight(0.4), borderRadius: responsiveWidth(3), marginTop: responsiveHeight(-1), marginRight: responsiveWidth(-1.5), width: responsiveWidth(5.5), height:responsiveHeight(2.5) }, animatedStyle]} >
             <CText type='b8' style={{ textAlign: 'center' }} numberOfLines={1} >{cartData?.length}</CText>
-          </Animated.View>}
+          </Animated.View>} */}
+          <Box>
+              <CartBlack height={iconSize} width={iconSize} />
+              {cartData?.length != 0 && <Box position='absolute' h={18} w={18} borderRadius={10} backgroundColor={colors.white} right={0} top={0} mt={-8} mr={-8} shadowColor='#000' shadowOffset={{ width: 0, height: 1 }} shadowOpacity={0.22} shadowRadius={2.22} alignItems='center' justifyContent='center' elevation={3}  >
+                <CText type='m10' align='center' numberOfLines={1} >{cartData?.length}</CText>
+              </Box>}
+            </Box>
 
         </Pressable>
 
-      </View>
+      </Box>
     )
   }
 
@@ -150,8 +172,9 @@ const ProductDetail = ({ route, navigation }) => {
   const onClickAddToCart = () => {
 
 
-    dispatch(addProductsToCart(productDetail))
-    dispatch(increaseQty(productDetail?.id))
+   if(!isPresentItem){
+    dispatch(addProductsToCart({ id: productDetail?.id, sku: productDetail?.sku, name: productDetail?.name, images: productDetail?.images, image_third_party: productDetail?.image_third_party, other_img: productDetail?.other_img, product_pricing: productDetail?.product_pricing, final_price: productDetail?.final_price,handling_price:productDetail?.handling_price, qty: 0 }))
+    // dispatch(increaseQty(productDetail?.id))
 
     scale.value = withSpring(1.5)
     setTimeout(() => {
@@ -169,6 +192,7 @@ const ProductDetail = ({ route, navigation }) => {
         )
       }
     })
+   }
   }
 
   let offPer = ((productDetail?.product_pricing[0]?.selling_price / productDetail?.product_pricing[0]?.buying_price) * 100).toFixed(0)
@@ -325,7 +349,7 @@ const ProductDetail = ({ route, navigation }) => {
                 type='m14'
                 color={colors.primary}
               >
-                Add to Cart
+              { isPresentItem ? 'Go to Cart' : 'Add to Cart'}
               </CText>
 
             </TouchableOpacity>

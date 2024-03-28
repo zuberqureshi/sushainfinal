@@ -447,3 +447,10 @@ export const bookingFor = [
   {label: 'Other', value: 'other'},
 
 ]
+
+export const chooseRole = [
+  {label: 'User', value: 'user'},
+  {label: 'Doctor', value: 'doctor'},
+  {label: 'Franchisee Partner', value: 'FranchiseePartner'},
+
+]

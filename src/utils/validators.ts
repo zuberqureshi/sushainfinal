@@ -94,6 +94,14 @@ export const addressAddSchema = yup.object().shape({
 
 })
 
+export const contactUsSchema = yup.object().shape({
+  name:yup.string().required("Name is required").typeError('Input must be a string'),
+  number:yup.string().required("Mobile number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter exactly 10 digits'),
+  email:yup.string().email('Invalid email').required('Email is required'),
+
+
+})
+
 export const signInWithOtpSchema = yup.object().shape({
   mobile:yup.string().required("Mobile number is required").matches(/^(\+91-|\+91|0)?\d{10}$/,'Enter exactly 10 digits'),
   // otp:yup.string().required("otp is required"),

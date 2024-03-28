@@ -9,6 +9,7 @@ class HomeService {
     getSpeclizationlist:'getSpeclizationlist',
     getDoctorsBySpeclization:'getDoctorsBySpeclization',
     getSetting : 'getSetting',
+    contactUs : 'contactUs',
   };
 
   getHomeData = async () => {
@@ -45,6 +46,16 @@ class HomeService {
     return fetcher({
       url: 'auth/settings',
       method: 'GET',
+    });
+  }
+
+  
+  contactUs = async (data:any) => {
+    
+    return fetcher({
+      url: `/leads/createcrmleads`,
+      method: 'POST',
+      data
     });
   }
 

@@ -38,6 +38,7 @@
     "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-actions-sheet": "^0.9.0-alpha.24",
+    "react-native-android-location-enabler": "^2.0.1",
     "react-native-cashfree-pg-sdk": "^2.1.8",
     "react-native-check-box": "^2.1.7",
     "react-native-countdown-component": "^2.7.1",

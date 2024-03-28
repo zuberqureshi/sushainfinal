@@ -6,6 +6,7 @@ class OrderService {
   queryKeys = {
     getMyOrders: 'getMyOrders',
     getOrderDetails : 'getOrderDetails',
+    orderCreate : 'orderCreate',
     
   };
 
@@ -20,6 +21,15 @@ class OrderService {
     return fetcher({
       url: `/order/orderdetails?orderId=${data}`,
       method: 'GET',
+    });
+  }
+
+  orderCreate = async (data:any) => {
+    
+    return fetcher({
+      url: `order/createorder`,
+      method: 'POST',
+      data
     });
   }
 

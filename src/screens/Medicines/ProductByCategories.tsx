@@ -24,7 +24,7 @@ import { Container } from '../../components/Container'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { addProducts, clearProducts, decreaseQty, increaseQty } from '../../redux/productSlice'
-import { Box, Spinner, Text } from '@gluestack-ui/themed'
+import { Box, Spinner, Text, Toast, ToastTitle, useToast } from '@gluestack-ui/themed'
 import Loader from '../../components/Loader/Loader'
 import { addProductsToCart, deleteCartItem, removeCartItem } from '../../redux/cartSlice'
 import { FlashList } from 'react-native-actions-sheet'
@@ -58,6 +58,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
   const limit = 10;
   const loadMore = true;
+
   const [apiData, setApiData] = useState<any[]>([])
   const [multipleAddButton, setMultipleAddButton] = useState(false)
   const [filterBy, setFilterBy] = useState('brand')
@@ -77,17 +78,22 @@ const ProductByCategories = ({ route, navigation }: any) => {
   const { data: medicinesSubCategoryData, isLoading: medicinesSubCategoryIsLoading } = useGetMedicinesSubCategory({ masterCat: mediType, personalCareType: personalCareType, category: selectedProductCategory })
 
   const dispatch = useDispatch()
+  const toast = useToast()
 
   const cartData = useSelector(state => state.cart);
+  const products = useSelector(state => state.product);
   // console.log({cartData});
 
   const fetchType = async () => {
+    // await dispatch(clearProducts())
+    await setApiData([])
     let medType = await getAccessToken('medType')
     await setPageNum(1)
     await setSelectedProductSubCtegory('')
     setMediType(medType)
+
     setSelectedProductCtegory(categoryName)
-    dispatch(clearProducts())
+
 
     queryClient.invalidateQueries({
       queryKey: [medicinesService.queryKeys.getMedicinesHealthConcerns + { masterCat: mediType, personalCareType: personalCareType }]
@@ -99,24 +105,21 @@ const ProductByCategories = ({ route, navigation }: any) => {
       })
       setProductCategory(updatedData)
     }
-    console.log(selectedProductCategory, mediType, personalCareType, selectedProductSubCategory);
+    console.log(selectedProductCategory, mediType, personalCareType, selectedProductSubCategory, apiData?.length);
   }
 
   useEffect(() => {
-    dispatch(clearProducts())
+    setApiData([])
     fetchType()
 
   }, [categoryName, personalCareType])
-
-
-
-
 
 
   const onProductCategoryChange = (item: any) => {
     setPageNum(1)
     setSelectedProductCtegory(item.value)
   }
+
 
   const getTotalPriceCart = () => {
     let total = 0;
@@ -139,13 +142,13 @@ const ProductByCategories = ({ route, navigation }: any) => {
   // useEffect(() => {
   //   addInRedux()
   // }, [])
-  const products = useSelector(state => state.product);
+
   // console.log(products,products.length,'PREDUXBBB');
 
 
 
   const fetchData = () => {
-    console.log(products.length, pageNum, selectedProductCategory, 'DATA LEE');
+    console.log(apiData.length, pageNum, selectedProductCategory, 'DATA LEE');
 
     setShowLoad(true)
     fetch(`https://prod-api.sushainclinic.com/api/v1/order/medicinebycategory?master_cat=${mediType}&cat_name=${selectedProductCategory}&pageNumber=${pageNum}&pageSize=10&sub_category=${selectedProductSubCategory}&personal_care=${personalCareType}`).then(res => res.json())
@@ -153,22 +156,31 @@ const ProductByCategories = ({ route, navigation }: any) => {
         // console.log(res?.result[0]?.productList?.length, pageNum, 'APIII DATAAA')
         // await dispatch(clearProducts())
 
-
-
         //  dataApi =   await [...dataApi,...res?.result[0]?.productList]
-
-
 
         // await setApiData([...apiData,...res?.result[0]?.productList])
 
-        await res?.result[0]?.productList?.map(item => {
-          // Assuming each item is an object
-          // return {
-          //   ...item,
-          //   qty: 0, // Add your new value here
-          // };
-          dispatch(addProducts({ ...item, qty: 0 }))
-        });
+        // await res?.result[0]?.productList?.map(item => {
+        //   // Assuming each item is an object
+        //   // return {
+        //   //   ...item,
+        //   //   qty: 0, // Add your new value here
+        //   // };
+        //   // dispatch(addProducts({ ...item, qty: 0 }))
+        //   setApiData([...apiData,item])
+
+        // });
+        // console.log(res?.result[0]?.productList?.length,'data nulllll');
+        if (res?.result[0]?.productList?.length !== 0) {
+          // setPageNum(10)
+
+          setApiData([...apiData, ...res?.result[0]?.productList])
+          setShowLoad(false)
+          await setPageNum(pageNum + 1)
+        }
+
+
+
         // console.log(products[0].qty,'productt map ADD QTY');
 
         //     modifiedData.map(item => {
@@ -177,7 +189,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
         // setApiData(res?.result[0]?.productList);
         // dispatch(addProducts(res?.result[0]?.productList))
         setShowLoad(false)
-        await setPageNum(pageNum + 1)
+
 
       }).catch((error => {
         console.log('erooor API PRODCC', error);
@@ -186,10 +198,16 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
   }
 
+  const fetchChangeSub = async () => {
+    await setPageNum(1)
+    setApiData([])
+    fetchData()
+  }
+
 
   useEffect(() => {
-    dispatch(clearProducts())
-    fetchData()
+    // dispatch(clearProducts())
+    fetchChangeSub()
 
   }, [selectedProductCategory, selectedProductSubCategory])
 
@@ -206,23 +224,54 @@ const ProductByCategories = ({ route, navigation }: any) => {
   // console.log('prodect LIST',productCategory);
 
 
-  const renderCardItem = useCallback(({ item, index }: any) => {
+  const RenderCardItem = useCallback(({ item, index }: any) => {
 
     //  console.log('qty',item?.id);
     const bestSeller = true
+    const [addedText, setAddedText] = useState('ADD')
+    // console.log(item?.qty,'item qty');
+
+    function isValuePresent(arrayOfObjects, searchValue) {
+      // Iterate through the array of objects
+      for (let i = 0; i < arrayOfObjects.length; i++) {
+        // Access the current object
+        const obj = arrayOfObjects[i];
+
+        // Check if the search value exists in the current object
+        for (let key in obj) {
+          if (obj[key] === searchValue) {
+            // If the value is found, return true
+            return true;
+          }
+        }
+      }
+
+      // If the value is not found in any object, return false
+      return false;
+    }
+
+    // Example usage
+    const arrayOfObjects = cartData;
+    const searchValue = item?.sku;
+    let isPresentItem = isValuePresent(arrayOfObjects, searchValue);
+    // if (isPresentItem) {
+    //   console.log(`Is '${searchValue}' present in the array of objects? ${isPresentItem},${cartData?.length}`);
+    // }
+
+
     return (
       <Pressable onPress={() => { navigation.navigate(StackNav.ProductDetail, { productDetail: item }) }} >
         <View style={[localStyles.cardMainContainer, { marginLeft: index % 2 && responsiveWidth(2.4) }]} >
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: responsiveWidth(1.5), marginTop: responsiveHeight(0), alignSelf: bestSeller ? 'auto' : 'flex-end', marginBottom: responsiveHeight(0.5) }}>
-            {bestSeller && <Text style={localStyles.bestsellerText} >BESTSELLER</Text>}
+         <Text style={localStyles.bestsellerText} >{item?.type_lifestyle_product} {addedText}</Text>
             {/* <HeartLightBlue style={{ alignSelf: 'flex-end' }} width={responsiveWidth(6)} height={responsiveHeight(4)} /> */}
 
 
 
           </View>
 
-          {!!item?.images ? <Image source={{ uri: `${API_IMAGE_BASE_URL}${item?.images}` }} style={localStyles.itemImg} /> : <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}>Opps! sorry</Text>}
+          {!!item?.images ? <Image source={{ uri: item?.image_third_party === 'NO' ? `${API_IMAGE_BASE_URL}${item?.images}` : item?.images }} style={localStyles.itemImg} /> : <Text fontFamily='$InterMedium' color={colors.gray3} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}>Opps! sorry</Text>}
 
           <View style={{ paddingLeft: responsiveWidth(1.5), marginTop: responsiveHeight(0.5), gap: moderateScale(2), height: responsiveHeight(4) }} >
             <Text fontFamily='$InterMedium' color={colors.black} fontSize={10} w='89%' numberOfLines={2} lineHeight={10}  >{item?.name}</Text>
@@ -241,19 +290,33 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
             </View>
 
-            {item?.qty == 0 ? (
+            {(
               <TouchableOpacity activeOpacity={0.6} onPress={() => {
-                dispatch(addProductsToCart(item))
-                dispatch(increaseQty(item?.id))
+                if (!isPresentItem && addedText === 'ADD') {
+                  setAddedText('ADDED')
+                  dispatch(addProductsToCart({ id: item?.id, sku: item?.sku, name: item?.name, images: item?.images, image_third_party: item?.image_third_party, other_img: item?.other_img, product_pricing: item?.product_pricing, final_price: item?.final_price,handling_price:item?.handling_price, qty: 0 }))
+                  toast.show({
+                    placement: 'bottom',
+                    render: ({ id }: { id: string }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} variant='accent' action='success'>
+                          <ToastTitle>Add To Cart</ToastTitle>
+                        </Toast>
+                      )
+                    }
+                  })
+
+                }
+                // dispatch(increaseQty(item?.id))
 
               }} style={{ backgroundColor: colors.lightSuccess, borderColor: colors.success, borderWidth: responsiveWidth(0.2), borderRadius: responsiveWidth(1.5) }} >
-                <Text fontFamily='$InterMedium' color={colors.success} fontSize={12} px={16} py={1} >ADD</Text>
+                <Text fontFamily='$InterMedium' color={colors.success} fontSize={12} px={16} py={1} >{isPresentItem ? 'ADDED' : addedText}</Text>
+
               </TouchableOpacity>
-            ) : null}
+            )}
 
-            {item?.qty !== 0 &&
-
-
+            {/* {item?.qty !== 0 &&
               <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.lightSuccess, borderColor: colors.success, borderWidth: responsiveWidth(0.2), borderRadius: responsiveWidth(1.5) }} >
 
                 {item?.qty !== 0 && <TouchableOpacity onPress={() => {
@@ -280,10 +343,7 @@ const ProductByCategories = ({ route, navigation }: any) => {
                 </TouchableOpacity>}
 
               </View>
-
-
-
-            }
+            } */}
           </View>
 
 
@@ -561,8 +621,8 @@ const ProductByCategories = ({ route, navigation }: any) => {
 
       <FlatList
         style={{ flex: 1, alignSelf: 'center', }}
-        data={products}
-        renderItem={renderCardItem}
+        data={apiData}
+        renderItem={({item,index})=>{return <RenderCardItem item={item} index={index}/>}}
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
         // justifyContent="space-between"
@@ -589,17 +649,17 @@ const ProductByCategories = ({ route, navigation }: any) => {
         //   )
         //  }}
         onEndReached={onEndReached}
-       ListFooterComponent={() => {
-         if (showLoad) {
-           return (
-             <Box h={50} pt={20}>
-               <Spinner color={colors.primary} size={'small'} />
-             </Box>
-           )
-         }
-       }}
+        ListFooterComponent={() => {
+          if (showLoad) {
+            return (
+              <Box h={50} pt={20}>
+                <Spinner color={colors.primary} size={'small'} />
+              </Box>
+            )
+          }
+        }}
       />
-{/* 
+      {/* 
       {showLoad && <Box mt={!!products ? 20 : 50} mb={20}>
         <Loader />
       </Box>} */}

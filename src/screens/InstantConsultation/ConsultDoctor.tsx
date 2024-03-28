@@ -39,7 +39,7 @@ const ConsultDoctor = () => {
 
   const [healthIssue, setHealthIssue] = useState('')
   // const [language, setLanguage] = useState('')
-  const [healthIssueOptions, setHealthIssueOptions] = useState()
+  const [healthIssueOptions, setHealthIssueOptions] = useState([])
   const [applyCoupon, setApplyCoupon] = useState(false)
   const [payPrice, setPayPrice] = useState('')
   const [isChecked, setIsChecked] = useState(false)
